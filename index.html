@@ -3,283 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RevisionVault - University Study Materials</title>
-    <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/512/2237/2237289.png">
+    <title>RevisionVault - Free Study Materials</title>
     <style>
-        /* === MODERN CSS RESET === */
+        /* Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --accent: #f72585;
-            --success: #4cc9f0;
-            --dark: #2b2d42;
-            --light: #f8f9fa;
-            --gray: #6c757d;
-            --shadow: 0 10px 30px rgba(0,0,0,0.1);
-            --gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
-            --radius: 12px;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: var(--dark);
-            line-height: 1.6;
+            padding: 20px;
+            color: #333;
         }
         
-        /* === MAIN CONTAINER === */
+        /* Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-        }
-        
-        /* === HEADER === */
-        .header {
             background: white;
-            border-radius: var(--radius);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
             padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
+            text-align: center;
         }
         
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .logo-icon {
-            background: var(--gradient);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+        .logo {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 24px;
+            gap: 15px;
+            margin-bottom: 10px;
         }
         
-        .logo-text h1 {
-            font-size: 28px;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
+        .logo i {
+            font-size: 2.5rem;
         }
         
-        .tagline {
-            color: var(--gray);
-            font-size: 14px;
-        }
-        
-        /* === HERO SECTION === */
-        .hero {
-            background: var(--gradient);
-            color: white;
-            border-radius: var(--radius);
-            padding: 50px 30px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 200%;
-            background: rgba(255,255,255,0.1);
-            transform: rotate(30deg);
-        }
-        
-        .hero h2 {
-            font-size: 36px;
-            margin-bottom: 15px;
+        .logo h1 {
+            font-size: 2.2rem;
             font-weight: 700;
         }
         
-        .hero p {
-            font-size: 18px;
+        .tagline {
             opacity: 0.9;
-            margin-bottom: 25px;
+            font-size: 1rem;
         }
         
-        .price-badge {
-            background: rgba(255,255,255,0.2);
-            display: inline-flex;
-            align-items: center;
-            padding: 15px 30px;
-            border-radius: 50px;
-            backdrop-filter: blur(10px);
+        /* Main Content */
+        .main-content {
+            padding: 30px;
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 15px;
+        }
+        
+        .hero h2 {
+            color: #1a2980;
+            margin-bottom: 15px;
+        }
+        
+        .price-tag {
             margin: 20px 0;
         }
         
         .price {
-            font-size: 48px;
-            font-weight: 800;
-            margin-right: 10px;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1a2980;
         }
         
         .period {
-            font-size: 16px;
-            opacity: 0.9;
+            font-size: 1.2rem;
+            color: #666;
         }
         
-        .per-day {
-            background: rgba(255,255,255,0.3);
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 14px;
-            display: inline-block;
+        /* Steps */
+        .steps-container {
+            background: #f0f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3b82f6;
         }
         
-        /* === STATUS MESSAGES === */
-        .status {
-            padding: 20px;
-            border-radius: var(--radius);
-            margin: 20px 0;
-            display: none;
-        }
-        
-        .status.success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-        }
-        
-        .status.error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-        
-        .status.warning {
-            background: #fef3c7;
-            color: #92400e;
-            border: 1px solid #fde68a;
-        }
-        
-        .pending-status {
+        .step {
             display: flex;
             align-items: center;
-            gap: 15px;
-            background: #fef3c7;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border: 2px solid #f59e0b;
+            margin-bottom: 20px;
         }
         
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #f59e0b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* === PAYMENT SECTION === */
-        .payment-section {
-            background: white;
-            border-radius: var(--radius);
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-        }
-        
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 30px;
-            color: var(--secondary);
-            font-size: 24px;
-        }
-        
-        .payment-box {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        .step-number {
+            background: #1a2980;
             color: white;
-            padding: 30px;
-            border-radius: var(--radius);
-            text-align: center;
-            margin: 30px 0;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
         }
         
-        .payment-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 10px;
+        .mpesa-box {
+            background: #10b981;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
         }
         
         .mpesa-number {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: 2px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
             margin: 10px 0;
-            font-family: monospace;
+            direction: ltr;
         }
         
-        .payment-note {
-            font-size: 13px;
-            opacity: 0.9;
-            margin-top: 10px;
+        /* Forms */
+        .form-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 30px;
         }
         
-        /* === FORM === */
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
-        .form-label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
+            font-weight: 500;
+            color: #333;
         }
         
-        .form-input {
+        .form-group input {
             width: 100%;
-            padding: 15px 20px;
+            padding: 15px;
             border: 2px solid #e2e8f0;
-            border-radius: var(--radius);
-            font-size: 16px;
-            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 1rem;
         }
         
-        .form-input:focus {
+        .form-group input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            border-color: #1a2980;
         }
         
+        /* Buttons */
         .btn {
-            padding: 16px 32px;
+            padding: 15px 30px;
+            border-radius: 10px;
             border: none;
-            border-radius: var(--radius);
-            font-size: 16px;
-            font-weight: 600;
+            font-weight: bold;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
@@ -287,665 +185,855 @@
         }
         
         .btn-primary {
-            background: var(--gradient);
+            background: linear-gradient(90deg, #1a2980 0%, #26d0ce 100%);
             color: white;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 10px 20px rgba(26, 41, 128, 0.3);
         }
         
         .btn-secondary {
-            background: #e2e8f0;
-            color: var(--dark);
+            background: #64748b;
+            color: white;
             margin-top: 15px;
         }
         
-        /* === DOCUMENTS === */
-        .documents-section {
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            width: auto;
+        }
+        
+        /* Documents */
+        .documents-container {
             background: white;
-            border-radius: var(--radius);
-            padding: 40px;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
             margin-bottom: 30px;
-            box-shadow: var(--shadow);
+        }
+        
+        .documents-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .subject-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .subject-chip {
+            padding: 8px 15px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .subject-chip.active {
+            background: #1a2980;
+            color: white;
+        }
+        
+        .subject-chip:hover {
+            background: #cbd5e1;
+        }
+        
+        .subject-chip.active:hover {
+            background: #15245e;
         }
         
         .documents-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin: 30px 0;
+            gap: 20px;
+            margin: 20px 0;
         }
         
         .document-card {
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
             transition: all 0.3s;
-            border: 1px solid #e2e8f0;
         }
         
         .document-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-color: #1a2980;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
         
-        .doc-icon {
-            background: var(--gradient);
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 32px;
-        }
-        
-        .doc-content {
-            padding: 25px;
-        }
-        
-        .doc-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--dark);
-        }
-        
-        .doc-meta {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .meta-tag {
-            background: #e2e8f0;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-        
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--gradient);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
-            margin-top: 15px;
-            transition: all 0.3s;
-        }
-        
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
-        }
-        
-        /* === ADMIN PANEL === */
-        .admin-panel {
-            background: white;
-            border-radius: var(--radius);
-            padding: 25px;
-            margin: 20px 0;
-            box-shadow: var(--shadow);
-            border: 2px solid #e2e8f0;
-            display: none;
-        }
-        
-        .admin-header {
+        .document-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e2e8f0;
+            align-items: start;
+            margin-bottom: 15px;
         }
         
-        .admin-stats {
+        .document-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1a2980;
+            margin-bottom: 5px;
+        }
+        
+        .document-meta {
             display: flex;
-            gap: 15px;
+            gap: 10px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            color: #64748b;
         }
         
-        .stat {
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
+        .document-caption {
+            color: #4b5563;
+            margin: 10px 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
         
-        .stat.pending {
-            background: #fef3c7;
-            color: #92400e;
+        .document-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
         
-        .stat.approved {
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #e0f2fe;
+            color: #0369a1;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        /* Status Messages */
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .status-success {
             background: #d1fae5;
             color: #065f46;
+            border: 1px solid #a7f3d0;
         }
         
-        .admin-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
         }
         
-        .tab-btn {
-            padding: 12px 20px;
-            border: none;
-            background: #f1f5f9;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
         }
         
-        .tab-btn.active {
-            background: #3b82f6;
-            color: white;
+        .status-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
         }
         
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .request-card {
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-left: 4px solid #f59e0b;
-        }
-        
-        .request-info {
-            margin-bottom: 15px;
-        }
-        
-        .request-phone {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 5px;
-        }
-        
-        .request-code {
-            color: #64748b;
-            font-family: monospace;
-            margin-bottom: 5px;
-        }
-        
-        .request-time {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-        
-        .request-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-approve, .btn-reject, .btn-whatsapp {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .btn-approve {
-            background: #10b981;
-            color: white;
-        }
-        
-        .btn-reject {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .btn-whatsapp {
-            background: #25d366;
-            color: white;
-        }
-        
-        /* === ADMIN ACCESS BUTTON === */
-        .admin-access-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #3b82f6;
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-            z-index: 1000;
-            border: none;
-        }
-        
-        /* === CONTACT LINKS === */
+        /* Contact Links */
         .contact-links {
             display: flex;
             justify-content: center;
             gap: 20px;
             margin: 20px 0;
-            flex-wrap: wrap;
         }
         
-        .contact-btn {
+        .contact-link {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 25px;
-            background: white;
-            border-radius: 50px;
+            gap: 8px;
+            color: #1a2980;
             text-decoration: none;
-            color: var(--dark);
             font-weight: 500;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
-        .contact-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        .contact-link:hover {
+            text-decoration: underline;
         }
         
-        .contact-btn.telegram {
-            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
-            color: white;
-        }
-        
-        .contact-btn.whatsapp {
-            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-            color: white;
-        }
-        
-        /* === FOOTER === */
+        /* Footer */
         .footer {
-            background: white;
-            border-radius: var(--radius);
-            padding: 40px;
-            margin-top: 40px;
-            box-shadow: var(--shadow);
             text-align: center;
+            padding: 25px;
+            color: #666;
+            border-top: 1px solid #e5e7eb;
         }
         
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin: 20px 0;
-            flex-wrap: wrap;
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a2980;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
         
-        .footer-link {
-            color: var(--gray);
-            text-decoration: none;
-            transition: color 0.3s;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        .footer-link:hover {
-            color: var(--primary);
-        }
-        
-        .copyright {
-            color: var(--gray);
-            font-size: 14px;
-            margin-top: 20px;
-        }
-        
-        /* === RESPONSIVE === */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-                gap: 20px;
-            }
-            
-            .hero h2 {
-                font-size: 28px;
-            }
-            
-            .price {
-                font-size: 36px;
-            }
-            
-            .mpesa-number {
-                font-size: 24px;
-            }
-            
-            .documents-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .contact-links {
-                flex-direction: column;
-            }
-            
-            .contact-btn {
-                justify-content: center;
-            }
-            
-            .request-actions {
-                flex-direction: column;
-            }
-            
-            .admin-tabs {
-                flex-direction: column;
-            }
-        }
-        
-        /* === LOADING === */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--gray);
-        }
-        
-        /* === ANIMATIONS === */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .main-content { padding: 20px; }
+            .price { font-size: 2.5rem; }
+            .mpesa-number { font-size: 1.5rem; }
+            .documents-grid { grid-template-columns: 1fr; }
+            .contact-links { flex-direction: column; gap: 10px; }
+            .documents-header { flex-direction: column; gap: 15px; }
+            .subject-filter { justify-content: center; }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container fade-in">
-        <!-- HEADER -->
-        <header class="header">
-            <div class="logo-section">
-                <div class="logo-icon">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <div class="logo-text">
-                    <h1>RevisionVault</h1>
-                    <p class="tagline">Premium University Study Materials</p>
-                </div>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <h1>RevisionVault</h1>
             </div>
-            <div id="userStatus">
-                <!-- User status will be shown here -->
-            </div>
-        </header>
-
-        <!-- HERO SECTION -->
-        <section class="hero">
-            <h2>Access 1000+ University Revision Papers</h2>
-            <p>One subscription. All subjects. Unlimited downloads.</p>
-            <div class="price-badge">
-                <span class="price">Ksh 50</span>
-                <span class="period">/semester</span>
-            </div>
-            <div class="per-day">Less than <strong>Ksh 0.50/day</strong></div>
-        </section>
-
-        <!-- STATUS MESSAGE -->
-        <div id="statusMessage" class="status"></div>
-
-        <!-- PENDING STATUS (shown when waiting) -->
-        <div id="pendingStatus" class="pending-status" style="display: none;">
-            <div class="spinner"></div>
-            <div>
-                <strong>⏳ Waiting for Admin Approval</strong>
-                <p>Your payment is being verified. We'll notify you when approved.</p>
-            </div>
+            <p class="tagline">Free Study Materials & Revision Papers</p>
         </div>
-
-        <!-- PAYMENT & VERIFICATION SECTION -->
-        <section class="payment-section">
-            <h2 class="section-title"><i class="fas fa-credit-card"></i> How to Subscribe</h2>
+        
+        <div class="main-content">
+            <!-- Hero Section -->
+            <div class="hero">
+                <h2>Access Thousands of Revision Papers</h2>
+                <p>Automatically updated from Telegram channel - New documents added daily</p>
+                <div class="price-tag">
+                    <span class="price">Ksh 50</span>
+                    <span class="period">/semester</span>
+                </div>
+                <p>Less than Ksh 0.50 per day for unlimited access</p>
+            </div>
             
-            <!-- Steps -->
-            <div style="margin: 25px 0;">
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <div style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">1</div>
-                    <div>Send <strong>Ksh 50</strong> to:</div>
+            <!-- Payment Status -->
+            <div id="statusMessage" class="status" style="display: none;"></div>
+            
+            <!-- How to Subscribe -->
+            <div class="steps-container">
+                <h3><i class="fas fa-mobile-alt"></i> How to Subscribe</h3>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <p>Open <strong>M-Pesa or Equitel</strong> on your phone</p>
                 </div>
                 
-                <!-- PAYMENT BOX -->
-                <div class="payment-box">
-                    <div class="payment-label">Send Ksh 50 to:</div>
-                    <div class="mpesa-number">0765098865</div>
-                    <div class="payment-label">Reference: <strong>REVISION</strong></div>
-                    <div class="payment-note">(M-Pesa/Equitel)</div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <p>Select <strong>"Send Money"</strong></p>
                 </div>
                 
-                <div style="display: flex; align-items: center; margin: 20px 0;">
-                    <div style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">2</div>
-                    <div>Enter your payment details below for verification</div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <p>Send <strong>Ksh 50</strong> to:</p>
                 </div>
-            </div>
-
-            <!-- VERIFICATION FORM -->
-            <h2 class="section-title"><i class="fas fa-check-circle"></i> Verify Your Payment</h2>
-            
-            <div class="form-group">
-                <label class="form-label" for="userPhone">Your Phone Number</label>
-                <input type="tel" id="userPhone" class="form-input" placeholder="0765 098 865" maxlength="13">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="txnCode">Transaction Code</label>
-                <input type="text" id="txnCode" class="form-input" placeholder="ABC123XYZ" maxlength="10">
-            </div>
-            
-            <button class="btn btn-primary" onclick="submitForApproval()">
-                <i class="fas fa-paper-plane"></i> Submit for Verification
-            </button>
-            
-            <button class="btn btn-secondary" onclick="testPayment()">
-                <i class="fas fa-bolt"></i> Try Demo (No Payment)
-            </button>
-            
-            <p style="text-align: center; margin-top: 20px; color: var(--gray); font-size: 14px;">
-                <i class="fas fa-clock"></i> Activation within 5-10 minutes after approval
-            </p>
-            
-            <!-- CONTACT LINKS -->
-            <div class="contact-links">
-                <a href="https://t.me/+QlZ_LCrZoB5kZjNk" class="contact-btn telegram" target="_blank">
-                    <i class="fab fa-telegram"></i> Join Telegram Channel
-                </a>
-                <a href="#" id="whatsappLink" class="contact-btn whatsapp">
-                    <i class="fab fa-whatsapp"></i> Contact Support
-                </a>
-            </div>
-        </section>
-
-        <!-- DOCUMENTS SECTION -->
-        <section class="documents-section">
-            <h2 class="section-title"><i class="fas fa-file-pdf"></i> Available Documents</h2>
-            
-            <div id="documentsList" class="documents-grid">
-                <div class="loading">
-                    <div class="spinner" style="margin: 0 auto 15px;"></div>
-                    <p>Loading documents...</p>
+                
+                <div class="mpesa-box">
+                    <div class="mpesa-number">0765 098 865</div>
+                    <p>Reference: <strong>REVISION</strong></p>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">(Equitel number - works with M-Pesa too)</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <p>Enter your <strong>M-Pesa/Equitel PIN</strong> and send</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <p>Copy the <strong>Transaction Code</strong> from SMS</p>
+                </div>
+                
+                <div class="contact-links">
+                    <a href="https://t.me/RevisionVaultDocuments" class="contact-link" target="_blank">
+                        <i class="fab fa-telegram"></i> Join Telegram Channel
+                    </a>
+                    <a href="#" id="whatsappLink" class="contact-link">
+                        <i class="fab fa-whatsapp"></i> Contact for Help
+                    </a>
                 </div>
             </div>
             
-            <div style="text-align: center; margin-top: 30px;">
-                <button class="btn btn-secondary" onclick="requestNotes()">
+            <!-- Verification Form -->
+            <div class="form-container">
+                <h3><i class="fas fa-check-circle"></i> Verify Your Payment</h3>
+                
+                <div class="form-group">
+                    <label for="userPhone">Your Phone Number</label>
+                    <input type="tel" id="userPhone" placeholder="0712 345 678">
+                </div>
+                
+                <div class="form-group">
+                    <label for="txnCode">Transaction Code</label>
+                    <input type="text" id="txnCode" placeholder="ABC123XYZ" maxlength="10">
+                </div>
+                
+                <button class="btn btn-primary" onclick="verifyPayment()">
+                    <i class="fas fa-paper-plane"></i> Submit for Verification
+                </button>
+                
+                <button class="btn btn-secondary" onclick="testAccess()">
+                    <i class="fas fa-bolt"></i> Test Access (Demo)
+                </button>
+                
+                <p style="text-align: center; margin-top: 15px; color: #666; font-size: 0.9rem;">
+                    Access activated within 5-10 minutes after verification
+                </p>
+            </div>
+            
+            <!-- Documents Section - AUTO UPLOAD FROM TELEGRAM -->
+            <div class="documents-container">
+                <div class="documents-header">
+                    <h3><i class="fas fa-file-pdf"></i> Available Study Materials</h3>
+                    <div>
+                        <span id="docCount" style="background: #1a2980; color: white; padding: 5px 10px; border-radius: 20px;">0 documents</span>
+                        <button class="btn btn-small" onclick="refreshDocuments()" style="margin-left: 10px;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="subject-filter" id="subjectFilters">
+                    <!-- Subjects will load here automatically -->
+                </div>
+                
+                <div class="documents-grid" id="documentsList">
+                    <!-- Documents will load here automatically from Telegram -->
+                </div>
+                
+                <div id="loadingSpinner" class="spinner" style="display: none;"></div>
+                
+                <div id="noDocuments" style="text-align: center; padding: 40px; color: #666; display: none;">
+                    <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                    <h3>No Documents Yet</h3>
+                    <p>New materials are being uploaded to Telegram. Check back soon!</p>
+                    <p style="margin-top: 10px;">
+                        <a href="https://t.me/RevisionVaultDocuments" target="_blank" style="color: #1a2980; text-decoration: underline;">
+                            <i class="fab fa-telegram"></i> Join our Telegram channel for updates
+                        </a>
+                    </p>
+                </div>
+                
+                <p style="text-align: center; margin-top: 20px; color: #666; font-size: 0.9rem;">
+                    <i class="fas fa-sync-alt"></i> Documents auto-update from Telegram channel every hour
+                </p>
+                
+                <button class="btn btn-secondary" onclick="requestNotes()" style="margin-top: 20px;">
                     <i class="fas fa-comment"></i> Request Specific Notes
                 </button>
             </div>
-        </section>
-
-        <!-- ADMIN PANEL (Hidden by default) -->
-        <div id="adminContainer" class="admin-panel">
-            <!-- Admin content will be loaded here -->
+            
+            <!-- User Info -->
+            <div class="form-container" id="userInfo" style="display: none;">
+                <h3><i class="fas fa-user"></i> Your Subscription</h3>
+                <div id="subscriptionDetails"></div>
+                <button class="btn btn-secondary" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
         </div>
-
-        <!-- FOOTER -->
-        <footer class="footer">
-            <div style="margin-bottom: 20px;">
-                <h3 style="color: var(--dark); margin-bottom: 10px;">RevisionVault</h3>
-                <p style="color: var(--gray);">University study materials made affordable</p>
-            </div>
-            
-            <div class="footer-links">
-                <a href="https://t.me/+QlZ_LCrZoB5kZjNk" class="footer-link" target="_blank">
-                    <i class="fab fa-telegram"></i> Telegram
-                </a>
-                <a href="#" id="footerWhatsapp" class="footer-link">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </a>
-                <a href="mailto:support@revisionvault.com" class="footer-link">
-                    <i class="fas fa-envelope"></i> Email
-                </a>
-            </div>
-            
-            <div style="margin: 30px 0; padding: 20px; background: var(--light); border-radius: var(--radius);">
-                <h4 style="margin-bottom: 10px; color: var(--dark);">Need Help?</h4>
-                <p style="color: var(--gray); margin-bottom: 15px;">Contact us for support or document requests</p>
-                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                    <div style="text-align: center;">
-                        <div style="font-weight: 600; color: var(--primary);">Payment Number</div>
-                        <div style="font-size: 18px; font-weight: 700;">0765098865</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-weight: 600; color: var(--primary);">Response Time</div>
-                        <div style="font-size: 18px; font-weight: 700;">5-10 minutes</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                <p>&copy; 2024 RevisionVault. All rights reserved.</p>
-                <p style="margin-top: 5px; font-size: 12px;">Made with ❤️ for Kenyan university students</p>
-            </div>
-        </footer>
+        
+        <div class="footer">
+            <p><strong>RevisionVault Study Materials</strong></p>
+            <p>Documents automatically uploaded from Telegram: <a href="https://t.me/RevisionVaultDocuments" target="_blank">@RevisionVaultDocuments</a></p>
+            <p><strong>Payment Number:</strong> 0765 098 865 (Equitel/M-Pesa)</p>
+            <p><strong>Contact:</strong> <a href="https://t.me/Walterzauko23" target="_blank">@Walterzauko23</a></p>
+            <p style="margin-top: 10px; color: #888; font-size: 0.9rem;">
+                Auto-sync system: Telegram → This App → Your Device
+            </p>
+        </div>
     </div>
 
-    <!-- ADMIN ACCESS BUTTON -->
-    <button class="admin-access-btn" onclick="showAdminPanel()">
-        <i class="fas fa-user-shield"></i>
-    </button>
-
     <script>
-        // ================= CONFIGURATION =================
+        // ==================== CONFIGURATION ====================
         const CONFIG = {
-            // YOUR DETAILS
-            yourPhoneNumber: '254765098865',      // 0765098865 in 254 format
-            yourWhatsAppNumber: '254765098865',   // Same for WhatsApp
-            yourTelegramLink: 'https://t.me/+QlZ_LCrZoB5kZjNk',
+            // Backend URL that fetches from your Telegram channel
+            backendUrl: 'https://revisionvault-backend--walterzauko.replit.app',
             
-            // APP SETTINGS
-            subscriptionDays: 180,  // 6 months
-            price: 50,
-            currency: 'Ksh',
+            // Your contact details
+            yourPhoneNumber: '254765098865',    // YOUR Equitel number in 254 format
+            yourWhatsAppNumber: '254765098865', // Same for WhatsApp
+            yourTelegramLink: 'https://t.me/RevisionVaultDocuments',
             
-            // ADMIN SETTINGS
-            adminPassword: 'RV2024',  // CHANGE THIS!
-            adminEmail: 'revisionvaultke@gmail.com'
+            // App settings
+            subscriptionDays: 180, // 6 months
+            autoRefreshMinutes: 5, // Auto-refresh documents every 5 minutes
+            testMode: false  // Set to true for testing without payment
         };
 
-        // ================= DATA STORAGE =================
-        let pendingRequests = JSON.parse(localStorage.getItem('pending_requests')) || [];
-        let activeSubscriptions = JSON.parse(localStorage.getItem('active_subscriptions')) || [];
+        // ==================== GLOBAL STATE ====================
+        let allDocuments = [];
+        let currentSubject = 'all';
+        let hasAccess = false;
 
-        // ================= DOCUMENTS DATA =================
-        const DOCUMENTS = [
-            {
-                id: 1,
-                title: "Calculus II - Past Papers 2020-2023",
-                course: "Mathematics",
-                university: "University of Nairobi",
-                year: 2023,
-                size: "2.4 MB",
-                pages: 45,
-                downloadUrl: "https://t.me/+QlZ_LCrZoB5kZjNk/1",
-                tags: ["mathematics", "calculus", "past-papers"]
-            },
-            {
-                id: 2,
-                title: "Data Structures & Algorithms",
-                course: "Computer Science",
-                university: "Kenyatta University",
-                year: 2022,
-                size: "3.1 MB",
-                pages: 68,
-                downloadUrl: "https://t.me/+QlZ_LCrZoB5kZjNk/2",
-                tags: ["cs", "algorithms", "notes"]
-            },
-            {
-                id: 3,
-                title: "Microeconomics - Theory & Practice",
-                course: "Economics",
-                university: "Moi University",
-                year: 2021,
-                size: "1.8 MB",
-                pages: 32,
-                downloadUrl: "https://t.me/+QlZ_LCrZoB5kZjNk/3",
-                tags: ["economics", "business", "theory"]
-            }
-        ];
-
-        // ================= INITIALIZE APP =================
+        // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
-            initApp();
-        });
-
-        function initApp() {
-            console.log('🚀 RevisionVault Initializing...');
+            console.log('🚀 RevisionVault App Initialized');
+            console.log('📡 Auto-fetching from Telegram channel...');
             
-            // Setup WhatsApp links
-            document.getElementById('whatsappLink').href = `https://wa.me/${CONFIG.yourWhatsAppNumber}`;
-            document.getElementById('footerWhatsapp').href = `https://wa.me/${CONFIG.yourWhatsAppNumber}`;
+            // Setup WhatsApp link
+            const whatsappLink = document.getElementById('whatsappLink');
+            whatsappLink.href = `https://wa.me/${CONFIG.yourWhatsAppNumber}`;
+            
+            // Check for existing subscription
+            checkSubscriptionStatus();
+            
+            // Load documents (will check access inside)
+            loadDocuments();
+            
+            // Setup auto-refresh
+            setInterval(() => {
+                if (hasAccess) {
+                    loadDocuments();
+                }
+            }, CONFIG.autoRefreshMinutes * 60 * 1000);
             
             // Setup phone input formatting
             const phoneInput = document.getElementById('userPhone');
             phoneInput.addEventListener('input', formatPhoneInput);
             
-            // Auto-uppercase transaction code
+            // Setup transaction code formatting
             const txnInput = document.getElementById('txnCode');
             txnInput.addEventListener('input', function(e) {
                 e.target.value = e.target.value.toUpperCase();
             });
-            
-            // Load documents
-            loadDocuments();
-            
-            // Check existing subscription
-            checkExistingSubscription();
-            
-            // Check for pending approval
-            checkPendingApproval();
-            
-            // Check URL for admin access
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('admin') === CONFIG.adminPassword) {
-                showAdminPanel();
+        });
+
+        // ==================== DOCUMENT FUNCTIONS ====================
+        async function loadDocuments() {
+            try {
+                showLoading();
+                
+                // Fetch documents from YOUR Telegram channel via backend
+                const response = await fetch(`${CONFIG.backendUrl}/getDocuments`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const documents = await response.json();
+                allDocuments = documents;
+                
+                // Update document count
+                document.getElementById('docCount').textContent = `${documents.length} documents`;
+                
+                // Update UI based on access
+                updateAccessUI();
+                
+                // Generate subject filters
+                generateSubjectFilters(documents);
+                
+                // Display documents
+                displayDocuments(documents);
+                
+                hideLoading();
+                
+            } catch (error) {
+                console.error('Error loading documents:', error);
+                showStatus('⚠️ Could not load documents. Please try again later.', 'warning');
+                hideLoading();
+                
+                // Show error message in document list
+                document.getElementById('documentsList').innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <i class="fas fa-wifi-slash" style="font-size: 3rem; color: #ef4444; margin-bottom: 20px;"></i>
+                        <h3>Connection Error</h3>
+                        <p>Unable to fetch documents from Telegram channel.</p>
+                        <button class="btn btn-primary" onclick="loadDocuments()" style="margin-top: 20px;">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                `;
             }
-            
-            console.log('✅ App Ready!');
         }
 
-        // ================= FORMATTING FUNCTIONS =================
+        function displayDocuments(documents) {
+            const container = document.getElementById('documentsList');
+            const noDocsDiv = document.getElementById('noDocuments');
+            
+            if (!documents || documents.length === 0) {
+                container.innerHTML = '';
+                noDocsDiv.style.display = 'block';
+                return;
+            }
+            
+            noDocsDiv.style.display = 'none';
+            
+            // Filter by subject if needed
+            let filteredDocs = documents;
+            if (currentSubject !== 'all') {
+                filteredDocs = documents.filter(doc => 
+                    doc.caption && doc.caption.toLowerCase().includes(currentSubject.toLowerCase())
+                );
+            }
+            
+            if (filteredDocs.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <i class="fas fa-search" style="font-size: 3rem; color: #64748b; margin-bottom: 20px;"></i>
+                        <h3>No documents in this category</h3>
+                        <p>Try selecting a different subject or check back later.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            filteredDocs.forEach(doc => {
+                const date = new Date(doc.date * 1000);
+                const dateStr = date.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                // Extract tags from caption
+                const tags = extractTags(doc.caption);
+                
+                html += `
+                    <div class="document-card">
+                        <div class="document-header">
+                            <div>
+                                <div class="document-title">${doc.name || 'Study Material'}</div>
+                                <div class="document-meta">
+                                    <span><i class="fas fa-file-pdf"></i> PDF</span>
+                                    <span><i class="fas fa-weight-hanging"></i> ${doc.fileSize || 'Unknown'}</span>
+                                    <span><i class="fas fa-calendar"></i> ${dateStr}</span>
+                                </div>
+                            </div>
+                            ${!hasAccess ? '<span class="tag" style="background: #fef3c7; color: #92400e;"><i class="fas fa-lock"></i> Locked</span>' : ''}
+                        </div>
+                        
+                        ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        
+                        ${doc.caption ? `
+                            <div class="document-caption">
+                                ${doc.caption}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="document-actions">
+                            ${hasAccess ? 
+                                `<button class="btn btn-success btn-small" onclick="downloadDocument('${doc.fileId}')">
+                                    <i class="fas fa-download"></i> Download PDF
+                                </button>
+                                <button class="btn btn-small" onclick="previewDocument('${doc.fileId}')">
+                                    <i class="fas fa-eye"></i> Preview
+                                </button>` :
+                                `<button class="btn btn-primary btn-small" onclick="showSubscribeMessage()">
+                                    <i class="fas fa-lock"></i> Subscribe to Download
+                                </button>
+                                <button class="btn btn-small" onclick="showDocumentInfo('${doc.name}', '${doc.fileSize}')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>`
+                            }
+                        </div>
+                        
+                        <div style="font-size: 0.8rem; color: #666; margin-top: 10px; display: flex; align-items: center; gap: 5px;">
+                            <i class="fab fa-telegram" style="color: #0088cc;"></i>
+                            Auto-uploaded from Telegram channel
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function generateSubjectFilters(documents) {
+            const container = document.getElementById('subjectFilters');
+            
+            // Extract unique subjects from document captions
+            const subjects = new Set(['all']);
+            documents.forEach(doc => {
+                if (doc.caption) {
+                    const tags = extractTags(doc.caption);
+                    tags.forEach(tag => {
+                        if (tag.startsWith('#')) {
+                            const subject = tag.substring(1).toLowerCase();
+                            if (subject.length > 2) { // Filter out short tags
+                                subjects.add(subject);
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Limit to top 10 subjects
+            const subjectArray = Array.from(subjects).slice(0, 11);
+            
+            let html = subjectArray.map(subject => {
+                const label = subject === 'all' ? 'All Documents' : 
+                             subject.charAt(0).toUpperCase() + subject.slice(1);
+                const activeClass = currentSubject === subject ? 'active' : '';
+                
+                return `<div class="subject-chip ${activeClass}" onclick="filterBySubject('${subject}')">${label}</div>`;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        function filterBySubject(subject) {
+            currentSubject = subject;
+            
+            // Update active chip
+            document.querySelectorAll('.subject-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Display filtered documents
+            displayDocuments(allDocuments);
+        }
+
+        async function downloadDocument(fileId) {
+            if (!hasAccess) {
+                showSubscribeMessage();
+                return;
+            }
+            
+            try {
+                const downloadUrl = `${CONFIG.backendUrl}/download?fileId=${fileId}`;
+                
+                // Create temporary link for download
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.target = '_blank';
+                link.click();
+                
+                showStatus('📥 Download started...', 'success');
+                
+                // Track download
+                trackDownload(fileId);
+                
+            } catch (error) {
+                showStatus('❌ Download failed. Please try again.', 'error');
+            }
+        }
+
+        function previewDocument(fileId) {
+            if (!hasAccess) {
+                showSubscribeMessage();
+                return;
+            }
+            
+            const downloadUrl = `${CONFIG.backendUrl}/download?fileId=${fileId}`;
+            window.open(downloadUrl, '_blank');
+            showStatus('👁️ Opening preview...', 'success');
+        }
+
+        function refreshDocuments() {
+            showStatus('🔄 Refreshing documents from Telegram...', 'info');
+            loadDocuments();
+        }
+
+        // ==================== PAYMENT FUNCTIONS ====================
+        function verifyPayment() {
+            const phoneInput = document.getElementById('userPhone');
+            const txnInput = document.getElementById('txnCode');
+            
+            const phone = phoneInput.value.trim();
+            const txnCode = txnInput.value.trim().toUpperCase();
+            
+            // Validation
+            if (!phone || phone.length < 10) {
+                showStatus('Please enter a valid Kenyan phone number (e.g., 0712 345 678)', 'error');
+                return;
+            }
+            
+            if (!txnCode || txnCode.length < 8) {
+                showStatus('Please enter a valid transaction code (8-10 characters)', 'error');
+                return;
+            }
+            
+            // Format phone
+            const formattedPhone = formatPhoneForAPI(phone);
+            
+            // Create WhatsApp verification message
+            const whatsappMessage = 
+                `📚 *REVISIONVAULT PAYMENT VERIFICATION*\n\n` +
+                `• Transaction Code: *${txnCode}*\n` +
+                `• Phone Number: *${phone}*\n` +
+                `• Amount: *Ksh 50*\n` +
+                `• Date: *${new Date().toLocaleDateString('en-GB')}*\n` +
+                `• Paid to: *0765 098 865 (Equitel)*\n\n` +
+                `Please activate my subscription.`;
+            
+            // Show success message
+            showStatus('✅ WhatsApp will open with verification message. Send it to complete verification.', 'success');
+            
+            // Open WhatsApp after delay
+            setTimeout(() => {
+                const encodedMessage = encodeURIComponent(whatsappMessage);
+                const whatsappURL = `https://wa.me/${CONFIG.yourWhatsAppNumber}?text=${encodedMessage}`;
+                window.open(whatsappURL, '_blank');
+            }, 1500);
+            
+            // For testing only: simulate activation
+            if (CONFIG.testMode) {
+                setTimeout(() => {
+                    activateSubscription(formattedPhone);
+                }, 2000);
+            }
+            
+            // Clear form
+            phoneInput.value = '';
+            txnInput.value = '';
+            
+            // Log the payment attempt
+            console.log('Payment verification attempted:', {
+                phone: formattedPhone,
+                txnCode: txnCode,
+                time: new Date().toISOString()
+            });
+        }
+
+        function testAccess() {
+            // Generate random test data
+            const testPhone = '2547' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+            const testTxn = 'TEST' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            
+            document.getElementById('userPhone').value = formatPhoneForDisplay(testPhone);
+            document.getElementById('txnCode').value = testTxn;
+            
+            showStatus('🧪 Test mode activated. Click "Submit for Verification" to test WhatsApp flow.', 'success');
+            
+            // Auto-activate for testing
+            if (CONFIG.testMode) {
+                setTimeout(() => {
+                    activateSubscription(testPhone);
+                }, 1000);
+            }
+        }
+
+        function activateSubscription(phone) {
+            // Create subscription data
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + CONFIG.subscriptionDays);
+            
+            const subscriptionData = {
+                phone: phone,
+                active: true,
+                expires: expiryDate.toISOString(),
+                activatedAt: new Date().toISOString(),
+                verifiedBy: 'System'
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('revisionvault_subscription', JSON.stringify(subscriptionData));
+            
+            // Update access
+            hasAccess = true;
+            
+            // Show success
+            showStatus('🎉 Subscription ACTIVATED! You now have access to all documents for 6 months.', 'success');
+            
+            // Update UI
+            updateAccessUI();
+            displayDocuments(allDocuments);
+            
+            console.log('Subscription activated for:', phone);
+        }
+
+        function checkSubscriptionStatus() {
+            const subscription = localStorage.getItem('revisionvault_subscription');
+            
+            if (subscription) {
+                const data = JSON.parse(subscription);
+                const expiry = new Date(data.expires);
+                const today = new Date();
+                
+                if (expiry > today) {
+                    // Active subscription
+                    hasAccess = true;
+                    
+                    document.getElementById('userInfo').style.display = 'block';
+                    
+                    const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                    
+                    document.getElementById('subscriptionDetails').innerHTML = `
+                        <p>✅ <strong>Active Subscription</strong></p>
+                        <p>Phone: ${formatPhoneForDisplay(data.phone)}</p>
+                        <p>Expires: ${expiry.toLocaleDateString()}</p>
+                        <p>Days remaining: ${daysLeft}</p>
+                        <p>Status: ${data.verifiedBy || 'Verified'}</p>
+                    `;
+                    
+                    return true;
+                } else {
+                    // Expired subscription
+                    localStorage.removeItem('revisionvault_subscription');
+                    showStatus('Your subscription has expired. Please renew.', 'error');
+                    hasAccess = false;
+                    return false;
+                }
+            }
+            
+            hasAccess = false;
+            return false;
+        }
+
+        function updateAccessUI() {
+            if (hasAccess) {
+                // Hide payment form
+                document.querySelector('.form-container').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'block';
+            } else {
+                // Show payment form
+                document.querySelector('.form-container').style.display = 'block';
+                document.getElementById('userInfo').style.display = 'none';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('revisionvault_subscription');
+            hasAccess = false;
+            document.getElementById('userInfo').style.display = 'none';
+            document.querySelector('.form-container').style.display = 'block';
+            showStatus('Logged out successfully.', 'success');
+            
+            // Refresh document display to show locked state
+            displayDocuments(allDocuments);
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function extractTags(caption) {
+            if (!caption) return [];
+            const matches = caption.match(/#[\w\u0600-\u06FF]+/g) || [];
+            return matches.slice(0, 5); // Return first 5 tags
+        }
+
         function formatPhoneForDisplay(phone) {
             if (phone.startsWith('254')) {
                 return '0' + phone.substring(3, 6) + ' ' + phone.substring(6, 9) + ' ' + phone.substring(9);
@@ -963,6 +1051,7 @@
 
         function formatPhoneInput(e) {
             let value = e.target.value.replace(/\D/g, '');
+            
             if (value.length > 0) {
                 if (value.length <= 3) {
                     value = value;
@@ -972,513 +1061,103 @@
                     value = value.substring(0, 3) + ' ' + value.substring(3, 6) + ' ' + value.substring(6, 9);
                 }
             }
+            
             e.target.value = value;
         }
 
-        // ================= PAYMENT SUBMISSION =================
-        function submitForApproval() {
-            const phone = document.getElementById('userPhone').value.trim();
-            const txnCode = document.getElementById('txnCode').value.trim().toUpperCase();
-
-            if (!phone || phone.replace(/\s/g, '').length < 9) {
-                showStatus('Please enter a valid Kenyan phone number', 'error');
-                return;
-            }
-
-            if (!txnCode || txnCode.length < 8) {
-                showStatus('Please enter a valid transaction code (8-10 characters)', 'error');
-                return;
-            }
-
-            // Create request
-            const request = {
-                id: Date.now(),
-                phone: formatPhoneForAPI(phone),
-                displayPhone: phone,
-                txnCode: txnCode,
-                amount: 50,
-                status: "pending",
-                submitted: new Date().toISOString(),
-                ip: "user-" + Math.random().toString(36).substr(2, 9)
-            };
-
-            // Add to pending requests
-            pendingRequests.push(request);
-            localStorage.setItem('pending_requests', JSON.stringify(pendingRequests));
-
-            // Save user phone for checking
-            localStorage.setItem('last_submitted_phone', request.phone);
-
-            // Show pending status
-            document.getElementById('pendingStatus').style.display = 'flex';
-            showStatus('✅ Payment submitted for admin approval! You will be notified when approved.', 'success');
-
-            // Send WhatsApp notification to admin
-            sendAdminNotification(request);
-
-            // Start checking for approval
-            startApprovalCheck(request.id);
-
-            // Clear form
-            document.getElementById('userPhone').value = '';
-            document.getElementById('txnCode').value = '';
-        }
-
-        function sendAdminNotification(request) {
-            const adminMessage = 
-                `🔄 NEW PAYMENT REQUEST\n\n` +
-                `📱 Phone: ${request.displayPhone}\n` +
-                `💳 Amount: Ksh ${request.amount}\n` +
-                `📟 Code: ${request.txnCode}\n` +
-                `⏰ Time: ${new Date(request.submitted).toLocaleTimeString()}\n\n` +
-                `To approve: ${window.location.origin}${window.location.pathname}?admin=${CONFIG.adminPassword}`;
-
-            const whatsappURL = `https://wa.me/${CONFIG.yourWhatsAppNumber}?text=${encodeURIComponent(adminMessage)}`;
+        function showSubscribeMessage() {
+            showStatus('🔒 This document requires subscription. Subscribe for Ksh 50 to access all materials.', 'warning');
             
-            // Open WhatsApp for admin
-            window.open(whatsappURL, '_blank');
-        }
-
-        // ================= APPROVAL CHECKING =================
-        function startApprovalCheck(requestId) {
-            let checkCount = 0;
-            const maxChecks = 120; // Check for 60 minutes (30 seconds × 120 = 60 mins)
-
-            const checkInterval = setInterval(() => {
-                checkCount++;
-
-                const request = pendingRequests.find(r => r.id == requestId);
-
-                if (!request) {
-                    clearInterval(checkInterval);
-                    return;
-                }
-
-                if (request.status === 'approved') {
-                    clearInterval(checkInterval);
-                    document.getElementById('pendingStatus').style.display = 'none';
-                    showStatus('🎉 Payment approved! All documents now unlocked.', 'success');
-                    
-                    // Activate user access
-                    activateUserAccess(request);
-                    
-                    // Refresh documents
-                    setTimeout(() => {
-                        loadDocuments();
-                    }, 1000);
-                    
-                } else if (request.status === 'rejected') {
-                    clearInterval(checkInterval);
-                    document.getElementById('pendingStatus').style.display = 'none';
-                    showStatus(`❌ Payment rejected. ${request.rejectionReason || 'Please contact support.'}`, 'error');
-                    
-                } else if (checkCount >= maxChecks) {
-                    clearInterval(checkInterval);
-                    document.getElementById('pendingStatus').style.display = 'none';
-                    showStatus('⏰ Approval taking longer than expected. We will notify you via WhatsApp.', 'warning');
-                }
-            }, 30000); // Check every 30 seconds
-        }
-
-        function checkPendingApproval() {
-            const lastPhone = localStorage.getItem('last_submitted_phone');
-            if (!lastPhone) return;
-
-            const pendingRequest = pendingRequests.find(r => 
-                r.phone === lastPhone && r.status === 'pending'
-            );
-
-            if (pendingRequest) {
-                document.getElementById('pendingStatus').style.display = 'flex';
-                startApprovalCheck(pendingRequest.id);
-            }
-        }
-
-        // ================= ADMIN PANEL =================
-        function showAdminPanel() {
-            const password = prompt('Enter admin password:');
-            if (password !== CONFIG.adminPassword) {
-                alert('Access denied');
-                return;
-            }
-
-            const pendingCount = pendingRequests.filter(r => r.status === 'pending').length;
-            const approvedCount = activeSubscriptions.length;
-
-            const adminHTML = `
-                <div class="admin-header">
-                    <h3><i class="fas fa-user-shield"></i> Admin Panel</h3>
-                    <div class="admin-stats">
-                        <span class="stat pending">⏳ ${pendingCount} Pending</span>
-                        <span class="stat approved">✅ ${approvedCount} Active</span>
-                    </div>
-                </div>
-                
-                <div class="admin-tabs">
-                    <button class="tab-btn active" onclick="showAdminTab('pending')">
-                        <i class="fas fa-clock"></i> Pending (${pendingCount})
-                    </button>
-                    <button class="tab-btn" onclick="showAdminTab('approved')">
-                        <i class="fas fa-check-circle"></i> Approved (${approvedCount})
-                    </button>
-                    <button class="tab-btn" onclick="showAdminTab('manual')">
-                        <i class="fas fa-user-plus"></i> Manual Add
-                    </button>
-                </div>
-                
-                <div id="pendingTab" class="tab-content active">
-                    <h4>Pending Approval Requests</h4>
-                    ${renderPendingRequests()}
-                </div>
-                
-                <div id="approvedTab" class="tab-content">
-                    <h4>Active Subscriptions</h4>
-                    ${renderApprovedUsers()}
-                </div>
-                
-                <div id="manualTab" class="tab-content">
-                    <h4>Manual User Activation</h4>
-                    <div style="margin: 20px 0;">
-                        <input type="text" id="manualPhone" placeholder="Phone (0712 345 678)" class="form-input" style="margin-bottom: 10px;">
-                        <input type="text" id="manualCode" placeholder="Transaction Code" class="form-input" style="margin-bottom: 10px;">
-                        <button class="btn btn-primary" onclick="manualApproveUser()">
-                            <i class="fas fa-check"></i> Activate User
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('adminContainer').innerHTML = adminHTML;
-            document.getElementById('adminContainer').style.display = 'block';
-        }
-
-        function showAdminTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
+            // Scroll to payment form
+            document.querySelector('.form-container').scrollIntoView({
+                behavior: 'smooth'
             });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Show selected tab
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            event.target.classList.add('active');
         }
 
-        function renderPendingRequests() {
-            const pending = pendingRequests.filter(r => r.status === 'pending');
-            
-            if (pending.length === 0) {
-                return '<p style="text-align: center; color: var(--gray); padding: 20px;">No pending requests</p>';
-            }
-            
-            return pending.map(request => `
-                <div class="request-card">
-                    <div class="request-info">
-                        <div class="request-phone">📱 ${request.displayPhone}</div>
-                        <div class="request-code">💳 ${request.txnCode}</div>
-                        <div class="request-time">⏰ ${new Date(request.submitted).toLocaleTimeString()}</div>
-                    </div>
-                    <div class="request-actions">
-                        <button class="btn-approve" onclick="approveRequest(${request.id})">
-                            <i class="fas fa-check"></i> Approve
-                        </button>
-                        <button class="btn-reject" onclick="rejectRequest(${request.id})">
-                            <i class="fas fa-times"></i> Reject
-                        </button>
-                        <button class="btn-whatsapp" onclick="messageUser('${request.displayPhone}')">
-                            <i class="fab fa-whatsapp"></i> Message
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderApprovedUsers() {
-            if (activeSubscriptions.length === 0) {
-                return '<p style="text-align: center; color: var(--gray); padding: 20px;">No active subscriptions</p>';
-            }
-            
-            return activeSubscriptions.map(user => `
-                <div class="request-card" style="border-left-color: #10b981;">
-                    <div class="request-info">
-                        <div class="request-phone">📱 ${formatPhoneForDisplay(user.phone)}</div>
-                        <div class="request-code">📅 Expires: ${new Date(user.expires).toLocaleDateString()}</div>
-                        <div class="request-time">⏰ Activated: ${new Date(user.activated).toLocaleDateString()}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // ================= ADMIN ACTIONS =================
-        function approveRequest(requestId) {
-            const request = pendingRequests.find(r => r.id == requestId);
-            if (!request) return;
-
-            // Update request status
-            request.status = 'approved';
-            request.approvedAt = new Date().toISOString();
-            localStorage.setItem('pending_requests', JSON.stringify(pendingRequests));
-
-            // Activate user
-            activateUserAccess(request);
-
-            // Refresh admin panel
-            showAdminPanel();
-
-            // Notify user
-            sendUserNotification(request, 'approved');
-
-            showStatus(`✅ User ${request.displayPhone} approved!`, 'success');
-        }
-
-        function rejectRequest(requestId) {
-            const reason = prompt('Rejection reason:');
-            if (reason === null) return;
-
-            const request = pendingRequests.find(r => r.id == requestId);
-            if (!request) return;
-
-            request.status = 'rejected';
-            request.rejectionReason = reason;
-            request.rejectedAt = new Date().toISOString();
-            localStorage.setItem('pending_requests', JSON.stringify(pendingRequests));
-
-            // Refresh admin panel
-            showAdminPanel();
-
-            // Notify user
-            sendUserNotification(request, 'rejected');
-
-            showStatus(`❌ Request rejected. User notified.`, 'error');
-        }
-
-        function manualApproveUser() {
-            const phone = document.getElementById('manualPhone').value.trim();
-            const txnCode = document.getElementById('manualCode').value.trim() || 'MANUAL-' + Date.now();
-
-            if (!phone) {
-                alert('Please enter phone number');
-                return;
-            }
-
-            const request = {
-                id: Date.now(),
-                phone: formatPhoneForAPI(phone),
-                displayPhone: phone,
-                txnCode: txnCode,
-                amount: 50,
-                status: "approved",
-                submitted: new Date().toISOString(),
-                approvedAt: new Date().toISOString()
-            };
-
-            // Add to pending for consistency
-            pendingRequests.push(request);
-            localStorage.setItem('pending_requests', JSON.stringify(pendingRequests));
-
-            // Activate user
-            activateUserAccess(request);
-
-            // Clear form
-            document.getElementById('manualPhone').value = '';
-            document.getElementById('manualCode').value = '';
-
-            // Refresh admin panel
-            showAdminPanel();
-
-            // Notify user
-            sendUserNotification(request, 'approved');
-
-            showStatus(`✅ User ${phone} manually activated!`, 'success');
-        }
-
-        function activateUserAccess(request) {
-            // Calculate expiry
-            const expiryDate = new Date();
-            expiryDate.setDate(expiryDate.getDate() + CONFIG.subscriptionDays);
-
-            const userData = {
-                phone: request.phone,
-                displayPhone: request.displayPhone,
-                status: 'Active',
-                expires: expiryDate.toISOString(),
-                activated: request.approvedAt || new Date().toISOString(),
-                txnCode: request.txnCode,
-                plan: 'Semester'
-            };
-
-            // Add to active subscriptions
-            const existingIndex = activeSubscriptions.findIndex(u => u.phone === request.phone);
-            if (existingIndex !== -1) {
-                activeSubscriptions[existingIndex] = userData;
-            } else {
-                activeSubscriptions.push(userData);
-            }
-
-            localStorage.setItem('active_subscriptions', JSON.stringify(activeSubscriptions));
-
-            // Also save as current user subscription
-            localStorage.setItem('revisionvault_subscription', JSON.stringify(userData));
-
-            // Update UI
-            updateUserStatus(userData);
-        }
-
-        function sendUserNotification(request, status) {
-            let message = '';
-            
-            if (status === 'approved') {
-                message = 
-                    `✅ *PAYMENT APPROVED!*\n\n` +
-                    `Your RevisionVault subscription is now ACTIVE!\n\n` +
-                    `📱 Login with: ${request.displayPhone}\n` +
-                    `📅 Expires: 6 months from now\n` +
-                    `🔗 App: ${window.location.href}\n\n` +
-                    `All documents are now unlocked!`;
-            } else {
-                message = 
-                    `❌ *PAYMENT REJECTED*\n\n` +
-                    `Your payment verification failed.\n` +
-                    `Reason: ${request.rejectionReason || 'Could not verify payment'}\n\n` +
-                    `Please contact support if you believe this is an error.`;
-            }
-
-            const whatsappURL = `https://wa.me/${request.phone}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappURL, '_blank');
-        }
-
-        function messageUser(phone) {
-            const message = prompt('Message to user:');
-            if (!message) return;
-
-            const whatsappURL = `https://wa.me/${formatPhoneForAPI(phone)}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappURL, '_blank');
-        }
-
-        // ================= USER MANAGEMENT =================
-        function checkExistingSubscription() {
-            const subscription = localStorage.getItem('revisionvault_subscription');
-            
-            if (subscription) {
-                const data = JSON.parse(subscription);
-                const expiry = new Date(data.expires);
-                const today = new Date();
-                
-                if (expiry > today) {
-                    updateUserStatus(data);
-                    return true;
-                } else {
-                    localStorage.removeItem('revisionvault_subscription');
-                }
-            }
-            return false;
-        }
-
-        function updateUserStatus(userData) {
-            const expiry = new Date(userData.expires);
-            const daysLeft = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
-            
-            document.getElementById('userStatus').innerHTML = `
-                <div style="background: #d1fae5; color: #065f46; padding: 10px 20px; border-radius: 50px; font-weight: 600;">
-                    <i class="fas fa-crown"></i> Active (${daysLeft} days)
-                </div>
-            `;
-        }
-
-        // ================= DOCUMENTS =================
-        function loadDocuments() {
-            const container = document.getElementById('documentsList');
-            const hasAccess = checkExistingSubscription();
-            
-            let html = '';
-            
-            DOCUMENTS.forEach(doc => {
-                html += `
-                    <div class="document-card">
-                        <div class="doc-icon">
-                            <i class="fas fa-file-pdf"></i>
-                        </div>
-                        <div class="doc-content">
-                            <h3 class="doc-title">${doc.title}</h3>
-                            <div class="doc-meta">
-                                <span class="meta-tag">${doc.course}</span>
-                                <span class="meta-tag">${doc.university}</span>
-                                <span class="meta-tag">${doc.year}</span>
-                            </div>
-                            <p style="color: var(--gray); margin: 10px 0;">
-                                <i class="fas fa-file"></i> ${doc.pages} pages • 
-                                <i class="fas fa-database"></i> ${doc.size}
-                            </p>
-                            
-                            ${hasAccess ? 
-                                `<a href="${doc.downloadUrl}" class="download-btn" target="_blank">
-                                    <i class="fas fa-download"></i> Download PDF
-                                </a>` :
-                                `<div style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; text-align: center;">
-                                    <i class="fas fa-lock"></i> Subscribe to unlock (Ksh 50)
-                                </div>`
-                            }
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        // ================= UTILITY FUNCTIONS =================
-        function testPayment() {
-            const testPhone = '2547' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
-            const testTxn = 'TEST' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-            
-            document.getElementById('userPhone').value = formatPhoneForDisplay(testPhone);
-            document.getElementById('txnCode').value = testTxn;
-            
-            showStatus('🧪 Demo mode activated. Click "Submit for Verification" to test the flow.', 'warning');
+        function showDocumentInfo(name, size) {
+            showStatus(`📄 ${name} (${size}) - Subscribe to download`, 'info');
         }
 
         function requestNotes() {
-            const course = prompt('Which course notes do you need?');
-            if (!course) return;
-
-            const message = 
-                `📚 *NOTE REQUEST*\n\n` +
-                `Course: ${course}\n` +
-                `Date: ${new Date().toLocaleDateString()}\n\n` +
-                `Please upload notes for this course.`;
-
-            const whatsappURL = `https://wa.me/${CONFIG.yourWhatsAppNumber}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappURL, '_blank');
+            const course = prompt('Which course notes do you need? (e.g., "Calculus II", "Data Structures"):');
             
-            showStatus('📝 Opening WhatsApp for your request...', 'success');
+            if (course) {
+                const message = 
+                    `📚 *REVISIONVAULT NOTE REQUEST*\n\n` +
+                    `• Course Needed: *${course}*\n` +
+                    `• Date: *${new Date().toLocaleDateString('en-GB')}*\n\n` +
+                    `Please upload notes for this course to your Telegram channel.`;
+                
+                showStatus('📝 Note request prepared. WhatsApp will open for you to send this request.', 'success');
+                
+                setTimeout(() => {
+                    const encodedMessage = encodeURIComponent(message);
+                    const whatsappURL = `https://wa.me/${CONFIG.yourWhatsAppNumber}?text=${encodedMessage}`;
+                    window.open(whatsappURL, '_blank');
+                }, 1500);
+            }
         }
 
+        // ==================== UI HELPER FUNCTIONS ====================
         function showStatus(message, type) {
             const statusDiv = document.getElementById('statusMessage');
             statusDiv.textContent = message;
-            statusDiv.className = `status ${type}`;
+            statusDiv.className = `status status-${type}`;
             statusDiv.style.display = 'block';
             
+            // Auto-hide after 5 seconds
             setTimeout(() => {
                 statusDiv.style.display = 'none';
             }, 5000);
         }
 
-        // ================= INITIAL LOG =================
+        function showLoading() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.getElementById('documentsList').style.opacity = '0.5';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('documentsList').style.opacity = '1';
+        }
+
+        function trackDownload(fileId) {
+            let downloads = JSON.parse(localStorage.getItem('downloads') || '[]');
+            downloads.push({
+                fileId,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('downloads', JSON.stringify(downloads));
+        }
+
+        // ==================== KEYBOARD SHORTCUTS ====================
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Shift+T for test access
+            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                testAccess();
+                e.preventDefault();
+            }
+            
+            // Ctrl+Shift+R to refresh documents
+            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                refreshDocuments();
+                e.preventDefault();
+            }
+        });
+
+        // Initial log
         console.log(`
-╔══════════════════════════════════════════════════╗
-║           REVISIONVAULT - READY TO LAUNCH        ║
-╠══════════════════════════════════════════════════╣
-║ ✅ M-Pesa: 0765098865                            ║
-║ ✅ WhatsApp: 0765098865                          ║
-║ ✅ Telegram: t.me/+QlZ_LCrZoB5kZjNk              ║
-║ ✅ Admin Password: RV2024                        ║
-╠══════════════════════════════════════════════════╣
-║ 🚀 Auto-Approval System Active                   ║
-║ 👑 Admin Panel: ?admin=RV2024                    ║
-╚══════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════╗
+║      REVISIONVAULT - AUTO UPLOAD SYSTEM           ║
+╠═══════════════════════════════════════════════════╣
+║ Telegram Channel: @RevisionVaultDocuments         ║
+║ Auto-fetching from: ${CONFIG.backendUrl}          ║
+║ Payment: 0765 098 865 (Equitel/M-Pesa)            ║
+╠═══════════════════════════════════════════════════╣
+║ Test Shortcuts:                                   ║
+║ • Ctrl+Shift+T = Test payment flow                ║
+║ • Ctrl+Shift+R = Refresh documents                ║
+╚═══════════════════════════════════════════════════╝
         `);
     </script>
 </body>
