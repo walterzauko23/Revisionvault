@@ -242,6 +242,11 @@
             color: white;
         }
         
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
         .btn-small {
             padding: 8px 15px;
             font-size: 0.9rem;
@@ -385,6 +390,12 @@
             border: 1px solid #bfdbfe;
         }
         
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        
         /* Document Viewer Modal */
         .modal {
             display: none;
@@ -489,6 +500,32 @@
             background: #f8fafc;
         }
         
+        /* Pending Approvals */
+        .pending-approval {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .pending-approval:hover {
+            background: #fde68a;
+        }
+        
+        /* Auto-sync indicator */
+        .auto-sync-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
         /* Footer */
         .footer {
             text-align: center;
@@ -524,7 +561,6 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -533,7 +569,7 @@
                 <i class="fas fa-graduation-cap"></i>
                 <h1>RevisionVault</h1>
             </div>
-            <p class="tagline">Complete Study Materials System with Admin Panel</p>
+            <p class="tagline">Complete Study Materials System with Admin Approval</p>
         </div>
         
         <!-- Tabs Navigation -->
@@ -599,6 +635,11 @@
                     <p>Copy the <strong>Transaction Code</strong> from SMS</p>
                 </div>
                 
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <p><strong>Submit</strong> details below and wait for <strong>Admin Approval</strong></p>
+                </div>
+                
                 <div style="display: flex; gap: 15px; margin-top: 20px;">
                     <a href="https://t.me/RevisionVaultDocuments" class="btn btn-secondary" target="_blank">
                         <i class="fab fa-telegram"></i> Join Telegram Channel
@@ -611,7 +652,7 @@
             
             <!-- Verification Form -->
             <div class="form-container">
-                <h3><i class="fas fa-check-circle"></i> Verify Your Payment</h3>
+                <h3><i class="fas fa-check-circle"></i> Submit Payment for Approval</h3>
                 
                 <div class="form-group">
                     <label for="userPhone">Your Phone Number</label>
@@ -623,17 +664,19 @@
                     <input type="text" id="txnCode" placeholder="ABC123XYZ" maxlength="10">
                 </div>
                 
-                <button class="btn btn-primary btn-block" onclick="verifyPayment()">
-                    <i class="fas fa-paper-plane"></i> Submit for Verification
+                <button class="btn btn-primary btn-block" onclick="submitPaymentForApproval()">
+                    <i class="fas fa-paper-plane"></i> Submit for Admin Approval
                 </button>
                 
-                <button class="btn btn-secondary btn-block" onclick="testAccess()" style="margin-top: 15px;">
-                    <i class="fas fa-bolt"></i> Test Access (Demo)
-                </button>
+                <div class="status status-info" style="margin-top: 20px;">
+                    <p><strong>⚠️ Important:</strong> Your access will be activated after admin approval</p>
+                    <p>Admin checks payments manually and approves within 1-2 hours</p>
+                </div>
                 
-                <p style="text-align: center; margin-top: 15px; color: #666; font-size: 0.9rem;">
-                    Access activated within 5-10 minutes after verification
-                </p>
+                <!-- Check Status Button -->
+                <button class="btn btn-secondary btn-block" onclick="checkApprovalStatus()" style="margin-top: 15px;">
+                    <i class="fas fa-sync-alt"></i> Check Approval Status
+                </button>
             </div>
             
             <!-- User Info -->
@@ -644,103 +687,134 @@
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
+            
+            <!-- Pending Approval Status -->
+            <div class="form-container" id="pendingApproval" style="display: none;">
+                <h3><i class="fas fa-clock"></i> Pending Approval</h3>
+                <div id="pendingDetails"></div>
+                <button class="btn btn-secondary btn-block" onclick="checkApprovalStatus()">
+                    <i class="fas fa-sync-alt"></i> Check Status Again
+                </button>
+            </div>
         </div>
         
         <!-- Admin Panel Tab -->
         <div id="admin" class="tab-content">
-            <div class="admin-section">
-                <h3><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h3>
-                
-                <div class="admin-dashboard">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalDocuments">0</div>
-                        <div class="stat-label">Total Documents</div>
+            <!-- Login Form for Admin -->
+            <div id="adminLogin" style="max-width: 400px; margin: 0 auto;">
+                <div class="form-container">
+                    <h3><i class="fas fa-lock"></i> Admin Login</h3>
+                    <div class="form-group">
+                        <label for="adminPassword">Admin Password</label>
+                        <input type="password" id="adminPassword" placeholder="Enter admin password">
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="activeStudents">0</div>
-                        <div class="stat-label">Active Students</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalDownloads">0</div>
-                        <div class="stat-label">Total Downloads</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="revenue">Ksh 0</div>
-                        <div class="stat-label">Total Revenue</div>
-                    </div>
+                    <button class="btn btn-primary btn-block" onclick="adminLogin()">
+                        <i class="fas fa-sign-in-alt"></i> Login as Admin
+                    </button>
+                    <p style="text-align: center; margin-top: 15px; color: #666; font-size: 0.9rem;">
+                        Default password: <strong>walter.zauko23</strong>
+                    </p>
                 </div>
             </div>
             
-            <div class="admin-section">
-                <h3><i class="fab fa-telegram"></i> Telegram Integration</h3>
+            <!-- Admin Dashboard (Hidden by Default) -->
+            <div id="adminDashboard" style="display: none;">
+                <div class="admin-section">
+                    <h3><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h3>
+                    
+                    <div class="admin-dashboard">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalDocuments">0</div>
+                            <div class="stat-label">Total Documents</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalStudents">0</div>
+                            <div class="stat-label">Total Students</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="pendingApprovalsCount">0</div>
+                            <div class="stat-label">Pending Approvals</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="revenue">Ksh 0</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-danger btn-block" onclick="adminLogout()" style="margin-top: 20px;">
+                        <i class="fas fa-sign-out-alt"></i> Logout Admin
+                    </button>
+                </div>
                 
-                <div class="form-group">
-                    <label>Backend Status:</label>
-                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                        <span id="backendStatus" style="padding: 8px 15px; background: #ef4444; color: white; border-radius: 20px;">Offline</span>
-                        <button class="btn btn-small btn-success" onclick="testBackend()">
-                            <i class="fas fa-plug"></i> Test Connection
-                        </button>
+                <div class="admin-section">
+                    <h3><i class="fas fa-user-check"></i> Pending Approvals</h3>
+                    <p style="color: #666; margin-bottom: 15px;">Approve student payments manually</p>
+                    
+                    <div id="pendingApprovalsList">
+                        <!-- Pending approvals will load here -->
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label>Channel Info:</label>
-                    <input type="text" value="@RevisionVaultDocuments" readonly style="background: #f8fafc;">
-                    <small style="color: #666;">Upload PDFs to this channel for auto-capture</small>
+                <div class="admin-section">
+                    <h3><i class="fab fa-telegram"></i> Telegram Auto-Sync</h3>
+                    
+                    <div class="form-group">
+                        <label>Auto-Sync Status:</label>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                            <span id="syncStatus" style="padding: 8px 15px; background: #10b981; color: white; border-radius: 20px;">
+                                <i class="fas fa-sync-alt"></i> Auto-Sync Active (30s)
+                            </span>
+                            <button class="btn btn-small btn-success" onclick="syncNow()">
+                                <i class="fas fa-sync-alt"></i> Sync Now
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Last Document Added:</label>
+                        <input type="text" id="lastDocument" value="None yet" readonly style="background: #f8fafc;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Documents Added Today:</label>
+                        <input type="text" id="todayDocuments" value="0" readonly style="background: #f8fafc;">
+                    </div>
                 </div>
                 
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="syncTelegramDocuments()">
-                        <i class="fas fa-sync-alt"></i> Sync Now
+                <div class="admin-section">
+                    <h3><i class="fas fa-cogs"></i> System Settings</h3>
+                    
+                    <div class="form-group">
+                        <label>Backend URL:</label>
+                        <input type="text" id="backendUrl" value="https://revisionvault-backend--walterzauko.replit.app">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Auto-Sync Interval (seconds):</label>
+                        <input type="number" id="syncInterval" value="30" min="10" max="300">
+                    </div>
+                    
+                    <button class="btn btn-primary btn-block" onclick="saveAdminSettings()">
+                        <i class="fas fa-save"></i> Save Settings
                     </button>
-                    <button class="btn btn-success" onclick="setupWebhook()">
-                        <i class="fas fa-link"></i> Setup Webhook
-                    </button>
-                    <button class="btn btn-secondary" onclick="viewRawData()">
-                        <i class="fas fa-code"></i> View Raw Data
-                    </button>
-                </div>
-            </div>
-            
-            <div class="admin-section">
-                <h3><i class="fas fa-cogs"></i> System Settings</h3>
-                
-                <div class="form-group">
-                    <label>Backend URL:</label>
-                    <input type="text" id="backendUrl" value="https://revisionvault-backend--walterzauko.replit.app">
                 </div>
                 
-                <div class="form-group">
-                    <label>Bot Token:</label>
-                    <input type="password" id="botToken" value="8283465762:AAFeLFLicX3zmuPL0_xFFLDCdYoYPjyVhG0">
+                <div class="admin-section">
+                    <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                    
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Activity</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityLog">
+                            <!-- Activity log will be loaded here -->
+                        </tbody>
+                    </table>
                 </div>
-                
-                <div class="form-group">
-                    <label>Channel ID:</label>
-                    <input type="text" id="channelId" value="1003462367863">
-                </div>
-                
-                <button class="btn btn-primary btn-block" onclick="saveSettings()">
-                    <i class="fas fa-save"></i> Save Settings
-                </button>
-            </div>
-            
-            <div class="admin-section">
-                <h3><i class="fas fa-users"></i> Recent Activity</h3>
-                
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Activity</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="activityLog">
-                        <!-- Activity log will be loaded here -->
-                    </tbody>
-                </table>
             </div>
         </div>
         
@@ -749,13 +823,11 @@
             <div class="documents-header">
                 <div>
                     <h3><i class="fas fa-file-pdf"></i> All Study Materials</h3>
-                    <p style="color: #666; margin-top: 5px;">Auto-fetched from Telegram channel</p>
+                    <p style="color: #666; margin-top: 5px;">Auto-synced from Telegram channel</p>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <span id="docCountBadge" style="background: #1a2980; color: white; padding: 8px 15px; border-radius: 20px;">0 documents</span>
-                    <button class="btn btn-small btn-primary" onclick="loadDocuments()">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
+                    <span id="lastSync" style="color: #666; font-size: 0.9rem;">Never synced</span>
                 </div>
             </div>
             
@@ -772,9 +844,9 @@
             <div id="noDocuments" style="text-align: center; padding: 50px; color: #666; display: none;">
                 <i class="fas fa-file-alt" style="font-size: 4rem; margin-bottom: 20px; color: #cbd5e1;"></i>
                 <h3>No Documents Found</h3>
-                <p>Upload PDFs to your Telegram channel to see them here.</p>
+                <p>Waiting for auto-sync from Telegram channel...</p>
                 <button class="btn btn-primary" onclick="loadDocuments()" style="margin-top: 20px;">
-                    <i class="fas fa-sync-alt"></i> Try Again
+                    <i class="fas fa-sync-alt"></i> Sync Now
                 </button>
             </div>
         </div>
@@ -782,7 +854,7 @@
         <div class="footer">
             <p><strong>RevisionVault Complete System</strong></p>
             <p>Telegram: @RevisionVaultDocuments | Payment: 0765 098 865 | Owner: Walter Zauko</p>
-            <p>Documents auto-sync from Telegram → Student Portal</p>
+            <p>Auto-Sync System: Telegram → Student Portal (30 seconds interval)</p>
         </div>
     </div>
     
@@ -799,21 +871,22 @@
         </div>
     </div>
     
-    <!-- PDF.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"></script>
+    <!-- Auto-Sync Indicator -->
+    <div id="autoSyncIndicator" class="auto-sync-indicator" style="display: none;">
+        <i class="fas fa-sync-alt fa-spin"></i>
+        <span>Auto-syncing documents...</span>
+    </div>
 
     <script>
         // ==================== CONFIGURATION ====================
         const CONFIG = {
             backendUrl: 'https://revisionvault-backend--walterzauko.replit.app',
-            botToken: '8283465762:AAFeLFLicX3zmuPL0_xFFLDCdYoYPjyVhG0',
-            channelId: '1003462367863',
+            adminPassword: 'walter.zauko23',
             yourPhoneNumber: '254765098865',
             yourWhatsAppNumber: '254765098865',
             subscriptionDays: 180,
-            autoRefreshMinutes: 2,
-            adminPassword: 'revisionvault2023' // Admin access password
+            autoSyncInterval: 30000, // 30 seconds
+            webhookEnabled: false
         };
 
         // ==================== GLOBAL STATE ====================
@@ -822,32 +895,32 @@
         let hasAccess = false;
         let isAdmin = false;
         let activityLog = [];
+        let autoSyncTimer = null;
+        let lastSyncTime = null;
+        let documentsAddedToday = 0;
+        let lastDocumentAdded = null;
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 RevisionVault System Initialized');
             
-            // Check admin access
-            checkAdminAccess();
-            
             // Check student subscription
             checkSubscriptionStatus();
             
-            // Load documents
+            // Load settings
+            loadSettings();
+            
+            // Initial document load
             loadDocuments();
             
-            // Setup auto-refresh
-            setInterval(() => {
-                if (hasAccess || isAdmin) {
-                    loadDocuments();
-                }
-            }, CONFIG.autoRefreshMinutes * 60 * 1000);
+            // Start auto-sync
+            startAutoSync();
             
             // Setup event listeners
             setupEventListeners();
             
-            // Test backend connection
-            testBackend();
+            // Check admin session
+            checkAdminSession();
         });
 
         function setupEventListeners() {
@@ -863,7 +936,7 @@
             const searchInput = document.createElement('input');
             searchInput.type = 'text';
             searchInput.placeholder = 'Search documents...';
-            searchInput.style.cssText = 'padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 25px; width: 300px; max-width: 100%;';
+            searchInput.style.cssText = 'padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 25px; width: 300px; max-width: 100%; margin-top: 10px;';
             searchInput.addEventListener('input', filterDocuments);
             
             // Add search to documents header
@@ -871,6 +944,13 @@
             if (documentsHeader) {
                 documentsHeader.querySelector('div').appendChild(searchInput);
             }
+            
+            // Admin password field enter key
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    adminLogin();
+                }
+            });
         }
 
         // ==================== TAB MANAGEMENT ====================
@@ -890,12 +970,116 @@
             event.target.closest('.tab').classList.add('active');
             
             // Load content for tab
-            if (tabName === 'documents' || tabName === 'admin') {
+            if (tabName === 'documents') {
                 loadDocuments();
             }
             
             // Add activity log
             addActivity(`Switched to ${tabName} tab`);
+        }
+
+        // ==================== AUTO-SYNC SYSTEM ====================
+        function startAutoSync() {
+            // Clear existing timer
+            if (autoSyncTimer) {
+                clearInterval(autoSyncTimer);
+            }
+            
+            // Start new timer
+            autoSyncTimer = setInterval(async () => {
+                await autoSyncDocuments();
+            }, CONFIG.autoSyncInterval);
+            
+            // Show sync indicator
+            showSyncIndicator();
+            
+            addActivity(`Auto-sync started (${CONFIG.autoSyncInterval/1000}s interval)`);
+        }
+
+        async function autoSyncDocuments() {
+            try {
+                // Show sync indicator
+                showSyncIndicator();
+                
+                // Get current document count before sync
+                const prevCount = allDocuments.length;
+                
+                // Fetch documents
+                const response = await fetch(`${CONFIG.backendUrl}/getDocuments`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const documents = await response.json();
+                
+                // Check if new documents were added
+                if (documents.length > prevCount) {
+                    const newDocsCount = documents.length - prevCount;
+                    documentsAddedToday += newDocsCount;
+                    
+                    // Update last document added
+                    if (documents.length > 0) {
+                        lastDocumentAdded = documents[0].name;
+                        document.getElementById('lastDocument').value = lastDocumentAdded;
+                    }
+                    
+                    // Update today's count
+                    document.getElementById('todayDocuments').value = documentsAddedToday;
+                    
+                    // Show notification
+                    if (newDocsCount > 0) {
+                        showStatus(`🔄 ${newDocsCount} new document(s) added from Telegram!`, 'success');
+                        addActivity(`Auto-sync: ${newDocsCount} new document(s) added`);
+                    }
+                }
+                
+                // Update documents
+                allDocuments = documents;
+                
+                // Update document count
+                updateDocumentCount(documents.length);
+                
+                // Update last sync time
+                lastSyncTime = new Date();
+                updateLastSyncTime();
+                
+                // Update UI if on documents tab
+                if (document.getElementById('documents').classList.contains('active')) {
+                    displayStudentDocuments(documents);
+                }
+                
+                // Update admin stats
+                updateAdminStats();
+                
+                // Hide sync indicator
+                setTimeout(() => {
+                    hideSyncIndicator();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Auto-sync error:', error);
+                hideSyncIndicator();
+                addActivity(`Auto-sync failed: ${error.message}`);
+            }
+        }
+
+        function showSyncIndicator() {
+            const indicator = document.getElementById('autoSyncIndicator');
+            indicator.style.display = 'flex';
+            indicator.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i><span>Auto-syncing documents...</span>';
+        }
+
+        function hideSyncIndicator() {
+            const indicator = document.getElementById('autoSyncIndicator');
+            indicator.style.display = 'none';
+        }
+
+        function updateLastSyncTime() {
+            if (lastSyncTime) {
+                const timeAgo = getTimeAgo(lastSyncTime);
+                document.getElementById('lastSync').textContent = `Last sync: ${timeAgo}`;
+            }
         }
 
         // ==================== DOCUMENT FUNCTIONS ====================
@@ -923,12 +1107,13 @@
                     displayStudentDocuments(documents);
                 }
                 
-                // Update admin stats
-                updateAdminStats(documents);
+                // Update last sync time
+                lastSyncTime = new Date();
+                updateLastSyncTime();
                 
                 hideLoading();
                 
-                addActivity(`Loaded ${documents.length} documents from Telegram`);
+                addActivity(`Loaded ${documents.length} documents`);
                 
             } catch (error) {
                 console.error('Error loading documents:', error);
@@ -941,7 +1126,6 @@
                     <i class="fas fa-wifi-slash" style="font-size: 4rem; margin-bottom: 20px; color: #ef4444;"></i>
                     <h3>Connection Error</h3>
                     <p>Unable to fetch documents from Telegram channel.</p>
-                    <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">Backend URL: ${CONFIG.backendUrl}</p>
                     <button class="btn btn-primary" onclick="loadDocuments()" style="margin-top: 20px;">
                         <i class="fas fa-redo"></i> Retry Connection
                     </button>
@@ -1036,7 +1220,7 @@
                         
                         <div style="font-size: 0.8rem; color: #666; margin-top: 10px; display: flex; align-items: center; gap: 5px;">
                             <i class="fab fa-telegram" style="color: #0088cc;"></i>
-                            Auto-uploaded from Telegram channel
+                            Auto-synced from Telegram
                         </div>
                     </div>
                 `;
@@ -1171,8 +1355,8 @@
             }
         }
 
-        // ==================== PAYMENT FUNCTIONS ====================
-        function verifyPayment() {
+        // ==================== PAYMENT & APPROVAL SYSTEM ====================
+        function submitPaymentForApproval() {
             const phoneInput = document.getElementById('userPhone');
             const txnInput = document.getElementById('txnCode');
             
@@ -1193,55 +1377,95 @@
             // Format phone
             const formattedPhone = formatPhoneForAPI(phone);
             
-            // Create WhatsApp verification message
+            // Create pending approval
+            const pendingApproval = {
+                phone: formattedPhone,
+                displayPhone: phone,
+                txnCode: txnCode,
+                submittedAt: new Date().toISOString(),
+                status: 'pending',
+                approved: false
+            };
+            
+            // Save to pending approvals
+            let pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            pendingApprovals.push(pendingApproval);
+            localStorage.setItem('revisionvault_pending_approvals', JSON.stringify(pendingApprovals));
+            
+            // Create WhatsApp notification message for admin
             const whatsappMessage = 
-                `📚 *REVISIONVAULT PAYMENT VERIFICATION*\n\n` +
+                `📚 *NEW PAYMENT FOR APPROVAL - REVISIONVAULT*\n\n` +
+                `• Student Phone: *${phone}*\n` +
                 `• Transaction Code: *${txnCode}*\n` +
-                `• Phone Number: *${phone}*\n` +
                 `• Amount: *Ksh 50*\n` +
                 `• Date: *${new Date().toLocaleDateString('en-GB')}*\n` +
-                `• Paid to: *0765 098 865 (Equitel)*\n\n` +
-                `Please activate my subscription.`;
+                `• Time: *${new Date().toLocaleTimeString()}*\n` +
+                `• Paid to: *0765 098 865*\n\n` +
+                `Please approve this payment in the admin panel.`;
             
             // Show success message
-            showStatus('✅ WhatsApp will open with verification message. Send it to complete verification.', 'success');
+            showStatus('✅ Payment submitted for admin approval! You will get access once approved.', 'success');
             
-            // Open WhatsApp after delay
+            // Hide payment form, show pending status
+            document.querySelector('#student .form-container').style.display = 'none';
+            document.getElementById('pendingApproval').style.display = 'block';
+            document.getElementById('pendingDetails').innerHTML = `
+                <div class="status status-pending">
+                    <p><strong>⏳ Waiting for Admin Approval</strong></p>
+                    <p>Phone: ${phone}</p>
+                    <p>Transaction: ${txnCode}</p>
+                    <p>Submitted: ${new Date().toLocaleString()}</p>
+                    <p>Status: <strong>Pending Approval</strong></p>
+                </div>
+            `;
+            
+            // Open WhatsApp for admin notification
             setTimeout(() => {
                 const encodedMessage = encodeURIComponent(whatsappMessage);
                 const whatsappURL = `https://wa.me/${CONFIG.yourWhatsAppNumber}?text=${encodedMessage}`;
                 window.open(whatsappURL, '_blank');
             }, 1500);
             
-            // Simulate activation for testing
-            setTimeout(() => {
-                activateSubscription(formattedPhone);
-            }, 2000);
-            
             // Clear form
             phoneInput.value = '';
             txnInput.value = '';
             
-            // Log the payment attempt
-            addActivity(`Payment verification attempted: ${formattedPhone}, Transaction: ${txnCode}`);
+            // Add activity log
+            addActivity(`Payment submitted for approval: ${phone}, Txn: ${txnCode}`);
         }
 
-        function testAccess() {
-            // Generate random test data
-            const testPhone = '2547' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
-            const testTxn = 'TEST' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        function checkApprovalStatus() {
+            const phoneInput = document.getElementById('userPhone');
+            const phone = phoneInput.value.trim();
             
-            document.getElementById('userPhone').value = formatPhoneForDisplay(testPhone);
-            document.getElementById('txnCode').value = testTxn;
+            if (!phone) {
+                showStatus('Please enter your phone number to check status', 'error');
+                return;
+            }
             
-            showStatus('🧪 Test mode activated. Click "Submit for Verification" to test WhatsApp flow.', 'success');
+            const formattedPhone = formatPhoneForAPI(phone);
             
-            // Auto-activate for testing
-            setTimeout(() => {
-                activateSubscription(testPhone);
-            }, 1000);
+            // Check approved subscriptions
+            let approvedSubscriptions = JSON.parse(localStorage.getItem('revisionvault_approved_subscriptions') || '[]');
+            const approved = approvedSubscriptions.find(sub => sub.phone === formattedPhone);
             
-            addActivity('Test access initiated');
+            if (approved) {
+                // User is approved
+                activateSubscription(formattedPhone);
+                showStatus('✅ Your payment has been approved! Access activated.', 'success');
+            } else {
+                // Check if still pending
+                let pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+                const pending = pendingApprovals.find(p => p.phone === formattedPhone && p.status === 'pending');
+                
+                if (pending) {
+                    showStatus('⏳ Your payment is still pending admin approval. Please wait.', 'warning');
+                } else {
+                    showStatus('❌ No payment found for this number. Please submit payment first.', 'error');
+                }
+            }
+            
+            addActivity(`Checked approval status for: ${phone}`);
         }
 
         function activateSubscription(phone) {
@@ -1251,37 +1475,48 @@
             
             const subscriptionData = {
                 phone: phone,
+                displayPhone: formatPhoneForDisplay(phone),
                 active: true,
                 expires: expiryDate.toISOString(),
                 activatedAt: new Date().toISOString(),
-                verifiedBy: 'System'
+                approvedBy: 'Admin'
             };
             
-            // Save to localStorage
-            localStorage.setItem('revisionvault_subscription', JSON.stringify(subscriptionData));
+            // Save to approved subscriptions
+            let approvedSubscriptions = JSON.parse(localStorage.getItem('revisionvault_approved_subscriptions') || '[]');
+            approvedSubscriptions.push(subscriptionData);
+            localStorage.setItem('revisionvault_approved_subscriptions', JSON.stringify(approvedSubscriptions));
             
             // Update access
             hasAccess = true;
             
             // Show success
-            showStatus('🎉 Subscription ACTIVATED! You now have access to all documents for 6 months.', 'success');
+            showStatus('🎉 Subscription ACTIVATED! You now have access to all documents.', 'success');
             
             // Update UI
             updateAccessUI();
             displayStudentDocuments(allDocuments);
             
-            // Add activity log
-            addActivity(`Subscription activated for: ${formatPhoneForDisplay(phone)}`);
+            // Hide pending approval if shown
+            document.getElementById('pendingApproval').style.display = 'none';
             
-            console.log('Subscription activated for:', phone);
+            addActivity(`Subscription activated for: ${formatPhoneForDisplay(phone)}`);
         }
 
         function checkSubscriptionStatus() {
-            const subscription = localStorage.getItem('revisionvault_subscription');
+            // Get phone from localStorage or prompt
+            let currentPhone = localStorage.getItem('revisionvault_current_phone');
+            
+            if (!currentPhone) {
+                return false;
+            }
+            
+            // Check approved subscriptions
+            let approvedSubscriptions = JSON.parse(localStorage.getItem('revisionvault_approved_subscriptions') || '[]');
+            const subscription = approvedSubscriptions.find(sub => sub.phone === currentPhone);
             
             if (subscription) {
-                const data = JSON.parse(subscription);
-                const expiry = new Date(data.expires);
+                const expiry = new Date(subscription.expires);
                 const today = new Date();
                 
                 if (expiry > today) {
@@ -1294,18 +1529,21 @@
                     
                     document.getElementById('subscriptionDetails').innerHTML = `
                         <p>✅ <strong>Active Subscription</strong></p>
-                        <p>Phone: ${formatPhoneForDisplay(data.phone)}</p>
+                        <p>Phone: ${subscription.displayPhone || formatPhoneForDisplay(subscription.phone)}</p>
                         <p>Expires: ${expiry.toLocaleDateString()}</p>
                         <p>Days remaining: ${daysLeft}</p>
-                        <p>Status: ${data.verifiedBy || 'Verified'}</p>
+                        <p>Approved by: ${subscription.approvedBy || 'Admin'}</p>
                     `;
+                    
+                    // Hide payment form
+                    document.querySelector('#student .form-container').style.display = 'none';
+                    document.getElementById('pendingApproval').style.display = 'none';
                     
                     return true;
                 } else {
                     // Expired subscription
-                    localStorage.removeItem('revisionvault_subscription');
-                    showStatus('Your subscription has expired. Please renew.', 'error');
                     hasAccess = false;
+                    showStatus('Your subscription has expired. Please renew.', 'error');
                     return false;
                 }
             }
@@ -1316,8 +1554,9 @@
 
         function updateAccessUI() {
             if (hasAccess) {
-                // Hide payment form
+                // Hide payment form and pending approval
                 document.querySelector('#student .form-container').style.display = 'none';
+                document.getElementById('pendingApproval').style.display = 'none';
                 document.getElementById('userInfo').style.display = 'block';
             } else {
                 // Show payment form
@@ -1327,10 +1566,11 @@
         }
 
         function logout() {
-            localStorage.removeItem('revisionvault_subscription');
+            localStorage.removeItem('revisionvault_current_phone');
             hasAccess = false;
             document.getElementById('userInfo').style.display = 'none';
             document.querySelector('#student .form-container').style.display = 'block';
+            document.getElementById('pendingApproval').style.display = 'none';
             showStatus('Logged out successfully.', 'success');
             
             // Refresh document display to show locked state
@@ -1340,133 +1580,168 @@
         }
 
         // ==================== ADMIN FUNCTIONS ====================
-        function checkAdminAccess() {
-            const adminToken = localStorage.getItem('revisionvault_admin');
-            if (adminToken === CONFIG.adminPassword) {
+        function checkAdminSession() {
+            const adminSession = localStorage.getItem('revisionvault_admin_session');
+            if (adminSession === 'active') {
                 isAdmin = true;
-                showStatus('👑 Admin mode activated', 'success');
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                loadPendingApprovals();
+                updateAdminStats();
             }
         }
 
-        async function testBackend() {
-            try {
-                showLoading();
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === CONFIG.adminPassword) {
+                isAdmin = true;
+                localStorage.setItem('revisionvault_admin_session', 'active');
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                showStatus('👑 Admin login successful!', 'success');
                 
-                const response = await fetch(CONFIG.backendUrl);
-                const data = await response.json();
+                // Load pending approvals
+                loadPendingApprovals();
                 
-                document.getElementById('backendStatus').textContent = 'Online';
-                document.getElementById('backendStatus').style.background = '#10b981';
+                // Update admin stats
+                updateAdminStats();
                 
-                showStatus('✅ Backend connected successfully!', 'success');
+                addActivity('Admin logged in');
                 
-                addActivity('Backend connection test: SUCCESS');
-                
-            } catch (error) {
-                document.getElementById('backendStatus').textContent = 'Offline';
-                document.getElementById('backendStatus').style.background = '#ef4444';
-                
-                showStatus('❌ Backend connection failed', 'error');
-                
-                addActivity(`Backend connection test: FAILED - ${error.message}`);
-            } finally {
-                hideLoading();
+            } else {
+                showStatus('❌ Invalid admin password', 'error');
             }
         }
 
-        async function syncTelegramDocuments() {
-            try {
-                showLoading();
+        function adminLogout() {
+            isAdmin = false;
+            localStorage.removeItem('revisionvault_admin_session');
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminDashboard').style.display = 'none';
+            showStatus('Admin logged out', 'success');
+            addActivity('Admin logged out');
+        }
+
+        function loadPendingApprovals() {
+            const container = document.getElementById('pendingApprovalsList');
+            let pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            
+            // Filter only pending approvals
+            pendingApprovals = pendingApprovals.filter(p => p.status === 'pending');
+            
+            if (pendingApprovals.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center;">No pending approvals</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            pendingApprovals.forEach((approval, index) => {
+                const submittedTime = new Date(approval.submittedAt);
+                const timeAgo = getTimeAgo(submittedTime);
                 
-                const response = await fetch(`${CONFIG.backendUrl}/sync`);
-                const data = await response.json();
+                html += `
+                    <div class="pending-approval" style="padding: 15px; margin-bottom: 15px; border-radius: 10px;">
+                        <p><strong>Student:</strong> ${approval.displayPhone || formatPhoneForDisplay(approval.phone)}</p>
+                        <p><strong>Transaction:</strong> ${approval.txnCode}</p>
+                        <p><strong>Submitted:</strong> ${timeAgo} (${submittedTime.toLocaleString()})</p>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="btn btn-success btn-small" onclick="approvePayment('${approval.phone}', '${approval.txnCode}')">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="rejectPayment('${approval.phone}', ${index})">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Update pending count
+            document.getElementById('pendingApprovalsCount').textContent = pendingApprovals.length;
+        }
+
+        function approvePayment(phone, txnCode) {
+            // Find the pending approval
+            let pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            const approvalIndex = pendingApprovals.findIndex(p => p.phone === phone && p.txnCode === txnCode && p.status === 'pending');
+            
+            if (approvalIndex !== -1) {
+                // Mark as approved
+                pendingApprovals[approvalIndex].status = 'approved';
+                pendingApprovals[approvalIndex].approvedAt = new Date().toISOString();
+                pendingApprovals[approvalIndex].approvedBy = 'Admin';
                 
-                // Reload documents
-                await loadDocuments();
+                // Save back to localStorage
+                localStorage.setItem('revisionvault_pending_approvals', JSON.stringify(pendingApprovals));
                 
-                showStatus(`✅ ${data.message || 'Documents synced successfully!'}`, 'success');
+                // Create subscription
+                activateSubscription(phone);
                 
-                addActivity('Manual document sync completed');
+                // Show success
+                showStatus(`✅ Payment approved for ${formatPhoneForDisplay(phone)}`, 'success');
                 
-            } catch (error) {
-                showStatus('❌ Sync failed. Please try again.', 'error');
-                addActivity(`Sync failed: ${error.message}`);
-            } finally {
-                hideLoading();
+                // Reload pending approvals
+                loadPendingApprovals();
+                
+                // Update admin stats
+                updateAdminStats();
+                
+                addActivity(`Admin approved payment for: ${formatPhoneForDisplay(phone)}`);
             }
         }
 
-        async function setupWebhook() {
-            try {
-                const webhookUrl = `${CONFIG.backendUrl}/webhook`;
-                const apiUrl = `https://api.telegram.org/bot${CONFIG.botToken}/setWebhook?url=${encodeURIComponent(webhookUrl)}`;
+        function rejectPayment(phone, index) {
+            let pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            
+            if (pendingApprovals[index]) {
+                pendingApprovals[index].status = 'rejected';
+                pendingApprovals[index].rejectedAt = new Date().toISOString();
                 
-                const response = await fetch(apiUrl);
-                const data = await response.json();
+                localStorage.setItem('revisionvault_pending_approvals', JSON.stringify(pendingApprovals));
                 
-                if (data.ok) {
-                    showStatus('✅ Webhook setup successful! Bot will now auto-catch uploads.', 'success');
-                    addActivity('Telegram webhook setup: SUCCESS');
-                } else {
-                    throw new Error(data.description || 'Webhook setup failed');
-                }
+                showStatus(`❌ Payment rejected for ${formatPhoneForDisplay(phone)}`, 'error');
                 
-            } catch (error) {
-                showStatus(`❌ Webhook setup failed: ${error.message}`, 'error');
-                addActivity(`Webhook setup failed: ${error.message}`);
+                loadPendingApprovals();
+                updateAdminStats();
+                
+                addActivity(`Admin rejected payment for: ${formatPhoneForDisplay(phone)}`);
             }
         }
 
-        function viewRawData() {
-            const newTab = window.open();
-            newTab.document.write(`
-                <pre style="padding: 20px; background: #1e1e1e; color: #d4d4d4; font-family: monospace;">
-${JSON.stringify(allDocuments, null, 2)}
-                </pre>
-            `);
-            
-            addActivity('Viewed raw document data');
+        function syncNow() {
+            autoSyncDocuments();
+            showStatus('🔄 Manual sync started...', 'info');
+            addActivity('Manual document sync initiated');
         }
 
-        function saveSettings() {
-            const newBackendUrl = document.getElementById('backendUrl').value;
-            const newBotToken = document.getElementById('botToken').value;
-            const newChannelId = document.getElementById('channelId').value;
-            
-            // Update config
-            CONFIG.backendUrl = newBackendUrl;
-            CONFIG.botToken = newBotToken;
-            CONFIG.channelId = newChannelId;
-            
-            // Save to localStorage
-            localStorage.setItem('revisionvault_settings', JSON.stringify({
-                backendUrl: newBackendUrl,
-                botToken: newBotToken,
-                channelId: newChannelId
-            }));
-            
-            showStatus('✅ Settings saved successfully', 'success');
-            addActivity('Admin settings updated');
-            
-            // Test new connection
-            testBackend();
-        }
-
-        function updateAdminStats(documents) {
+        function updateAdminStats() {
             // Update document count
-            document.getElementById('totalDocuments').textContent = documents.length;
+            document.getElementById('totalDocuments').textContent = allDocuments.length;
             
-            // Update active students (simulated)
-            const subscriptions = JSON.parse(localStorage.getItem('revisionvault_subscriptions') || '[]');
-            document.getElementById('activeStudents').textContent = subscriptions.length;
+            // Update student count
+            let approvedSubscriptions = JSON.parse(localStorage.getItem('revisionvault_approved_subscriptions') || '[]');
+            document.getElementById('totalStudents').textContent = approvedSubscriptions.length;
             
-            // Update downloads
-            const downloads = JSON.parse(localStorage.getItem('revisionvault_downloads') || '[]');
-            document.getElementById('totalDownloads').textContent = downloads.length;
+            // Update pending approvals count
+            let pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            pendingApprovals = pendingApprovals.filter(p => p.status === 'pending');
+            document.getElementById('pendingApprovalsCount').textContent = pendingApprovals.length;
             
-            // Update revenue (simulated: Ksh 50 per subscription)
-            const revenue = subscriptions.length * 50;
+            // Update revenue (Ksh 50 per approved subscription)
+            const revenue = approvedSubscriptions.length * 50;
             document.getElementById('revenue').textContent = `Ksh ${revenue}`;
+            
+            // Update today's documents
+            document.getElementById('todayDocuments').value = documentsAddedToday;
+            
+            // Update last document
+            if (lastDocumentAdded) {
+                document.getElementById('lastDocument').value = lastDocumentAdded;
+            }
             
             // Update activity log
             updateActivityLog();
@@ -1499,8 +1774,49 @@ ${JSON.stringify(allDocuments, null, 2)}
             }
             
             // Update log display if admin tab is active
-            if (document.getElementById('admin').classList.contains('active')) {
+            if (document.getElementById('admin').classList.contains('active') && isAdmin) {
                 updateActivityLog();
+            }
+        }
+
+        function saveAdminSettings() {
+            const newBackendUrl = document.getElementById('backendUrl').value;
+            const newSyncInterval = document.getElementById('syncInterval').value;
+            
+            // Update config
+            CONFIG.backendUrl = newBackendUrl;
+            CONFIG.autoSyncInterval = newSyncInterval * 1000;
+            
+            // Save to localStorage
+            localStorage.setItem('revisionvault_admin_settings', JSON.stringify({
+                backendUrl: newBackendUrl,
+                syncInterval: newSyncInterval
+            }));
+            
+            // Restart auto-sync with new interval
+            startAutoSync();
+            
+            showStatus('✅ Admin settings saved', 'success');
+            addActivity('Admin settings updated');
+        }
+
+        function loadSettings() {
+            // Load admin settings
+            const savedSettings = localStorage.getItem('revisionvault_admin_settings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                CONFIG.backendUrl = settings.backendUrl || CONFIG.backendUrl;
+                CONFIG.autoSyncInterval = (settings.syncInterval || 30) * 1000;
+                
+                // Update form fields
+                document.getElementById('backendUrl').value = CONFIG.backendUrl;
+                document.getElementById('syncInterval').value = CONFIG.autoSyncInterval / 1000;
+            }
+            
+            // Load current phone
+            const currentPhone = localStorage.getItem('revisionvault_current_phone');
+            if (currentPhone) {
+                document.getElementById('userPhone').value = formatPhoneForDisplay(currentPhone);
             }
         }
 
@@ -1544,6 +1860,17 @@ ${JSON.stringify(allDocuments, null, 2)}
 
         function updateDocumentCount(count) {
             document.getElementById('docCountBadge').textContent = `${count} documents`;
+        }
+
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const time = new Date(timestamp);
+            const seconds = Math.floor((now - time) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+            return `${Math.floor(seconds / 86400)} days ago`;
         }
 
         function showSubscribeMessage() {
@@ -1595,22 +1922,18 @@ ${JSON.stringify(allDocuments, null, 2)}
 
         // ==================== KEYBOARD SHORTCUTS ====================
         document.addEventListener('keydown', function(e) {
-            // Ctrl+Shift+A for admin access
+            // Ctrl+Shift+A for admin login
             if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                const password = prompt('Enter admin password:');
-                if (password === CONFIG.adminPassword) {
-                    localStorage.setItem('revisionvault_admin', password);
-                    isAdmin = true;
-                    showStatus('👑 Admin mode activated!', 'success');
-                    switchTab('admin');
-                }
                 e.preventDefault();
+                if (!isAdmin) {
+                    document.getElementById('adminPassword').focus();
+                }
             }
             
-            // Ctrl+Shift+R to refresh
-            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
-                loadDocuments();
+            // Ctrl+Shift+S to sync
+            if (e.ctrlKey && e.shiftKey && e.key === 'S') {
                 e.preventDefault();
+                syncNow();
             }
             
             // Esc to close modal
@@ -1619,22 +1942,8 @@ ${JSON.stringify(allDocuments, null, 2)}
             }
         });
 
-        // Load saved settings
-        const savedSettings = localStorage.getItem('revisionvault_settings');
-        if (savedSettings) {
-            const settings = JSON.parse(savedSettings);
-            CONFIG.backendUrl = settings.backendUrl || CONFIG.backendUrl;
-            CONFIG.botToken = settings.botToken || CONFIG.botToken;
-            CONFIG.channelId = settings.channelId || CONFIG.channelId;
-            
-            // Update form fields
-            document.getElementById('backendUrl').value = CONFIG.backendUrl;
-            document.getElementById('botToken').value = CONFIG.botToken;
-            document.getElementById('channelId').value = CONFIG.channelId;
-        }
-
         // Initial activity log entry
-        addActivity('System initialized', `Backend: ${CONFIG.backendUrl}`);
+        addActivity('System initialized', `Auto-sync: ${CONFIG.autoSyncInterval/1000}s interval`);
     </script>
 </body>
 </html>
