@@ -634,6 +634,37 @@
             cursor: pointer;
         }
 
+        /* ==================== DOCUMENT VIEWER ==================== */
+        .document-viewer-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .document-viewer-toolbar {
+            padding: 15px;
+            background: var(--light);
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .document-viewer-frame {
+            flex: 1;
+            border: none;
+            background: white;
+        }
+
+        .file-type-indicator {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
         /* ==================== SEARCH ==================== */
         .search-container {
             position: relative;
@@ -1123,6 +1154,52 @@
                     </table>
                 </div>
 
+                <!-- Telegram Bot Configuration -->
+                <div class="admin-section">
+                    <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                        <i class="fab fa-telegram"></i>
+                        Telegram Bot Configuration
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Telegram Bot Token</label>
+                        <input type="password" id="telegramBotToken" class="form-control" placeholder="Enter your Telegram bot token" value="YOUR_BOT_TOKEN_HERE">
+                        <small style="color: var(--gray); margin-top: 5px; display: block;">
+                            Get token from @BotFather on Telegram
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Telegram Channel Username</label>
+                        <input type="text" id="telegramChannel" class="form-control" placeholder="e.g., RevisionVaultDocuments" value="RevisionVaultDocuments">
+                        <small style="color: var(--gray); margin-top: 5px; display: block;">
+                            Your Telegram channel username (without @)
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Auto-Sync Interval (Minutes)</label>
+                        <select id="syncInterval" class="form-control">
+                            <option value="15">Every 15 minutes</option>
+                            <option value="30">Every 30 minutes</option>
+                            <option value="60">Every hour</option>
+                            <option value="1440">Once daily</option>
+                            <option value="0">Manual only</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px;">
+                        <button class="btn btn-success btn-block" onclick="testTelegramConnection()">
+                            <i class="fas fa-wifi"></i> Test Connection
+                        </button>
+                        <button class="btn btn-primary btn-block" onclick="syncTelegramDocuments()">
+                            <i class="fas fa-sync-alt"></i> Sync Now
+                        </button>
+                    </div>
+                    
+                    <div id="telegramStatus" class="status-message" style="display: none; margin-top: 20px;"></div>
+                </div>
+
                 <!-- Document Upload -->
                 <div class="admin-section">
                     <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
@@ -1166,8 +1243,8 @@
                         <button class="btn btn-primary btn-block" onclick="addManualDocument()">
                             <i class="fas fa-upload"></i> Upload Document
                         </button>
-                        <button class="btn btn-info btn-block" onclick="syncTelegramDocuments()">
-                            <i class="fas fa-sync-alt"></i> Sync from Telegram
+                        <button class="btn btn-info btn-block" onclick="openTelegramFileHelper()">
+                            <i class="fab fa-telegram"></i> Get File Link Helper
                         </button>
                     </div>
                 </div>
@@ -1212,19 +1289,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div style="font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-file-pdf"></i>
+                    <i class="fas fa-file-alt"></i>
                     <span id="modalDocTitle">Document Viewer</span>
                 </div>
                 <button class="close-modal" onclick="closeDocumentViewer()">×</button>
             </div>
             <div class="modal-body">
-                <div id="pdfViewer" style="height: 100%; width: 100%;">
-                    <iframe 
-                        id="pdfFrame"
-                        style="width: 100%; height: 100%; border: none;"
-                        title="Document Viewer"
-                        allow="fullscreen"
-                    ></iframe>
+                <div id="documentViewerContent" style="height: 100%;">
+                    <!-- Dynamic content will be loaded here -->
                 </div>
             </div>
         </div>
@@ -1240,7 +1312,11 @@
             subscriptionDays: 150, // 5 months approximately
             telegramChannel: 'RevisionVaultDocuments',
             // Session timeout for admin (8 hours)
-            adminSessionTimeout: 8 * 60 * 60 * 1000
+            adminSessionTimeout: 8 * 60 * 60 * 1000,
+            
+            // TELEGRAM BOT SETTINGS (You'll need to create a bot)
+            telegramBotToken: '', // Will be set from input
+            telegramChannelId: '@RevisionVaultDocuments'
         };
 
         // ==================== GLOBAL STATE ====================
@@ -1249,6 +1325,7 @@
         let currentUser = null;
         let isAdmin = false;
         let selectedUniversity = '';
+        let telegramSyncInterval = null;
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -1258,12 +1335,537 @@
             checkUserSession();
             checkAdminSession();
             loadDocuments();
+            initializeTelegramSync();
             
             // Check if we're on admin tab with session
             if (window.location.hash === '#admin') {
                 switchTab('admin');
             }
         });
+
+        // ==================== TELEGRAM SYNC FUNCTIONS ====================
+        function initializeTelegramSync() {
+            // Load Telegram config from localStorage
+            const savedToken = localStorage.getItem('revisionvault_telegram_token');
+            const savedChannel = localStorage.getItem('revisionvault_telegram_channel');
+            
+            if (savedToken) {
+                document.getElementById('telegramBotToken').value = savedToken;
+                CONFIG.telegramBotToken = savedToken;
+            }
+            
+            if (savedChannel) {
+                document.getElementById('telegramChannel').value = savedChannel;
+                CONFIG.telegramChannelId = savedChannel.startsWith('@') ? savedChannel : '@' + savedChannel;
+            }
+            
+            // Start auto-sync if enabled
+            startAutoSync();
+        }
+
+        function startAutoSync() {
+            // Clear any existing interval
+            if (telegramSyncInterval) {
+                clearInterval(telegramSyncInterval);
+            }
+            
+            const intervalSelect = document.getElementById('syncInterval');
+            const intervalMinutes = intervalSelect ? parseInt(intervalSelect.value) : 0;
+            
+            if (intervalMinutes > 0) {
+                const intervalMs = intervalMinutes * 60 * 1000;
+                telegramSyncInterval = setInterval(syncTelegramDocuments, intervalMs);
+                
+                console.log(`🔄 Telegram auto-sync started: ${intervalMinutes} minutes interval`);
+                showTelegramStatus('✅ Auto-sync enabled: ' + intervalSelect.options[intervalSelect.selectedIndex].text, 'success');
+            }
+        }
+
+        function saveTelegramConfig() {
+            const token = document.getElementById('telegramBotToken').value.trim();
+            const channel = document.getElementById('telegramChannel').value.trim();
+            
+            if (token && token !== 'YOUR_BOT_TOKEN_HERE') {
+                localStorage.setItem('revisionvault_telegram_token', token);
+                CONFIG.telegramBotToken = token;
+            }
+            
+            if (channel) {
+                localStorage.setItem('revisionvault_telegram_channel', channel);
+                CONFIG.telegramChannelId = channel.startsWith('@') ? channel : '@' + channel;
+            }
+            
+            startAutoSync();
+        }
+
+        function testTelegramConnection() {
+            const token = document.getElementById('telegramBotToken').value.trim();
+            const channel = document.getElementById('telegramChannel').value.trim();
+            
+            if (!token || token === 'YOUR_BOT_TOKEN_HERE') {
+                showTelegramStatus('❌ Please enter your Telegram bot token', 'error');
+                return;
+            }
+            
+            if (!channel) {
+                showTelegramStatus('❌ Please enter your Telegram channel username', 'error');
+                return;
+            }
+            
+            showTelegramStatus('🔌 Testing Telegram connection...', 'info');
+            
+            // Save config
+            saveTelegramConfig();
+            
+            // Test connection using Telegram Bot API
+            fetch(`https://api.telegram.org/bot${token}/getMe`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        showTelegramStatus(`✅ Connected to bot: @${data.result.username}`, 'success');
+                        return fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=@${channel}`);
+                    } else {
+                        throw new Error('Invalid bot token');
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        showTelegramStatus(`✅ Connected to channel: ${data.result.title}`, 'success');
+                        // Test if bot is admin in channel
+                        return fetch(`https://api.telegram.org/bot${token}/getChatAdministrators?chat_id=@${channel}`);
+                    } else {
+                        throw new Error('Cannot access channel');
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        const isAdmin = data.result.some(admin => admin.user.username === 'RevisionVaultBot');
+                        if (isAdmin) {
+                            showTelegramStatus('✅ Bot is admin in channel. Ready to sync!', 'success');
+                        } else {
+                            showTelegramStatus('⚠️ Bot is not admin in channel. Add bot as admin for full sync.', 'warning');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Telegram connection error:', error);
+                    showTelegramStatus(`❌ Connection failed: ${error.message}`, 'error');
+                });
+        }
+
+        function syncTelegramDocuments() {
+            const token = CONFIG.telegramBotToken;
+            const channel = CONFIG.telegramChannelId.replace('@', '');
+            
+            if (!token || token === 'YOUR_BOT_TOKEN_HERE') {
+                showTelegramStatus('❌ Please configure Telegram bot token first', 'error');
+                return;
+            }
+            
+            showTelegramStatus('🔄 Syncing documents from Telegram...', 'info');
+            
+            // Get last synced message ID
+            const lastMessageId = localStorage.getItem('revisionvault_last_sync_id') || 0;
+            
+            // Fetch recent messages from channel
+            fetch(`https://api.telegram.org/bot${token}/getChatHistory?chat_id=@${channel}&limit=100`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.ok) {
+                        throw new Error('Failed to fetch messages');
+                    }
+                    
+                    const messages = data.result;
+                    let newDocuments = [];
+                    let highestMessageId = lastMessageId;
+                    
+                    // Process each message
+                    messages.forEach(message => {
+                        if (message.message_id > lastMessageId) {
+                            highestMessageId = Math.max(highestMessageId, message.message_id);
+                            
+                            // Check if message contains a document
+                            if (message.document || message.photo) {
+                                const documentInfo = extractDocumentInfo(message);
+                                if (documentInfo) {
+                                    newDocuments.push(documentInfo);
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Add new documents
+                    if (newDocuments.length > 0) {
+                        newDocuments.forEach(doc => {
+                            // Check if document already exists
+                            const existingDoc = allDocuments.find(d => d.id === doc.id);
+                            if (!existingDoc) {
+                                allDocuments.unshift(doc);
+                            }
+                        });
+                        
+                        saveDocumentsToCache();
+                        updateDocumentCount(allDocuments.length);
+                        
+                        if (currentUser) {
+                            loadUserDocuments();
+                        }
+                        
+                        // Save last sync ID
+                        localStorage.setItem('revisionvault_last_sync_id', highestMessageId);
+                        
+                        showTelegramStatus(`✅ Synced ${newDocuments.length} new documents from Telegram`, 'success');
+                        logActivity('Telegram sync: ' + newDocuments.length + ' new documents', 'admin');
+                        
+                        // Update admin stats
+                        updateAdminStats();
+                    } else {
+                        showTelegramStatus('ℹ️ No new documents found in Telegram', 'info');
+                    }
+                })
+                .catch(error => {
+                    console.error('Telegram sync error:', error);
+                    showTelegramStatus(`❌ Sync failed: ${error.message}`, 'error');
+                });
+        }
+
+        function extractDocumentInfo(message) {
+            try {
+                // Extract university from message text/caption
+                let university = 'Egerton University'; // Default
+                const caption = message.caption || message.text || '';
+                
+                // Try to detect university from caption
+                const universities = [
+                    'Egerton University',
+                    'University of Nairobi',
+                    'Kenyatta University',
+                    'JKUAT',
+                    'MMUST',
+                    'Moi University',
+                    'Strathmore University',
+                    'Catholic University'
+                ];
+                
+                universities.forEach(uni => {
+                    if (caption.toLowerCase().includes(uni.toLowerCase())) {
+                        university = uni;
+                    }
+                });
+                
+                // Extract document details
+                let documentData = null;
+                
+                if (message.document) {
+                    // Regular document
+                    const doc = message.document;
+                    documentData = {
+                        id: 'telegram_' + doc.file_id,
+                        name: doc.file_name || caption.substring(0, 50) || 'Telegram Document',
+                        university: university,
+                        subject: extractSubject(caption),
+                        year: new Date().getFullYear().toString(),
+                        size: formatFileSize(doc.file_size),
+                        date: message.date * 1000, // Convert Unix timestamp
+                        caption: caption || '',
+                        tags: extractTags(caption),
+                        url: `https://api.telegram.org/file/bot${CONFIG.telegramBotToken}/${doc.file_path}`,
+                        telegramUrl: `https://t.me/${CONFIG.telegramChannelId.replace('@', '')}/${message.message_id}`,
+                        fileType: getFileType(doc.file_name),
+                        uploadedAt: new Date(message.date * 1000).toISOString()
+                    };
+                } else if (message.photo && message.photo.length > 0) {
+                    // Photo (use largest size)
+                    const photo = message.photo[message.photo.length - 1];
+                    documentData = {
+                        id: 'telegram_photo_' + photo.file_id,
+                        name: caption.substring(0, 50) || 'Telegram Image',
+                        university: university,
+                        subject: extractSubject(caption),
+                        year: new Date().getFullYear().toString(),
+                        size: 'Image',
+                        date: message.date * 1000,
+                        caption: caption || '',
+                        tags: extractTags(caption),
+                        url: `https://api.telegram.org/file/bot${CONFIG.telegramBotToken}/${photo.file_path}`,
+                        telegramUrl: `https://t.me/${CONFIG.telegramChannelId.replace('@', '')}/${message.message_id}`,
+                        fileType: 'image',
+                        uploadedAt: new Date(message.date * 1000).toISOString()
+                    };
+                }
+                
+                return documentData;
+            } catch (error) {
+                console.error('Error extracting document info:', error);
+                return null;
+            }
+        }
+
+        function extractSubject(caption) {
+            const subjectKeywords = [
+                'mathematics', 'physics', 'chemistry', 'biology',
+                'computer', 'engineering', 'business', 'economics',
+                'law', 'medicine', 'agriculture', 'statistics'
+            ];
+            
+            for (const keyword of subjectKeywords) {
+                if (caption.toLowerCase().includes(keyword)) {
+                    return keyword.charAt(0).toUpperCase() + keyword.slice(1);
+                }
+            }
+            
+            return 'General';
+        }
+
+        function extractTags(caption) {
+            const tags = [];
+            const words = caption.toLowerCase().split(/\s+/);
+            
+            const tagKeywords = [
+                'notes', 'past paper', 'exam', 'assignment',
+                'lab', 'manual', 'guide', 'textbook',
+                'lecture', 'tutorial', 'solution', 'answer'
+            ];
+            
+            tagKeywords.forEach(keyword => {
+                if (caption.toLowerCase().includes(keyword)) {
+                    tags.push(keyword.replace(' ', '-'));
+                }
+            });
+            
+            // Add university tag if found
+            const universities = [
+                'egerton', 'nairobi', 'kenyatta', 'jkuat',
+                'mmust', 'moi', 'strathmore', 'catholic'
+            ];
+            
+            universities.forEach(uni => {
+                if (caption.toLowerCase().includes(uni)) {
+                    tags.push(uni);
+                }
+            });
+            
+            return tags.length > 0 ? tags : ['telegram'];
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return 'Unknown';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function getFileType(filename) {
+            if (!filename) return 'file';
+            
+            const extension = filename.split('.').pop().toLowerCase();
+            const fileTypes = {
+                'pdf': 'pdf',
+                'doc': 'word',
+                'docx': 'word',
+                'txt': 'text',
+                'ppt': 'powerpoint',
+                'pptx': 'powerpoint',
+                'xls': 'excel',
+                'xlsx': 'excel',
+                'jpg': 'image',
+                'jpeg': 'image',
+                'png': 'image',
+                'gif': 'image'
+            };
+            
+            return fileTypes[extension] || 'file';
+        }
+
+        function showTelegramStatus(message, type) {
+            const statusDiv = document.getElementById('telegramStatus');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+                statusDiv.className = `status-message status-${type}`;
+                statusDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function openTelegramFileHelper() {
+            window.open('https://t.me/RevisionVaultDocuments', '_blank');
+            showAdminStatus('ℹ️ Open your Telegram channel to get document links', 'info');
+        }
+
+        // ==================== FIXED DOCUMENT VIEWER ====================
+        function viewDocument(docId) {
+            if (!currentUser) {
+                showStatus('Please subscribe to view documents', 'error');
+                return;
+            }
+            
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) {
+                showStatus('Document not found', 'error');
+                return;
+            }
+            
+            document.getElementById('documentModal').style.display = 'flex';
+            document.getElementById('modalDocTitle').textContent = doc.name;
+            
+            const viewerContent = document.getElementById('documentViewerContent');
+            
+            // Get file extension
+            const url = doc.url || doc.directUrl || doc.telegramUrl;
+            const fileType = doc.fileType || getFileTypeFromUrl(url);
+            
+            // Create viewer based on file type
+            if (fileType === 'pdf') {
+                // Use Google Docs Viewer for PDFs
+                viewerContent.innerHTML = `
+                    <div class="document-viewer-container">
+                        <div class="document-viewer-toolbar">
+                            <div class="file-type-indicator">
+                                <i class="fas fa-file-pdf"></i> PDF Document
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <a href="${url}" target="_blank" class="btn btn-small btn-primary">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                        <iframe 
+                            src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true"
+                            class="document-viewer-frame"
+                            title="${doc.name}"
+                            allow="fullscreen"
+                        ></iframe>
+                    </div>
+                `;
+            } else if (fileType === 'word') {
+                // Use Microsoft Office Online Viewer for Word documents
+                viewerContent.innerHTML = `
+                    <div class="document-viewer-container">
+                        <div class="document-viewer-toolbar">
+                            <div class="file-type-indicator">
+                                <i class="fas fa-file-word"></i> Word Document
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <a href="${url}" target="_blank" class="btn btn-small btn-primary">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                        <iframe 
+                            src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}"
+                            class="document-viewer-frame"
+                            title="${doc.name}"
+                            allow="fullscreen"
+                        ></iframe>
+                    </div>
+                `;
+            } else if (fileType === 'image') {
+                // Display images directly
+                viewerContent.innerHTML = `
+                    <div class="document-viewer-container">
+                        <div class="document-viewer-toolbar">
+                            <div class="file-type-indicator">
+                                <i class="fas fa-file-image"></i> Image
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <a href="${url}" target="_blank" class="btn btn-small btn-primary">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                        <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: #f3f4f6; overflow: auto;">
+                            <img src="${url}" alt="${doc.name}" style="max-width: 100%; max-height: 100%;">
+                        </div>
+                    </div>
+                `;
+            } else {
+                // For other file types, show download option
+                viewerContent.innerHTML = `
+                    <div class="document-viewer-container">
+                        <div class="document-viewer-toolbar">
+                            <div class="file-type-indicator">
+                                <i class="fas fa-file-alt"></i> ${fileType.toUpperCase()} File
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <a href="${url}" target="_blank" class="btn btn-small btn-primary">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f3f4f6; padding: 40px;">
+                            <i class="fas fa-file-download" style="font-size: 80px; color: var(--primary); margin-bottom: 20px;"></i>
+                            <h3 style="font-size: 24px; color: var(--dark); margin-bottom: 15px;">${doc.name}</h3>
+                            <p style="color: var(--gray); text-align: center; margin-bottom: 30px;">
+                                This file type cannot be previewed directly. Please download it to view.
+                            </p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 100%; max-width: 500px;">
+                                <div style="text-align: center; padding: 20px; background: white; border-radius: var(--radius); border: 2px solid var(--border);">
+                                    <div style="font-size: 14px; color: var(--gray); margin-bottom: 5px;">File Type</div>
+                                    <div style="font-weight: 600; color: var(--dark);">${doc.fileType || getFileType(doc.name)}</div>
+                                </div>
+                                <div style="text-align: center; padding: 20px; background: white; border-radius: var(--radius); border: 2px solid var(--border);">
+                                    <div style="font-size: 14px; color: var(--gray); margin-bottom: 5px;">File Size</div>
+                                    <div style="font-weight: 600; color: var(--dark);">${doc.size || 'Unknown'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            logActivity('Viewed document: ' + doc.name);
+        }
+
+        function getFileTypeFromUrl(url) {
+            if (!url) return 'file';
+            
+            // Check if URL ends with file extension
+            const extensionMatch = url.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
+            if (extensionMatch) {
+                const ext = extensionMatch[1].toLowerCase();
+                if (ext === 'pdf') return 'pdf';
+                if (['doc', 'docx'].includes(ext)) return 'word';
+                if (['ppt', 'pptx'].includes(ext)) return 'powerpoint';
+                if (['xls', 'xlsx'].includes(ext)) return 'excel';
+                if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(ext)) return 'image';
+                if (['txt', 'rtf'].includes(ext)) return 'text';
+            }
+            
+            // Check Telegram file paths
+            if (url.includes('api.telegram.org/file')) {
+                const pathMatch = url.match(/\/[^\/]+\.([a-zA-Z0-9]+)(?:\?|$)/);
+                if (pathMatch) {
+                    const ext = pathMatch[1].toLowerCase();
+                    if (ext === 'pdf') return 'pdf';
+                    if (['doc', 'docx'].includes(ext)) return 'word';
+                    if (['jpg', 'jpeg', 'png'].includes(ext)) return 'image';
+                }
+            }
+            
+            return 'file';
+        }
+
+        function closeDocumentViewer() {
+            document.getElementById('documentModal').style.display = 'none';
+            document.getElementById('documentViewerContent').innerHTML = '';
+        }
 
         // ==================== EVENT LISTENERS ====================
         function setupEventListeners() {
@@ -1307,6 +1909,21 @@
                 adminPasswordInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') adminLogin();
                 });
+            }
+            
+            // Telegram config save on change
+            const telegramTokenInput = document.getElementById('telegramBotToken');
+            const telegramChannelInput = document.getElementById('telegramChannel');
+            const syncIntervalSelect = document.getElementById('syncInterval');
+            
+            if (telegramTokenInput) {
+                telegramTokenInput.addEventListener('change', saveTelegramConfig);
+            }
+            if (telegramChannelInput) {
+                telegramChannelInput.addEventListener('change', saveTelegramConfig);
+            }
+            if (syncIntervalSelect) {
+                syncIntervalSelect.addEventListener('change', startAutoSync);
             }
         }
 
@@ -1461,6 +2078,11 @@
             loadUsersTable();
             updateAdminStats();
             loadActivityLog();
+            
+            // Initialize Telegram sync if configured
+            if (CONFIG.telegramBotToken && CONFIG.telegramBotToken !== 'YOUR_BOT_TOKEN_HERE') {
+                startAutoSync();
+            }
         }
 
         // ==================== UNIVERSITY SELECTION ====================
@@ -1776,6 +2398,19 @@
                     year: 'numeric'
                 });
                 
+                // Determine file type icon
+                const fileType = doc.fileType || getFileTypeFromUrl(doc.url);
+                const fileIcons = {
+                    'pdf': 'fa-file-pdf',
+                    'word': 'fa-file-word',
+                    'excel': 'fa-file-excel',
+                    'powerpoint': 'fa-file-powerpoint',
+                    'image': 'fa-file-image',
+                    'text': 'fa-file-alt',
+                    'file': 'fa-file'
+                };
+                const fileIcon = fileIcons[fileType] || 'fa-file';
+                
                 html += `
                     <div class="document-card">
                         <div class="document-university">
@@ -1783,7 +2418,10 @@
                             ${doc.university}
                         </div>
                         
-                        <h3 class="document-title">${doc.name}</h3>
+                        <h3 class="document-title">
+                            <i class="fas ${fileIcon}" style="color: var(--primary); margin-right: 10px;"></i>
+                            ${doc.name}
+                        </h3>
                         
                         <div class="document-meta">
                             <div style="display: flex; align-items: center; gap: 8px;">
@@ -1816,6 +2454,9 @@
                             <button class="btn btn-primary btn-small" onclick="viewDocument('${doc.id}')">
                                 <i class="fas fa-eye"></i> View Document
                             </button>
+                            <a href="${doc.url || doc.directUrl}" target="_blank" class="btn btn-secondary btn-small">
+                                <i class="fas fa-download"></i> Download
+                            </a>
                         </div>
                         
                         <div style="font-size: 12px; color: var(--gray); margin-top: 20px;">
@@ -1859,36 +2500,6 @@
             document.getElementById('documentsList').style.display = 'none';
             document.getElementById('userBadge').style.display = 'none';
             document.getElementById('searchInput').style.display = 'none';
-        }
-
-        // ==================== DOCUMENT VIEWER ====================
-        function viewDocument(docId) {
-            if (!currentUser) {
-                showStatus('Please subscribe to view documents', 'error');
-                return;
-            }
-            
-            const doc = allDocuments.find(d => d.id === docId);
-            if (!doc) {
-                showStatus('Document not found', 'error');
-                return;
-            }
-            
-            // Show modal with iframe
-            document.getElementById('documentModal').style.display = 'flex';
-            document.getElementById('modalDocTitle').textContent = doc.name;
-            
-            // Set iframe source directly to document URL
-            const pdfFrame = document.getElementById('pdfFrame');
-            pdfFrame.src = doc.url || doc.directUrl || `https://docs.google.com/viewer?url=${encodeURIComponent(doc.url)}&embedded=true`;
-            
-            logActivity('Viewed document: ' + doc.name);
-        }
-
-        function closeDocumentViewer() {
-            document.getElementById('documentModal').style.display = 'none';
-            // Clear iframe source to stop any ongoing loading
-            document.getElementById('pdfFrame').src = '';
         }
 
         // ==================== ADMIN FUNCTIONS ====================
@@ -2188,12 +2799,6 @@
                 return;
             }
             
-            // Validate Telegram URL
-            if (!url.includes('t.me') && !url.includes('telegram.org')) {
-                showAdminStatus('Please enter a valid Telegram URL', 'error');
-                return;
-            }
-            
             // Create new document
             const newDoc = {
                 id: 'doc_' + Date.now(),
@@ -2201,11 +2806,12 @@
                 university: university,
                 subject: subject || 'General',
                 year: new Date().getFullYear().toString(),
-                size: 'PDF',
+                size: getFileSizeFromUrl(url),
                 date: Date.now(),
                 caption: 'Uploaded via admin panel',
                 tags: subject ? [subject.toLowerCase().replace(/ /g, '-')] : ['general'],
                 url: url,
+                fileType: getFileTypeFromUrl(url),
                 uploadedAt: new Date().toISOString(),
                 uploadedBy: 'admin'
             };
@@ -2230,53 +2836,10 @@
             logActivity('Document uploaded: ' + name + ' (' + university + ')', 'admin');
         }
 
-        function syncTelegramDocuments() {
-            showAdminStatus('⏳ Syncing documents from Telegram...', 'info');
-            
-            // Simulate Telegram sync
-            setTimeout(() => {
-                // Add some demo documents from Telegram
-                const telegramDocs = [
-                    {
-                        id: 'telegram_' + Date.now(),
-                        name: 'Mathematics Past Papers 2023',
-                        university: 'University of Nairobi',
-                        subject: 'Mathematics',
-                        year: '2023',
-                        size: '2.1 MB',
-                        date: Date.now() - 86400000,
-                        caption: 'Latest mathematics past papers with solutions',
-                        tags: ['mathematics', 'past-papers', 'uon'],
-                        url: 'https://t.me/RevisionVaultDocuments/1'
-                    },
-                    {
-                        id: 'telegram_' + (Date.now() + 1),
-                        name: 'Physics Laboratory Guide',
-                        university: 'Egerton University',
-                        subject: 'Physics',
-                        year: '2023',
-                        size: '3.4 MB',
-                        date: Date.now() - 172800000,
-                        caption: 'Complete physics laboratory manual',
-                        tags: ['physics', 'laboratory', 'egerton'],
-                        url: 'https://t.me/RevisionVaultDocuments/2'
-                    }
-                ];
-                
-                // Add to documents
-                telegramDocs.forEach(doc => allDocuments.unshift(doc));
-                saveDocumentsToCache();
-                
-                // Update UI
-                updateDocumentCount(allDocuments.length);
-                
-                if (currentUser) {
-                    loadUserDocuments();
-                }
-                
-                showAdminStatus('✅ Synced 2 new documents from Telegram', 'success');
-                logActivity('Telegram sync completed: 2 new documents', 'admin');
-            }, 2000);
+        function getFileSizeFromUrl(url) {
+            // This is a placeholder - in a real app you would fetch the file header
+            // to get the actual size
+            return 'PDF';
         }
 
         function saveDocumentsToCache() {
@@ -2415,15 +2978,17 @@
             const demoDocs = [
                 {
                     id: '1',
-                    name: 'Mathematics 101 - Calculus',
+                    name: 'Mathematics 101 - Calculus Notes',
                     university: 'Egerton University',
                     subject: 'Mathematics',
                     year: '2023',
                     size: '2.4 MB',
                     date: Date.now() - 86400000,
-                    caption: 'Calculus past papers with solutions',
-                    tags: ['calculus', 'mathematics', 'egerton'],
-                    url: 'https://t.me/RevisionVaultDocuments/demo1'
+                    caption: 'Calculus past papers with solutions and study guide',
+                    tags: ['calculus', 'mathematics', 'egerton', 'notes'],
+                    url: 'https://docs.google.com/document/d/1/edit?usp=sharing',
+                    fileType: 'word',
+                    uploadedAt: new Date().toISOString()
                 },
                 {
                     id: '2',
@@ -2433,28 +2998,17 @@
                     year: '2023',
                     size: '3.1 MB',
                     date: Date.now() - 172800000,
-                    caption: 'Physics laboratory experiments',
-                    tags: ['physics', 'laboratory', 'uon'],
-                    url: 'https://t.me/RevisionVaultDocuments/demo2'
+                    caption: 'Physics laboratory experiments and procedures',
+                    tags: ['physics', 'laboratory', 'uon', 'manual'],
+                    url: 'https://drive.google.com/file/d/1/view?usp=sharing',
+                    fileType: 'pdf',
+                    uploadedAt: new Date().toISOString()
                 }
             ];
             
             saveDocumentsToCache(demoDocs);
             allDocuments = demoDocs;
             updateDocumentCount(demoDocs.length);
-        }
-        
-        function saveDocumentsToCache(docs) {
-            try {
-                const cacheData = {
-                    documents: docs || allDocuments,
-                    timestamp: Date.now(),
-                    count: (docs || allDocuments).length
-                };
-                localStorage.setItem('revisionvault_documents_cache', JSON.stringify(cacheData));
-            } catch (error) {
-                console.error('Error saving to cache:', error);
-            }
         }
     </script>
 </body>
