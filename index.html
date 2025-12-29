@@ -330,6 +330,67 @@
             margin-bottom: 10px;
         }
 
+        /* ==================== ADMIN LOGIN ==================== */
+        .admin-login-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 50px 0;
+        }
+
+        .admin-login-box {
+            background: white;
+            padding: 50px;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--border);
+            text-align: center;
+        }
+
+        .admin-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .admin-logo i {
+            font-size: 48px;
+            color: white;
+        }
+
+        .admin-login-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .admin-login-subtitle {
+            color: var(--gray);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .admin-secret-hint {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fef3c7;
+            border-radius: var(--radius);
+            border: 2px solid #fde68a;
+            color: #92400e;
+            font-size: 14px;
+            display: none;
+        }
+
+        .admin-secret-hint.show {
+            display: block;
+        }
+
         /* ==================== STATUS MESSAGES ==================== */
         .status-message {
             padding: 20px;
@@ -636,6 +697,7 @@
             .documents-grid { grid-template-columns: 1fr; }
             .admin-dashboard { grid-template-columns: 1fr; }
             .mpesa-number { font-size: 32px; }
+            .admin-login-box { padding: 30px; }
         }
 
         @media (max-width: 480px) {
@@ -645,24 +707,19 @@
             .document-card { padding: 20px; }
             .stat-card { padding: 20px; }
             .stat-value { font-size: 36px; }
+            .admin-login-title { font-size: 24px; }
+            .admin-logo { width: 80px; height: 80px; }
+            .admin-logo i { font-size: 36px; }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
 </head>
 <body>
-    <!-- Admin Secret Access -->
+    <!-- Admin Secret Access Button -->
     <div style="position: fixed; top: 15px; right: 15px; z-index: 9999;">
         <button onclick="showAdminSecretAccess()" style="background: var(--primary); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; box-shadow: var(--shadow);">
             <i class="fas fa-shield-alt"></i>
         </button>
-    </div>
-
-    <!-- Auto-Sync Indicator -->
-    <div id="autoSyncIndicator" class="status-message status-info" style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: none;">
-        <i class="fas fa-sync-alt fa-spin"></i>
-        <span>Syncing new documents...</span>
     </div>
 
     <div class="container">
@@ -913,11 +970,6 @@
                 </button>
             </div>
 
-            <!-- Subject Filter -->
-            <div style="display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap;" id="subjectFilters">
-                <!-- Subjects will be loaded here -->
-            </div>
-
             <!-- Documents Grid -->
             <div class="documents-grid" id="documentsList">
                 <!-- Documents will be loaded here -->
@@ -950,13 +1002,18 @@
 
         <!-- Admin Panel Tab -->
         <div id="admin" class="tab-content">
-            <!-- Admin Login -->
-            <div id="adminLogin">
-                <div class="form-container" style="max-width: 500px; margin: 0 auto;">
-                    <h2 style="font-size: 28px; margin-bottom: 20px; color: var(--dark); display: flex; align-items: center; gap: 15px;">
-                        <i class="fas fa-lock"></i>
-                        Admin Login
-                    </h2>
+            <!-- Admin Login (Always shown first) -->
+            <div id="adminLogin" class="admin-login-container">
+                <div class="admin-login-box">
+                    <div class="admin-logo">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    
+                    <h2 class="admin-login-title">Admin Panel</h2>
+                    <p class="admin-login-subtitle">Enter password to access admin controls</p>
+                    
+                    <!-- Status Message -->
+                    <div id="adminStatusMessage" class="status-message" style="display: none;"></div>
                     
                     <div class="form-group">
                         <label class="form-label">Admin Password</label>
@@ -966,11 +1023,40 @@
                     <button class="btn btn-primary btn-block" onclick="adminLogin()">
                         <i class="fas fa-sign-in-alt"></i> Login as Admin
                     </button>
+                    
+                    <!-- Secret hint for admin -->
+                    <div id="adminSecretHint" class="admin-secret-hint">
+                        <i class="fas fa-key"></i>
+                        <strong>Admin Hint:</strong> Use the shield button in top-right corner for quick access
+                    </div>
+                    
+                    <!-- Logout button (shown when logged in) -->
+                    <div id="adminLogoutBtn" style="display: none; margin-top: 20px;">
+                        <button class="btn btn-secondary btn-block" onclick="adminLogout()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Admin Dashboard -->
+            <!-- Admin Dashboard (Hidden until login) -->
             <div id="adminDashboard" style="display: none;">
+                <!-- Admin Header -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                    <div>
+                        <h2 style="font-size: 28px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                            <i class="fas fa-user-shield"></i>
+                            Admin Dashboard
+                        </h2>
+                        <p style="color: var(--gray); margin-top: 10px;">
+                            Welcome back, Admin. Manage subscriptions and documents.
+                        </p>
+                    </div>
+                    <button class="btn btn-danger" onclick="adminLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+
                 <!-- Stats Cards -->
                 <div class="admin-dashboard">
                     <div class="stat-card">
@@ -1157,12 +1243,14 @@
     <script>
         // ==================== CONFIGURATION ====================
         const CONFIG = {
+            // ADMIN PASSWORD - ONLY YOU KNOW THIS
             adminPassword: 'walter.zauko23',
             phoneNumber: '254765098865',
             whatsappNumber: '254765098865',
             subscriptionDays: 150, // 5 months approximately
-            autoSyncInterval: 30000, // 30 seconds
-            telegramChannel: 'RevisionVaultDocuments'
+            telegramChannel: 'RevisionVaultDocuments',
+            // Session timeout for admin (8 hours)
+            adminSessionTimeout: 8 * 60 * 60 * 1000
         };
 
         // ==================== GLOBAL STATE ====================
@@ -1171,7 +1259,6 @@
         let currentUser = null;
         let isAdmin = false;
         let selectedUniversity = '';
-        let autoSyncTimer = null;
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -1181,40 +1268,56 @@
             checkUserSession();
             checkAdminSession();
             loadDocuments();
-            startAutoSync();
+            
+            // Check if we're on admin tab with session
+            if (window.location.hash === '#admin') {
+                switchTab('admin');
+            }
         });
 
         // ==================== EVENT LISTENERS ====================
         function setupEventListeners() {
             // Phone input formatting
-            document.getElementById('userPhone').addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length > 0) {
-                    if (value.length <= 3) {
-                        value = value;
-                    } else if (value.length <= 6) {
-                        value = value.substring(0, 3) + ' ' + value.substring(3);
-                    } else {
-                        value = value.substring(0, 3) + ' ' + value.substring(3, 6) + ' ' + value.substring(6, 9);
+            const phoneInput = document.getElementById('userPhone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 0) {
+                        if (value.length <= 3) {
+                            value = value;
+                        } else if (value.length <= 6) {
+                            value = value.substring(0, 3) + ' ' + value.substring(3);
+                        } else {
+                            value = value.substring(0, 3) + ' ' + value.substring(3, 6) + ' ' + value.substring(6, 9);
+                        }
                     }
-                }
-                e.target.value = value;
-            });
+                    e.target.value = value;
+                });
+            }
             
             // Transaction code uppercase
-            document.getElementById('txnCode').addEventListener('input', function(e) {
-                e.target.value = e.target.value.toUpperCase();
-            });
+            const txnInput = document.getElementById('txnCode');
+            if (txnInput) {
+                txnInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+            }
             
             // Search input
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') searchDocuments();
-            });
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') searchDocuments();
+                });
+            }
             
             // Admin password enter key
-            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') adminLogin();
-            });
+            const adminPasswordInput = document.getElementById('adminPassword');
+            if (adminPasswordInput) {
+                adminPasswordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') adminLogin();
+                });
+            }
         }
 
         // ==================== TAB MANAGEMENT ====================
@@ -1230,7 +1333,16 @@
             
             // Activate selected tab
             document.getElementById(tabName).classList.add('active');
-            event.target.closest('.tab').classList.add('active');
+            
+            // Find and activate the clicked tab
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                if (tab.textContent.includes(tabName === 'subscribe' ? 'Subscribe' : 
+                                             tabName === 'documents' ? 'My University Materials' : 
+                                             'Admin Panel')) {
+                    tab.classList.add('active');
+                }
+            });
             
             // Load content for tab
             if (tabName === 'documents') {
@@ -1243,7 +1355,122 @@
                 checkAdminSession();
             }
             
+            // Update URL hash
+            window.location.hash = tabName;
+            
             logActivity('Switched to ' + tabName + ' tab');
+        }
+
+        // ==================== ADMIN SECRET ACCESS ====================
+        function showAdminSecretAccess() {
+            const secretCode = prompt('🔐 Enter Admin Secret Code:');
+            if (secretCode === 'RV2023@Walter') {
+                document.getElementById('adminPassword').value = CONFIG.adminPassword;
+                showAdminStatus('🔑 Admin access code accepted', 'success');
+                switchTab('admin');
+                
+                setTimeout(() => {
+                    document.getElementById('adminPassword').focus();
+                    document.getElementById('adminSecretHint').classList.add('show');
+                }, 500);
+            } else if (secretCode) {
+                showAdminStatus('❌ Invalid secret code', 'error');
+            }
+        }
+
+        // ==================== ADMIN SESSION MANAGEMENT ====================
+        function checkAdminSession() {
+            const adminData = localStorage.getItem('revisionvault_admin_session');
+            if (adminData) {
+                try {
+                    const session = JSON.parse(adminData);
+                    const now = new Date().getTime();
+                    
+                    // Check if session is still valid
+                    if (session.expires > now && session.loggedIn) {
+                        isAdmin = true;
+                        showAdminDashboard();
+                    } else {
+                        // Session expired
+                        adminLogout();
+                    }
+                } catch (error) {
+                    console.error('Error parsing admin session:', error);
+                    adminLogout();
+                }
+            } else {
+                // No session found, show login
+                showAdminLogin();
+            }
+        }
+
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value.trim();
+            
+            if (!password) {
+                showAdminStatus('Please enter admin password', 'error');
+                return;
+            }
+            
+            if (password === CONFIG.adminPassword) {
+                isAdmin = true;
+                
+                // Create admin session
+                const session = {
+                    loggedIn: true,
+                    timestamp: new Date().getTime(),
+                    expires: new Date().getTime() + CONFIG.adminSessionTimeout
+                };
+                
+                // Save session to localStorage
+                localStorage.setItem('revisionvault_admin_session', JSON.stringify(session));
+                
+                // Update UI
+                showAdminDashboard();
+                
+                showAdminStatus('✅ Admin login successful!', 'success');
+                logActivity('Admin logged in', 'admin');
+                
+                // Clear password field
+                document.getElementById('adminPassword').value = '';
+                
+            } else {
+                showAdminStatus('❌ Invalid admin password', 'error');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function adminLogout() {
+            isAdmin = false;
+            
+            // Clear admin session
+            localStorage.removeItem('revisionvault_admin_session');
+            
+            // Update UI
+            showAdminLogin();
+            
+            showAdminStatus('👋 Admin logged out', 'success');
+            logActivity('Admin logged out', 'admin');
+        }
+
+        function showAdminLogin() {
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminLogoutBtn').style.display = 'none';
+            document.getElementById('adminSecretHint').classList.remove('show');
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminLogin').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            document.getElementById('adminLogoutBtn').style.display = 'block';
+            
+            // Load admin data
+            loadPendingApprovals();
+            loadUsersTable();
+            updateAdminStats();
+            loadActivityLog();
         }
 
         // ==================== UNIVERSITY SELECTION ====================
@@ -1642,7 +1869,6 @@
             document.getElementById('documentsList').style.display = 'none';
             document.getElementById('userBadge').style.display = 'none';
             document.getElementById('searchInput').style.display = 'none';
-            document.getElementById('subjectFilters').style.display = 'none';
         }
 
         // ==================== DOCUMENT VIEWER ====================
@@ -1688,99 +1914,7 @@
             `;
         }
 
-        // ==================== ADMIN SYSTEM ====================
-        function showAdminSecretAccess() {
-            const secretCode = prompt('🔐 Enter Admin Secret Code:');
-            if (secretCode === 'RV2023@Walter') {
-                document.getElementById('adminPassword').value = CONFIG.adminPassword;
-                showStatus('🔑 Admin access code accepted', 'success');
-                switchTab('admin');
-                
-                setTimeout(() => {
-                    document.getElementById('adminPassword').focus();
-                }, 500);
-            } else if (secretCode) {
-                showStatus('❌ Invalid secret code', 'error');
-            }
-        }
-
-        function adminLogin() {
-            const password = document.getElementById('adminPassword').value.trim();
-            
-            if (!password) {
-                showStatus('Please enter admin password', 'error');
-                return;
-            }
-            
-            if (password === CONFIG.adminPassword) {
-                isAdmin = true;
-                
-                // Save admin session
-                localStorage.setItem('revisionvault_admin', JSON.stringify({
-                    loggedIn: true,
-                    timestamp: Date.now()
-                }));
-                
-                // Update UI
-                document.getElementById('adminLogin').style.display = 'none';
-                document.getElementById('adminDashboard').style.display = 'block';
-                
-                // Load admin data
-                loadPendingApprovals();
-                loadUsersTable();
-                updateAdminStats();
-                loadActivityLog();
-                
-                showStatus('✅ Admin login successful!', 'success');
-                logActivity('Admin logged in', 'admin');
-                
-                document.getElementById('adminPassword').value = '';
-                
-            } else {
-                showStatus('❌ Invalid admin password', 'error');
-                document.getElementById('adminPassword').value = '';
-                document.getElementById('adminPassword').focus();
-            }
-        }
-
-        function checkAdminSession() {
-            const adminData = localStorage.getItem('revisionvault_admin');
-            if (adminData) {
-                try {
-                    const admin = JSON.parse(adminData);
-                    if (admin.loggedIn) {
-                        const sessionAge = Date.now() - admin.timestamp;
-                        const maxSessionAge = 12 * 60 * 60 * 1000;
-                        
-                        if (sessionAge < maxSessionAge) {
-                            isAdmin = true;
-                            document.getElementById('adminLogin').style.display = 'none';
-                            document.getElementById('adminDashboard').style.display = 'block';
-                            loadPendingApprovals();
-                            loadUsersTable();
-                            updateAdminStats();
-                            loadActivityLog();
-                        } else {
-                            adminLogout();
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error parsing admin data:', error);
-                }
-            }
-        }
-
-        function adminLogout() {
-            isAdmin = false;
-            localStorage.removeItem('revisionvault_admin');
-            
-            document.getElementById('adminLogin').style.display = 'block';
-            document.getElementById('adminDashboard').style.display = 'none';
-            
-            showStatus('👋 Admin logged out', 'success');
-            logActivity('Admin logged out', 'admin');
-        }
-
+        // ==================== ADMIN FUNCTIONS ====================
         function loadPendingApprovals() {
             const container = document.getElementById('pendingApprovalsList');
             const pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
@@ -1886,7 +2020,7 @@
                 // Send approval notification
                 sendApprovalNotification(approval.displayPhone, approval.university);
                 
-                showStatus(`✅ Approved subscription for ${approval.displayPhone} (${approval.university})`, 'success');
+                showAdminStatus(`✅ Approved subscription for ${approval.displayPhone} (${approval.university})`, 'success');
                 logActivity('Approved subscription: ' + approval.displayPhone + ' (' + approval.university + ')', 'admin');
             }
         }
@@ -1904,7 +2038,7 @@
                 loadPendingApprovals();
                 updateAdminStats();
                 
-                showStatus(`❌ Rejected subscription for ${phone}`, 'success');
+                showAdminStatus(`❌ Rejected subscription for ${phone}`, 'success');
                 logActivity('Rejected subscription: ' + phone + ' (' + university + ')', 'admin');
             }
         }
@@ -2034,7 +2168,7 @@
                 loadUsersTable();
                 updateAdminStats();
                 
-                showStatus(`✅ Deactivated user: ${userPhone}`, 'success');
+                showAdminStatus(`✅ Deactivated user: ${userPhone}`, 'success');
                 logActivity('Deactivated user: ' + userPhone + ' (' + university + ')', 'admin');
             }
         }
@@ -2060,7 +2194,7 @@
                 loadUsersTable();
                 updateAdminStats();
                 
-                showStatus(`✅ Extended subscription for ${userPhone} by 30 days`, 'success');
+                showAdminStatus(`✅ Extended subscription for ${userPhone} by 30 days`, 'success');
                 logActivity('Extended subscription: ' + userPhone, 'admin');
             }
         }
@@ -2073,13 +2207,13 @@
             const url = document.getElementById('docUrl').value.trim();
             
             if (!name || !university || !url) {
-                showStatus('Please fill all required fields', 'error');
+                showAdminStatus('Please fill all required fields', 'error');
                 return;
             }
             
             // Validate Telegram URL
             if (!url.includes('t.me') && !url.includes('telegram.org')) {
-                showStatus('Please enter a valid Telegram URL', 'error');
+                showAdminStatus('Please enter a valid Telegram URL', 'error');
                 return;
             }
             
@@ -2115,12 +2249,12 @@
             document.getElementById('docSubject').value = '';
             document.getElementById('docUrl').value = '';
             
-            showStatus('✅ Document uploaded successfully', 'success');
+            showAdminStatus('✅ Document uploaded successfully', 'success');
             logActivity('Document uploaded: ' + name + ' (' + university + ')', 'admin');
         }
 
         function syncTelegramDocuments() {
-            document.getElementById('autoSyncIndicator').style.display = 'flex';
+            showAdminStatus('⏳ Syncing documents from Telegram...', 'info');
             
             // Simulate Telegram sync
             setTimeout(() => {
@@ -2163,8 +2297,7 @@
                     loadUserDocuments();
                 }
                 
-                document.getElementById('autoSyncIndicator').style.display = 'none';
-                showStatus('✅ Synced 2 new documents from Telegram', 'success');
+                showAdminStatus('✅ Synced 2 new documents from Telegram', 'success');
                 logActivity('Telegram sync completed: 2 new documents', 'admin');
             }, 2000);
         }
@@ -2239,73 +2372,6 @@
             tbody.innerHTML = html;
         }
 
-        // ==================== AUTO-SYNC ====================
-        function startAutoSync() {
-            if (autoSyncTimer) {
-                clearInterval(autoSyncTimer);
-            }
-            
-            autoSyncTimer = setInterval(async () => {
-                await autoSyncDocuments();
-            }, CONFIG.autoSyncInterval);
-            
-            logActivity('Auto-sync started');
-        }
-
-        async function autoSyncDocuments() {
-            try {
-                // Show sync indicator
-                document.getElementById('autoSyncIndicator').style.display = 'flex';
-                
-                // Simulate fetching new documents
-                setTimeout(() => {
-                    // In real implementation, this would fetch from Telegram API
-                    const newDocs = [
-                        {
-                            id: 'sync_' + Date.now(),
-                            name: 'New Chemistry Notes',
-                            university: 'Kenyatta University',
-                            subject: 'Chemistry',
-                            year: '2023',
-                            size: '1.8 MB',
-                            date: Date.now(),
-                            caption: 'Latest chemistry notes uploaded',
-                            tags: ['chemistry', 'ku', 'notes'],
-                            url: 'https://t.me/RevisionVaultDocuments/new'
-                        }
-                    ];
-                    
-                    // Add to documents
-                    newDocs.forEach(doc => {
-                        if (!allDocuments.find(d => d.name === doc.name)) {
-                            allDocuments.unshift(doc);
-                        }
-                    });
-                    
-                    saveDocumentsToCache();
-                    
-                    // Update UI
-                    updateDocumentCount(allDocuments.length);
-                    
-                    if (currentUser) {
-                        loadUserDocuments();
-                    }
-                    
-                    // Hide sync indicator
-                    setTimeout(() => {
-                        document.getElementById('autoSyncIndicator').style.display = 'none';
-                    }, 2000);
-                    
-                    logActivity('Auto-sync: 1 new document added');
-                    
-                }, 1500);
-                
-            } catch (error) {
-                console.error('Auto-sync error:', error);
-                document.getElementById('autoSyncIndicator').style.display = 'none';
-            }
-        }
-
         // ==================== UTILITY FUNCTIONS ====================
         function formatPhoneForAPI(phone) {
             let cleaned = phone.replace(/\s+/g, '');
@@ -2316,18 +2382,36 @@
         }
 
         function updateDocumentCount(count) {
-            document.getElementById('docCountBadge').textContent = count + ' documents';
+            const badge = document.getElementById('docCountBadge');
+            if (badge) {
+                badge.textContent = count + ' documents';
+            }
         }
 
         function showStatus(message, type) {
             const statusDiv = document.getElementById('statusMessage');
-            statusDiv.textContent = message;
-            statusDiv.className = `status-message status-${type}`;
-            statusDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 5000);
+            if (statusDiv) {
+                statusDiv.textContent = message;
+                statusDiv.className = `status-message status-${type}`;
+                statusDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showAdminStatus(message, type) {
+            const statusDiv = document.getElementById('adminStatusMessage');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+                statusDiv.className = `status-message status-${type}`;
+                statusDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
         }
 
         function logActivity(message, user = 'system') {
@@ -2347,6 +2431,40 @@
             if (isAdmin && document.getElementById('adminDashboard').style.display !== 'none') {
                 loadActivityLog();
             }
+        }
+
+        // Load demo documents on first run
+        if (!localStorage.getItem('revisionvault_documents_cache')) {
+            const demoDocs = [
+                {
+                    id: '1',
+                    name: 'Mathematics 101 - Calculus',
+                    university: 'Egerton University',
+                    subject: 'Mathematics',
+                    year: '2023',
+                    size: '2.4 MB',
+                    date: Date.now() - 86400000,
+                    caption: 'Calculus past papers with solutions',
+                    tags: ['calculus', 'mathematics', 'egerton'],
+                    url: 'https://t.me/RevisionVaultDocuments/demo1'
+                },
+                {
+                    id: '2',
+                    name: 'Physics Laboratory Manual',
+                    university: 'University of Nairobi',
+                    subject: 'Physics',
+                    year: '2023',
+                    size: '3.1 MB',
+                    date: Date.now() - 172800000,
+                    caption: 'Physics laboratory experiments',
+                    tags: ['physics', 'laboratory', 'uon'],
+                    url: 'https://t.me/RevisionVaultDocuments/demo2'
+                }
+            ];
+            
+            saveDocumentsToCache(demoDocs);
+            allDocuments = demoDocs;
+            updateDocumentCount(demoDocs.length);
         }
     </script>
 </body>
