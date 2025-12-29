@@ -481,6 +481,8 @@
             font-weight: 700;
             color: var(--dark);
             margin-bottom: 15px;
+            word-break: break-word;
+            white-space: normal;
         }
 
         .document-meta {
@@ -697,6 +699,9 @@
             color: var(--dark);
             margin-bottom: 5px;
             font-size: 14px;
+            white-space: normal !important;
+            word-break: break-word !important;
+            line-height: 1.4 !important;
         }
 
         .document-list-item-meta {
@@ -821,6 +826,12 @@
             border-radius: 12px;
             margin-top: 20px;
             display: none;
+        }
+
+        /* ==================== FIXED STYLES ==================== */
+        #currentDocumentTitle {
+            word-break: break-word;
+            white-space: normal;
         }
 
         /* ==================== RESPONSIVE ==================== */
@@ -1501,8 +1512,8 @@
             subscriptionDays: 150,
             telegramChannel: 'RevisionVaultDocuments',
             adminSessionTimeout: 8 * 60 * 60 * 1000,
-            telegramBotToken: null, // You can add your bot token here for auto-sync
-            telegramChannelId: null // Add your channel ID here
+            telegramBotToken: null,
+            telegramChannelId: null
         };
 
         // ==================== GLOBAL STATE ====================
@@ -1531,7 +1542,7 @@
         });
 
         function initializeDemoData() {
-            // Initialize with sample documents if none exist
+            // Only initialize if no documents exist
             if (!localStorage.getItem('revisionvault_documents_cache')) {
                 const demoDocs = [
                     {
@@ -1541,11 +1552,12 @@
                         subject: 'Mathematics',
                         year: '2023',
                         size: '2.4 MB',
-                        date: Date.now() - 86400000,
+                        date: Date.now(),
                         caption: 'Calculus past papers with solutions',
                         tags: ['calculus', 'mathematics', 'egerton'],
-                        url: 'https://www.africau.edu/images/default/sample.pdf',
-                        type: 'pdf'
+                        url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                        type: 'pdf',
+                        uploadedAt: new Date().toISOString()
                     },
                     {
                         id: '2',
@@ -1554,11 +1566,12 @@
                         subject: 'Physics',
                         year: '2023',
                         size: '3.1 MB',
-                        date: Date.now() - 172800000,
+                        date: Date.now() - 86400000,
                         caption: 'Physics laboratory experiments and procedures',
                         tags: ['physics', 'laboratory', 'uon'],
-                        url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-                        type: 'pdf'
+                        url: 'https://www.africau.edu/images/default/sample.pdf',
+                        type: 'pdf',
+                        uploadedAt: new Date(Date.now() - 86400000).toISOString()
                     },
                     {
                         id: '3',
@@ -1567,11 +1580,54 @@
                         subject: 'Computer Science',
                         year: '2023',
                         size: '1.8 MB',
-                        date: Date.now() - 259200000,
+                        date: Date.now() - 172800000,
                         caption: 'Introduction to programming and algorithms',
                         tags: ['computer-science', 'programming', 'ku'],
                         url: 'https://css4.pub/2015/textbook/somatosensory.pdf',
-                        type: 'pdf'
+                        type: 'pdf',
+                        uploadedAt: new Date(Date.now() - 172800000).toISOString()
+                    },
+                    {
+                        id: '4',
+                        name: 'AGRO 222 Notes - Aged 24 Batch 4',
+                        university: 'Egerton University',
+                        subject: 'Agriculture',
+                        year: '2024',
+                        size: '2.1 MB',
+                        date: Date.now() - 259200000,
+                        caption: 'Agriculture course notes for batch 4',
+                        tags: ['agriculture', 'agro', 'egerton'],
+                        url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                        type: 'pdf',
+                        uploadedAt: new Date(Date.now() - 259200000).toISOString()
+                    },
+                    {
+                        id: '5',
+                        name: 'EDFO 112 Epistemology and Education Notes',
+                        university: 'University of Nairobi',
+                        subject: 'Education',
+                        year: '2024',
+                        size: '1.9 MB',
+                        date: Date.now() - 345600000,
+                        caption: 'Education philosophy and epistemology notes',
+                        tags: ['education', 'philosophy', 'uon'],
+                        url: 'https://www.africau.edu/images/default/sample.pdf',
+                        type: 'pdf',
+                        uploadedAt: new Date(Date.now() - 345600000).toISOString()
+                    },
+                    {
+                        id: '6',
+                        name: 'BOTA 241 - Taxonomy of Higher Plants Notes (1)',
+                        university: 'Kenyatta University',
+                        subject: 'Botany',
+                        year: '2024',
+                        size: '3.2 MB',
+                        date: Date.now() - 432000000,
+                        caption: 'Botany notes on plant taxonomy',
+                        tags: ['botany', 'plants', 'taxonomy', 'ku'],
+                        url: 'https://css4.pub/2015/textbook/somatosensory.pdf',
+                        type: 'pdf',
+                        uploadedAt: new Date(Date.now() - 432000000).toISOString()
                     }
                 ];
                 
@@ -1580,9 +1636,15 @@
                     timestamp: Date.now(),
                     count: demoDocs.length
                 };
-                localStorage.setItem('revisionvault_documents_cache', JSON.stringify(cacheData));
-                allDocuments = demoDocs;
-                updateDocumentCount(demoDocs.length);
+                
+                try {
+                    localStorage.setItem('revisionvault_documents_cache', JSON.stringify(cacheData));
+                    allDocuments = demoDocs;
+                    updateDocumentCount(demoDocs.length);
+                    console.log('Demo data initialized with', demoDocs.length, 'documents');
+                } catch (error) {
+                    console.error('Error saving demo data:', error);
+                }
             }
         }
 
@@ -1762,10 +1824,26 @@
             if (userData) {
                 try {
                     const user = JSON.parse(userData);
-                    const expiry = new Date(user.expiry);
+                    
+                    // Fix: Ensure expiry is a valid date
+                    let expiry;
+                    try {
+                        expiry = new Date(user.expiry);
+                        if (isNaN(expiry.getTime())) {
+                            expiry = new Date();
+                            expiry.setDate(expiry.getDate() + CONFIG.subscriptionDays);
+                        }
+                    } catch (error) {
+                        expiry = new Date();
+                        expiry.setDate(expiry.getDate() + CONFIG.subscriptionDays);
+                    }
                     
                     if (expiry > new Date()) {
                         currentUser = user;
+                        
+                        // Ensure expiry is updated
+                        currentUser.expiry = expiry.toISOString();
+                        localStorage.setItem('revisionvault_user', JSON.stringify(currentUser));
                         
                         document.getElementById('subscriptionForm').style.display = 'none';
                         document.getElementById('userInfo').style.display = 'block';
@@ -1777,8 +1855,8 @@
                             <div class="status-message status-success">
                                 <div style="text-align: left;">
                                     <h4 style="margin-bottom: 15px;">✅ Active Subscription</h4>
-                                    <p><strong>University:</strong> ${user.university}</p>
-                                    <p><strong>Phone:</strong> ${user.phone}</p>
+                                    <p><strong>University:</strong> ${user.university || 'Not specified'}</p>
+                                    <p><strong>Phone:</strong> ${user.phone || 'Not specified'}</p>
                                     <p><strong>Expires:</strong> ${expiry.toLocaleDateString()}</p>
                                     <p><strong>Days remaining:</strong> ${daysLeft}</p>
                                     <p><strong>Status:</strong> Approved</p>
@@ -1786,13 +1864,17 @@
                             </div>
                         `;
                         
+                        // Update user badge
                         document.getElementById('userBadge').style.display = 'inline-flex';
-                        document.getElementById('userPhoneDisplay').textContent = user.displayPhone;
-                        document.getElementById('userUniversityDisplay').textContent = user.university;
+                        document.getElementById('userPhoneDisplay').textContent = user.displayPhone || user.phone || 'User';
+                        document.getElementById('userUniversityDisplay').textContent = user.university || 'University';
                         
-                        document.getElementById('documentsTitle').textContent = user.university + ' Materials';
-                        document.getElementById('documentsSubtitle').textContent = 'Materials from ' + user.university + ' only';
+                        // Update documents tab title
+                        const uniName = user.university || 'University';
+                        document.getElementById('documentsTitle').textContent = uniName + ' Materials';
+                        document.getElementById('documentsSubtitle').textContent = 'Materials from ' + uniName + ' only';
                         
+                        // Load user-specific documents
                         loadUserDocuments();
                         
                         logActivity('User session restored: ' + user.phone);
@@ -1805,6 +1887,7 @@
                     logout();
                 }
             } else {
+                // No user session
                 document.getElementById('subscriptionForm').style.display = 'block';
                 document.getElementById('userInfo').style.display = 'none';
                 document.getElementById('pendingApproval').style.display = 'none';
@@ -2020,21 +2103,42 @@
             let html = '';
             
             documents.forEach((doc, index) => {
-                const date = new Date(doc.date);
-                const dateStr = date.toLocaleDateString('en-GB', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric'
-                });
+                // Fix: Proper date handling
+                let dateStr = 'Recent';
+                try {
+                    if (doc.date) {
+                        const date = new Date(doc.date);
+                        if (!isNaN(date.getTime())) {
+                            dateStr = date.toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric'
+                            });
+                        }
+                    } else if (doc.uploadedAt) {
+                        const date = new Date(doc.uploadedAt);
+                        dateStr = date.toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Date error for doc:', doc.name, error);
+                }
+                
+                // Fix: Handle document name formatting
+                const docName = doc.name || 'Untitled Document';
+                const displayName = docName.replace(/(\d+)\s*\((\d+)\)/g, '$1 ($2)');
                 
                 html += `
                     <div class="document-card">
                         <div class="document-university">
                             <i class="fas fa-university"></i>
-                            ${doc.university}
+                            ${doc.university || 'University'}
                         </div>
                         
-                        <h3 class="document-title">${doc.name}</h3>
+                        <h3 class="document-title">${displayName}</h3>
                         
                         <div class="document-meta">
                             <div style="display: flex; align-items: center; gap: 8px;">
@@ -2043,7 +2147,7 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-calendar"></i>
-                                <span>${doc.year || '2023'}</span>
+                                <span>${doc.year || '2024'}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-file-alt"></i>
@@ -2057,11 +2161,13 @@
                             </p>
                         ` : ''}
                         
-                        <div class="document-tags">
-                            ${(doc.tags || []).slice(0, 3).map(tag => `
-                                <span class="document-tag">#${tag}</span>
-                            `).join('')}
-                        </div>
+                        ${doc.tags && doc.tags.length > 0 ? `
+                            <div class="document-tags">
+                                ${doc.tags.slice(0, 3).map(tag => `
+                                    <span class="document-tag">#${tag}</span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
                         
                         <div class="document-actions">
                             <button class="btn btn-primary btn-small" onclick="viewDocument('${doc.id}')">
@@ -2122,6 +2228,11 @@
                 return;
             }
             
+            // Ensure documents are loaded
+            if (userDocuments.length === 0) {
+                loadUserDocuments();
+            }
+            
             viewerDocuments = userDocuments;
             currentViewerIndex = viewerDocuments.findIndex(d => d.id === docId);
             
@@ -2135,17 +2246,81 @@
         }
 
         function updateViewerContent() {
+            if (viewerDocuments.length === 0) {
+                closeDocumentViewer();
+                showStatus('No documents available', 'error');
+                return;
+            }
+            
             const doc = viewerDocuments[currentViewerIndex];
             
-            document.getElementById('modalDocTitle').textContent = 'Document Viewer - ' + currentUser.university;
-            document.getElementById('currentDocumentTitle').textContent = doc.name;
+            // Fix: Check if university exists
+            const universityName = currentUser && currentUser.university ? currentUser.university : 'University';
+            
+            document.getElementById('modalDocTitle').textContent = 'Document Viewer - ' + universityName;
+            document.getElementById('currentDocumentTitle').textContent = doc.name || 'Untitled Document';
+            
+            // Fix: Format date properly
+            let formattedDate = 'Recent';
+            try {
+                if (doc.date) {
+                    const date = new Date(doc.date);
+                    if (!isNaN(date.getTime())) {
+                        formattedDate = date.toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                    }
+                } else if (doc.uploadedAt) {
+                    const date = new Date(doc.uploadedAt);
+                    formattedDate = date.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                }
+            } catch (error) {
+                console.error('Date formatting error:', error);
+                formattedDate = 'Recent';
+            }
+            
             document.getElementById('currentDocumentMeta').innerHTML = `
-                <span>${doc.subject || 'General'} • ${doc.size || 'Unknown'} • ${new Date(doc.date).toLocaleDateString()}</span>
+                <span>${doc.subject || 'General'} • ${doc.size || 'Unknown'} • ${formattedDate}</span>
             `;
             
+            // Fix: Handle document URLs properly
             const pdfFrame = document.getElementById('pdfFrame');
-            pdfFrame.src = doc.url;
+            let documentUrl = doc.url;
             
+            // If it's a Telegram URL, make sure it's properly formatted
+            if (documentUrl && documentUrl.includes('t.me')) {
+                if (!documentUrl.startsWith('https://')) {
+                    documentUrl = 'https://' + documentUrl;
+                }
+            } else if (!documentUrl && doc.directUrl) {
+                documentUrl = doc.directUrl;
+            }
+            
+            // For PDFs, use Google Docs viewer as fallback
+            if (documentUrl && (documentUrl.includes('.pdf') || doc.type === 'pdf')) {
+                if (!documentUrl.includes('drive.google.com') && !documentUrl.includes('docs.google.com')) {
+                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(documentUrl)}&embedded=true`;
+                    pdfFrame.src = googleViewerUrl;
+                } else {
+                    pdfFrame.src = documentUrl;
+                }
+            } else if (documentUrl) {
+                pdfFrame.src = documentUrl;
+            } else {
+                pdfFrame.src = 'about:blank';
+                document.getElementById('currentDocumentTitle').textContent = 'Document not available';
+                document.getElementById('currentDocumentMeta').innerHTML = `
+                    <span style="color: var(--danger);">This document is not available for viewing</span>
+                `;
+            }
+            
+            // Update position indicator
             document.getElementById('currentDocPosition').textContent = `${currentViewerIndex + 1} of ${viewerDocuments.length}`;
             document.getElementById('prevBtn').disabled = currentViewerIndex === 0;
             document.getElementById('nextBtn').disabled = currentViewerIndex === viewerDocuments.length - 1;
@@ -2158,16 +2333,48 @@
 
         function populateDocumentList() {
             const container = document.getElementById('documentListContent');
+            
+            if (!viewerDocuments || viewerDocuments.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--gray);">
+                        <i class="fas fa-file-alt" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>No documents available</p>
+                    </div>
+                `;
+                return;
+            }
+            
             let html = '';
             
             viewerDocuments.forEach((doc, index) => {
                 const isActive = index === currentViewerIndex;
+        
+                let listDate = '';
+                try {
+                    if (doc.date) {
+                        const date = new Date(doc.date);
+                        if (!isNaN(date.getTime())) {
+                            listDate = date.toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: 'short'
+                            });
+                        }
+                    }
+                } catch (error) {
+                    listDate = '';
+                }
+                
+                const docName = doc.name || 'Untitled Document';
+                const displayName = docName.replace(/(\d+)\s*\((\d+)\)/g, '$1 ($2)');
+                
                 html += `
                     <div class="document-list-item ${isActive ? 'active' : ''}" onclick="switchToDocument(${index})">
-                        <div class="document-list-item-title">${doc.name}</div>
+                        <div class="document-list-item-title">
+                            ${displayName}
+                        </div>
                         <div class="document-list-item-meta">
                             <span>${doc.subject || 'General'}</span>
-                            <span>${doc.size || 'Unknown'}</span>
+                            <span>${listDate}</span>
                         </div>
                     </div>
                 `;
