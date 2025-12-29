@@ -1,0 +1,2739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevisionVault - University Study Materials</title>
+    <style>
+        /* ==================== GLOBAL STYLES ==================== */
+        :root {
+            --primary: #1a2980;
+            --secondary: #26d0ce;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1f2937;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px 50px;
+            text-align: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-icon i {
+            font-size: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text h1 {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+        }
+
+        .tagline {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* ==================== TABS ==================== */
+        .tabs {
+            display: flex;
+            background: var(--light);
+            border-bottom: 2px solid var(--border);
+            padding: 0 50px;
+        }
+
+        .tab {
+            padding: 25px 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 4px solid transparent;
+            transition: all 0.3s;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 50px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            padding: 16px 32px;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(26, 41, 128, 0.25);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        /* ==================== SUBSCRIPTION PANEL ==================== */
+        .subscription-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .price-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid #bae6fd;
+            margin-bottom: 40px;
+        }
+
+        .price-tag {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 10px;
+            margin: 30px 0;
+            padding: 25px 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .price {
+            font-size: 56px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .period {
+            font-size: 20px;
+            color: var(--gray);
+        }
+
+        .mpesa-box {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 40px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .mpesa-number {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ==================== FORMS ==================== */
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            border: 2px solid var(--border);
+            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 16px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 41, 128, 0.1);
+        }
+
+        /* ==================== UNIVERSITY SELECTION ==================== */
+        .university-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .university-card {
+            padding: 20px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .university-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .university-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            box-shadow: var(--shadow);
+        }
+
+        .university-icon {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        /* ==================== ADMIN LOGIN ==================== */
+        .admin-login-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 50px 0;
+        }
+
+        .admin-login-box {
+            background: white;
+            padding: 50px;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--border);
+            text-align: center;
+        }
+
+        .admin-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .admin-logo i {
+            font-size: 48px;
+            color: white;
+        }
+
+        .admin-login-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .admin-login-subtitle {
+            color: var(--gray);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .admin-secret-hint {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fef3c7;
+            border-radius: var(--radius);
+            border: 2px solid #fde68a;
+            color: #92400e;
+            font-size: 14px;
+            display: none;
+        }
+
+        .admin-secret-hint.show {
+            display: block;
+        }
+
+        /* ==================== STATUS MESSAGES ==================== */
+        .status-message {
+            padding: 20px;
+            border-radius: var(--radius);
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #a7f3d0;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #fecaca;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #fde68a;
+        }
+
+        .status-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 2px solid #bfdbfe;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #fde68a;
+        }
+
+        /* ==================== DOCUMENTS GRID ==================== */
+        .documents-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .document-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        .document-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .document-university {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #e0f2fe;
+            color: #0369a1;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .document-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .document-meta {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .document-description {
+            color: var(--gray);
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .document-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .document-tag {
+            padding: 6px 12px;
+            background: #f3f4f6;
+            color: var(--dark);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        /* ==================== ADMIN PANEL ==================== */
+        .admin-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 16px;
+        }
+
+        .admin-section {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            border: 2px solid var(--border);
+            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+        }
+
+        .users-table th {
+            background: var(--light);
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .users-table td {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            color: var(--gray);
+        }
+
+        .users-table tr:hover {
+            background: var(--light);
+        }
+
+        /* ==================== MODAL ==================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 95%;
+            height: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            height: calc(100% - 80px);
+            padding: 0;
+            position: relative;
+            background: white;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        /* ==================== DOCUMENT VIEWER ==================== */
+        .document-viewer-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .document-viewer-toolbar {
+            padding: 15px;
+            background: var(--light);
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .document-viewer-frame {
+            flex: 1;
+            border: none;
+            background: white;
+        }
+
+        .file-type-indicator {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* ==================== SEARCH ==================== */
+        .search-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .search-input {
+            padding: 20px 60px 20px 30px;
+            font-size: 18px;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            width: 100%;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* ==================== USER BADGE ==================== */
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: var(--light);
+            border-radius: 50px;
+            font-weight: 600;
+            color: var(--dark);
+            border: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1200px) {
+            .logo-text h1 { font-size: 36px; }
+            .price { font-size: 48px; }
+        }
+
+        @media (max-width: 992px) {
+            .header { padding: 30px; }
+            .tabs { padding: 0 30px; }
+            .tab-content { padding: 30px; }
+            .tab { padding: 20px 25px; font-size: 16px; }
+            .documents-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { padding: 25px; }
+            .logo { flex-direction: column; }
+            .logo-text h1 { font-size: 32px; }
+            .tabs { overflow-x: auto; }
+            .tab { padding: 18px 20px; font-size: 15px; }
+            .tab-content { padding: 25px; }
+            .price { font-size: 42px; }
+            .form-container { padding: 25px; }
+            .documents-grid { grid-template-columns: 1fr; }
+            .admin-dashboard { grid-template-columns: 1fr; }
+            .mpesa-number { font-size: 32px; }
+            .admin-login-box { padding: 30px; }
+            .modal-content { width: 98%; height: 98%; }
+        }
+
+        @media (max-width: 480px) {
+            .price { font-size: 36px; }
+            .btn { padding: 14px 24px; font-size: 15px; }
+            .search-input { padding: 16px 50px 16px 20px; font-size: 16px; }
+            .document-card { padding: 20px; }
+            .stat-card { padding: 20px; }
+            .stat-value { font-size: 36px; }
+            .admin-login-title { font-size: 24px; }
+            .admin-logo { width: 80px; height: 80px; }
+            .admin-logo i { font-size: 36px; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Admin Secret Access Button -->
+    <div style="position: fixed; top: 15px; right: 15px; z-index: 9999;">
+        <button onclick="showAdminSecretAccess()" style="background: var(--primary); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; box-shadow: var(--shadow);">
+            <i class="fas fa-shield-alt"></i>
+        </button>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>RevisionVault</h1>
+                    <p class="tagline">University-Specific Study Materials System</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('subscribe')">
+                <i class="fas fa-user-graduate"></i>
+                <span>Subscribe</span>
+            </div>
+            <div class="tab" onclick="switchTab('documents')">
+                <i class="fas fa-file-pdf"></i>
+                <span>My University Materials</span>
+            </div>
+            <div class="tab" onclick="switchTab('admin')">
+                <i class="fas fa-user-shield"></i>
+                <span>Admin Panel</span>
+            </div>
+        </div>
+
+        <!-- Tab Contents -->
+        
+        <!-- Subscribe Tab -->
+        <div id="subscribe" class="tab-content active">
+            <div class="subscription-section">
+                <!-- Status Message -->
+                <div id="statusMessage" class="status-message" style="display: none;"></div>
+
+                <!-- User Info (if logged in) -->
+                <div id="userInfo" style="display: none;">
+                    <div class="form-container">
+                        <h2 style="font-size: 28px; margin-bottom: 20px; color: var(--dark);">
+                            <i class="fas fa-user-check"></i> Your Subscription
+                        </h2>
+                        <div id="subscriptionDetails"></div>
+                        <button class="btn btn-secondary btn-block" onclick="logout()" style="margin-top: 30px;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pending Approval -->
+                <div id="pendingApproval" style="display: none;">
+                    <div class="form-container">
+                        <h2 style="font-size: 28px; margin-bottom: 20px; color: var(--dark);">
+                            <i class="fas fa-clock"></i> Pending Approval
+                        </h2>
+                        <div id="pendingDetails"></div>
+                        <button class="btn btn-secondary btn-block" onclick="checkApprovalStatus()">
+                            <i class="fas fa-sync-alt"></i> Check Status Again
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Subscription Form (shown when not subscribed) -->
+                <div id="subscriptionForm">
+                    <div class="price-card">
+                        <h2 style="font-size: 32px; margin-bottom: 15px; color: var(--primary);">Access Your University Revision Materials</h2>
+                        <p style="font-size: 18px; color: var(--gray); margin-bottom: 20px;">
+                            Subscribe to access all study materials from your chosen university only. No mixing with other universities.
+                        </p>
+                        
+                        <div class="price-tag">
+                            <span class="price">Ksh 50</span>
+                            <span class="period">/semester (5 months)</span>
+                        </div>
+                        
+                        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap;">
+                            <a href="https://t.me/RevisionVaultDocuments" class="btn btn-info" target="_blank">
+                                <i class="fab fa-telegram"></i> Telegram Channel
+                            </a>
+                            <a href="https://wa.me/254765098865" class="btn btn-success" target="_blank">
+                                <i class="fab fa-whatsapp"></i> Contact Support
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- How to Subscribe -->
+                    <div class="form-container">
+                        <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                            <i class="fas fa-mobile-alt"></i>
+                            How to Subscribe
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin: 40px 0;">
+                            <div style="text-align: center; padding: 25px; border-left: 4px solid var(--primary); background: var(--light); border-radius: var(--radius);">
+                                <div style="width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; margin: 0 auto 20px;">1</div>
+                                <h4 style="font-size: 20px; margin-bottom: 15px; color: var(--dark);">Select University</h4>
+                                <p style="color: var(--gray);">Choose your university during subscription</p>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 25px; border-left: 4px solid var(--success); background: var(--light); border-radius: var(--radius);">
+                                <div style="width: 50px; height: 50px; background: var(--success); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; margin: 0 auto 20px;">2</div>
+                                <h4 style="font-size: 20px; margin-bottom: 15px; color: var(--dark);">Send Ksh 50</h4>
+                                <p style="color: var(--gray);">Via M-Pesa to number below</p>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 25px; border-left: 4px solid var(--info); background: var(--light); border-radius: var(--radius);">
+                                <div style="width: 50px; height: 50px; background: var(--info); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; margin: 0 auto 20px;">3</div>
+                                <h4 style="font-size: 20px; margin-bottom: 15px; color: var(--dark);">Submit Details</h4>
+                                <p style="color: var(--gray);">Phone and transaction code for approval</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mpesa-box">
+                            <div style="font-size: 20px; margin-bottom: 10px;">
+                                <i class="fas fa-money-bill-wave"></i> Send Ksh 50 to:
+                            </div>
+                            <div class="mpesa-number">0765 098 865</div>
+                            <div style="font-size: 18px; margin: 15px 0;">
+                                <strong>Reference:</strong> REVISIONVAULT
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Form -->
+                    <div class="form-container">
+                        <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                            <i class="fas fa-check-circle"></i>
+                            Subscribe to Your University
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Your Phone Number</label>
+                            <input type="tel" id="userPhone" class="form-control" placeholder="0712 345 678" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Transaction Code</label>
+                            <input type="text" id="txnCode" class="form-control" placeholder="ABC123XYZ" maxlength="10" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Your University</label>
+                            <div class="university-grid">
+                                <div class="university-card" onclick="selectUniversity('Egerton University')">
+                                    <div class="university-icon">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div style="font-weight: 600; color: var(--dark);">Egerton University</div>
+                                </div>
+                                
+                                <div class="university-card" onclick="selectUniversity('University of Nairobi')">
+                                    <div class="university-icon">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div style="font-weight: 600; color: var(--dark);">University of Nairobi (UON)</div>
+                                </div>
+                                
+                                <div class="university-card" onclick="selectUniversity('Kenyatta University')">
+                                    <div class="university-icon">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div style="font-weight: 600; color: var(--dark);">Kenyatta University (KU)</div>
+                                </div>
+                                
+                                <div class="university-card" onclick="selectUniversity('JKUAT')">
+                                    <div class="university-icon">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div style="font-weight: 600; color: var(--dark);">JKUAT</div>
+                                </div>
+                                
+                                <div class="university-card" onclick="selectUniversity('MMUST')">
+                                    <div class="university-icon">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div style="font-weight: 600; color: var(--dark);">MMUST</div>
+                                </div>
+                                
+                                <div class="university-card" onclick="selectUniversity('Moi University')">
+                                    <div class="university-icon">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div style="font-weight: 600; color: var(--dark);">Moi University</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="userUniversity" required>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-block" onclick="submitPayment()">
+                            <i class="fas fa-paper-plane"></i> Submit for Approval
+                        </button>
+                        
+                        <div class="status-message status-warning" style="margin-top: 30px;">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Important:</strong> You will only access materials from your chosen university.
+                                No mixing with other universities. Approval takes 1-24 hours.
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-secondary btn-block" onclick="checkApprovalStatus()" style="margin-top: 20px;">
+                            <i class="fas fa-sync-alt"></i> Check Approval Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Tab -->
+        <div id="documents" class="tab-content">
+            <!-- User Badge -->
+            <div id="userBadge" class="user-badge" style="display: none;">
+                <i class="fas fa-user-graduate"></i>
+                <span id="userPhoneDisplay">Loading...</span>
+                <span style="color: var(--primary);">•</span>
+                <i class="fas fa-university"></i>
+                <span id="userUniversityDisplay">Loading...</span>
+            </div>
+
+            <div class="documents-header">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-file-pdf"></i>
+                        <span id="documentsTitle">My University Materials</span>
+                    </h2>
+                    <p style="color: var(--gray); margin-top: 10px;" id="documentsSubtitle">
+                        Materials from your chosen university only
+                    </p>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div style="background: var(--primary); color: white; padding: 12px 24px; border-radius: 50px; font-weight: 600;">
+                        <i class="fas fa-file-alt"></i>
+                        <span id="docCountBadge">0 documents</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search within your university materials...">
+                <button class="search-button" onclick="searchDocuments()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <!-- Documents Grid -->
+            <div class="documents-grid" id="documentsList">
+                <!-- Documents will be loaded here -->
+            </div>
+
+            <!-- No Documents Message -->
+            <div id="noDocuments" style="text-align: center; padding: 60px; color: var(--gray); display: none;">
+                <i class="fas fa-file-alt" style="font-size: 80px; margin-bottom: 30px; color: #e5e7eb;"></i>
+                <h3 style="font-size: 28px; margin-bottom: 15px; color: var(--dark);">No Documents Found</h3>
+                <p style="font-size: 18px; margin-bottom: 30px;" id="noDocumentsMessage">
+                    No materials available for your university yet.
+                </p>
+                <button class="btn btn-primary" onclick="loadDocuments()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Subscribe Message -->
+            <div id="subscribeMessage" style="text-align: center; padding: 60px; color: var(--gray); display: none;">
+                <i class="fas fa-lock" style="font-size: 80px; margin-bottom: 30px; color: #e5e7eb;"></i>
+                <h3 style="font-size: 28px; margin-bottom: 15px; color: var(--dark);">Access Restricted</h3>
+                <p style="font-size: 18px; margin-bottom: 30px;">
+                    Please subscribe to access university materials.
+                </p>
+                <button class="btn btn-primary" onclick="switchTab('subscribe')">
+                    <i class="fas fa-user-graduate"></i> Subscribe Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Admin Panel Tab -->
+        <div id="admin" class="tab-content">
+            <!-- Admin Login (Always shown first) -->
+            <div id="adminLogin" class="admin-login-container">
+                <div class="admin-login-box">
+                    <div class="admin-logo">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    
+                    <h2 class="admin-login-title">Admin Panel</h2>
+                    <p class="admin-login-subtitle">Enter password to access admin controls</p>
+                    
+                    <!-- Status Message -->
+                    <div id="adminStatusMessage" class="status-message" style="display: none;"></div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Admin Password</label>
+                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password" autocomplete="off">
+                    </div>
+                    
+                    <button class="btn btn-primary btn-block" onclick="adminLogin()">
+                        <i class="fas fa-sign-in-alt"></i> Login as Admin
+                    </button>
+                    
+                    <!-- Secret hint for admin -->
+                    <div id="adminSecretHint" class="admin-secret-hint">
+                        <i class="fas fa-key"></i>
+                        <strong>Admin Hint:</strong> Use the shield button in top-right corner for quick access
+                    </div>
+                    
+                    <!-- Logout button (shown when logged in) -->
+                    <div id="adminLogoutBtn" style="display: none; margin-top: 20px;">
+                        <button class="btn btn-secondary btn-block" onclick="adminLogout()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Dashboard (Hidden until login) -->
+            <div id="adminDashboard" style="display: none;">
+                <!-- Admin Header -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                    <div>
+                        <h2 style="font-size: 28px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                            <i class="fas fa-user-shield"></i>
+                            Admin Dashboard
+                        </h2>
+                        <p style="color: var(--gray); margin-top: 10px;">
+                            Welcome back, Admin. Manage subscriptions and documents.
+                        </p>
+                    </div>
+                    <button class="btn btn-danger" onclick="adminLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="admin-dashboard">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalDocuments">0</div>
+                        <div class="stat-label">Total Documents</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalStudents">0</div>
+                        <div class="stat-label">Active Students</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="pendingApprovalsCount">0</div>
+                        <div class="stat-label">Pending Approvals</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="revenue">Ksh 0</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                </div>
+
+                <!-- Pending Approvals -->
+                <div class="admin-section">
+                    <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-user-check"></i>
+                        Pending Approvals
+                    </h3>
+                    <div id="pendingApprovalsList"></div>
+                </div>
+
+                <!-- Users Management -->
+                <div class="admin-section">
+                    <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-users"></i>
+                        Users Management
+                    </h3>
+                    
+                    <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
+                        <div style="font-weight: 600; color: var(--dark);">Show:</div>
+                        <button class="btn btn-small btn-secondary" onclick="filterUsers('all')">All Users</button>
+                        <button class="btn btn-small btn-success" onclick="filterUsers('active')">Active</button>
+                        <button class="btn btn-small btn-warning" onclick="filterUsers('expiring')">Expiring</button>
+                        <button class="btn btn-small btn-danger" onclick="filterUsers('expired')">Expired</button>
+                    </div>
+                    
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Phone</th>
+                                <th>University</th>
+                                <th>Status</th>
+                                <th>Days Left</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Document Upload Section -->
+                <div class="admin-section">
+                    <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-upload"></i>
+                        Upload New Document
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Document Name *</label>
+                        <input type="text" id="docName" class="form-control" placeholder="e.g., Mathematics 101 - Calculus Notes">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">University *</label>
+                        <select id="docUniversity" class="form-control">
+                            <option value="Egerton University">Egerton University</option>
+                            <option value="University of Nairobi">University of Nairobi</option>
+                            <option value="Kenyatta University">Kenyatta University</option>
+                            <option value="JKUAT">JKUAT</option>
+                            <option value="MMUST">MMUST</option>
+                            <option value="Moi University">Moi University</option>
+                            <option value="Strathmore University">Strathmore University</option>
+                            <option value="Catholic University">Catholic University of EA</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Subject/Course *</label>
+                        <input type="text" id="docSubject" class="form-control" placeholder="e.g., Mathematics, Physics, Computer Science">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Document Description</label>
+                        <textarea id="docDescription" class="form-control" rows="3" placeholder="Brief description of the document"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Document Type</label>
+                        <select id="docType" class="form-control">
+                            <option value="pdf">PDF</option>
+                            <option value="word">Word Document (.doc/.docx)</option>
+                            <option value="excel">Excel (.xls/.xlsx)</option>
+                            <option value="ppt">PowerPoint (.ppt/.pptx)</option>
+                            <option value="image">Image (.jpg/.png)</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <!-- URL Section -->
+                    <div class="form-group">
+                        <label class="form-label">Document URL *</label>
+                        <input type="text" id="docUrl" class="form-control" placeholder="https://drive.google.com/... or https://t.me/...">
+                        <small style="color: var(--gray); margin-top: 5px; display: block;">
+                            For best results, use Google Drive links. Make sure sharing is set to "Anyone with the link can view"
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Alternative Download URL (Optional)</label>
+                        <input type="text" id="docDownloadUrl" class="form-control" placeholder="https://direct-download-link.com/file.pdf">
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <button class="btn btn-primary btn-block" onclick="addDocument()">
+                            <i class="fas fa-upload"></i> Upload Document
+                        </button>
+                        <button class="btn btn-secondary btn-block" onclick="clearDocumentForm()">
+                            <i class="fas fa-times"></i> Clear Form
+                        </button>
+                    </div>
+                    
+                    <!-- Google Drive Helper -->
+                    <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: var(--radius); border: 2px solid #a5d6a7;">
+                        <h4 style="color: #2e7d32; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-info-circle"></i> How to Get Google Drive Link:
+                        </h4>
+                        <ol style="color: #388e3c; padding-left: 20px;">
+                            <li>Upload file to Google Drive</li>
+                            <li>Right-click file → Share → Share with people and groups</li>
+                            <li>Click "Change" → Select "Anyone with the link" → Viewer</li>
+                            <li>Click "Copy link" and paste above</li>
+                            <li>Make sure link starts with: <code>https://drive.google.com/file/d/...</code></li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Quick Document Actions -->
+                <div class="admin-section">
+                    <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-bolt"></i>
+                        Quick Actions
+                    </h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <button class="btn btn-success" onclick="loadAllDocuments()">
+                            <i class="fas fa-sync-alt"></i> Refresh All Documents
+                        </button>
+                        <button class="btn btn-info" onclick="exportDocuments()">
+                            <i class="fas fa-download"></i> Export Document List
+                        </button>
+                        <button class="btn btn-warning" onclick="addSampleDocuments()">
+                            <i class="fas fa-plus-circle"></i> Add Sample Documents
+                        </button>
+                        <button class="btn btn-danger" onclick="clearAllDocuments()">
+                            <i class="fas fa-trash"></i> Clear All Documents
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="admin-section">
+                    <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-history"></i>
+                        Recent Activity
+                    </h3>
+                    
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Activity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityLog"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 40px; color: var(--gray); border-top: 2px solid var(--border); background: var(--light);">
+            <p style="font-size: 18px; font-weight: 600; color: var(--dark); margin-bottom: 10px;">
+                RevisionVault - University-Specific System
+            </p>
+            <p style="color: var(--gray); margin-bottom: 5px;">
+                Owner: Walter Zauko • Contact: 0765 098 865
+            </p>
+            <p style="color: var(--gray); font-size: 14px;">
+                Each user only accesses materials from their chosen university
+            </p>
+        </div>
+    </div>
+
+    <!-- Document Viewer Modal -->
+    <div id="documentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div style="font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-file-alt"></i>
+                    <span id="modalDocTitle">Document Viewer</span>
+                </div>
+                <button class="close-modal" onclick="closeDocumentViewer()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="documentViewerContent" style="height: 100%;">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const CONFIG = {
+            adminPassword: 'walter.zauko23',
+            phoneNumber: '254765098865',
+            whatsappNumber: '254765098865',
+            subscriptionDays: 150,
+            adminSessionTimeout: 8 * 60 * 60 * 1000
+        };
+
+        // ==================== GLOBAL STATE ====================
+        let allDocuments = [];
+        let userDocuments = [];
+        let currentUser = null;
+        let isAdmin = false;
+        let selectedUniversity = '';
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎓 RevisionVault System Initialized');
+            
+            setupEventListeners();
+            checkUserSession();
+            checkAdminSession();
+            loadDocuments();
+            
+            // Load sample documents if none exist
+            if (!localStorage.getItem('revisionvault_documents_cache')) {
+                addSampleDocuments();
+            }
+            
+            if (window.location.hash === '#admin') {
+                switchTab('admin');
+            }
+        });
+
+        // ==================== EVENT LISTENERS ====================
+        function setupEventListeners() {
+            // Phone input formatting
+            const phoneInput = document.getElementById('userPhone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 0) {
+                        if (value.length <= 3) {
+                            value = value;
+                        } else if (value.length <= 6) {
+                            value = value.substring(0, 3) + ' ' + value.substring(3);
+                        } else {
+                            value = value.substring(0, 3) + ' ' + value.substring(3, 6) + ' ' + value.substring(6, 9);
+                        }
+                    }
+                    e.target.value = value;
+                });
+            }
+            
+            // Transaction code uppercase
+            const txnInput = document.getElementById('txnCode');
+            if (txnInput) {
+                txnInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+            }
+            
+            // Search input
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') searchDocuments();
+                });
+            }
+            
+            // Admin password enter key
+            const adminPasswordInput = document.getElementById('adminPassword');
+            if (adminPasswordInput) {
+                adminPasswordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') adminLogin();
+                });
+            }
+        }
+
+        // ==================== TAB MANAGEMENT ====================
+        function switchTab(tabName) {
+            // Update tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activate selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Find and activate the clicked tab
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                if (tab.textContent.includes(tabName === 'subscribe' ? 'Subscribe' : 
+                                             tabName === 'documents' ? 'My University Materials' : 
+                                             'Admin Panel')) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Load content for tab
+            if (tabName === 'documents') {
+                if (currentUser) {
+                    loadUserDocuments();
+                } else {
+                    showSubscribeMessageInDocuments();
+                }
+            } else if (tabName === 'admin') {
+                checkAdminSession();
+            }
+            
+            // Update URL hash
+            window.location.hash = tabName;
+            
+            logActivity('Switched to ' + tabName + ' tab');
+        }
+
+        // ==================== ADMIN SECRET ACCESS ====================
+        function showAdminSecretAccess() {
+            const secretCode = prompt('🔐 Enter Admin Secret Code:');
+            if (secretCode === 'RV2023@Walter') {
+                document.getElementById('adminPassword').value = CONFIG.adminPassword;
+                showAdminStatus('🔑 Admin access code accepted', 'success');
+                switchTab('admin');
+                
+                setTimeout(() => {
+                    document.getElementById('adminPassword').focus();
+                    document.getElementById('adminSecretHint').classList.add('show');
+                }, 500);
+            } else if (secretCode) {
+                showAdminStatus('❌ Invalid secret code', 'error');
+            }
+        }
+
+        // ==================== ADMIN SESSION MANAGEMENT ====================
+        function checkAdminSession() {
+            const adminData = localStorage.getItem('revisionvault_admin_session');
+            if (adminData) {
+                try {
+                    const session = JSON.parse(adminData);
+                    const now = new Date().getTime();
+                    
+                    if (session.expires > now && session.loggedIn) {
+                        isAdmin = true;
+                        showAdminDashboard();
+                    } else {
+                        adminLogout();
+                    }
+                } catch (error) {
+                    console.error('Error parsing admin session:', error);
+                    adminLogout();
+                }
+            } else {
+                showAdminLogin();
+            }
+        }
+
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value.trim();
+            
+            if (!password) {
+                showAdminStatus('Please enter admin password', 'error');
+                return;
+            }
+            
+            if (password === CONFIG.adminPassword) {
+                isAdmin = true;
+                
+                const session = {
+                    loggedIn: true,
+                    timestamp: new Date().getTime(),
+                    expires: new Date().getTime() + CONFIG.adminSessionTimeout
+                };
+                
+                localStorage.setItem('revisionvault_admin_session', JSON.stringify(session));
+                
+                showAdminDashboard();
+                
+                showAdminStatus('✅ Admin login successful!', 'success');
+                logActivity('Admin logged in', 'admin');
+                
+                document.getElementById('adminPassword').value = '';
+                
+            } else {
+                showAdminStatus('❌ Invalid admin password', 'error');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function adminLogout() {
+            isAdmin = false;
+            localStorage.removeItem('revisionvault_admin_session');
+            showAdminLogin();
+            showAdminStatus('👋 Admin logged out', 'success');
+            logActivity('Admin logged out', 'admin');
+        }
+
+        function showAdminLogin() {
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminLogoutBtn').style.display = 'none';
+            document.getElementById('adminSecretHint').classList.remove('show');
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminLogin').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            document.getElementById('adminLogoutBtn').style.display = 'block';
+            
+            loadPendingApprovals();
+            loadUsersTable();
+            updateAdminStats();
+            loadActivityLog();
+        }
+
+        // ==================== UNIVERSITY SELECTION ====================
+        function selectUniversity(university) {
+            selectedUniversity = university;
+            
+            document.querySelectorAll('.university-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            event.target.closest('.university-card').classList.add('selected');
+            document.getElementById('userUniversity').value = university;
+        }
+
+        // ==================== USER SESSION ====================
+        function checkUserSession() {
+            const userData = localStorage.getItem('revisionvault_user');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    const now = new Date();
+                    const expiry = new Date(user.expiry);
+                    
+                    if (expiry > now) {
+                        currentUser = user;
+                        
+                        document.getElementById('subscriptionForm').style.display = 'none';
+                        document.getElementById('userInfo').style.display = 'block';
+                        document.getElementById('pendingApproval').style.display = 'none';
+                        
+                        const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                        
+                        document.getElementById('subscriptionDetails').innerHTML = `
+                            <div class="status-message status-success">
+                                <div style="text-align: left;">
+                                    <h4 style="margin-bottom: 15px;">✅ Active Subscription</h4>
+                                    <p><strong>University:</strong> ${user.university}</p>
+                                    <p><strong>Phone:</strong> ${user.phone}</p>
+                                    <p><strong>Expires:</strong> ${expiry.toLocaleDateString()}</p>
+                                    <p><strong>Days remaining:</strong> ${daysLeft}</p>
+                                    <p><strong>Status:</strong> Approved</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        document.getElementById('userBadge').style.display = 'inline-flex';
+                        document.getElementById('userPhoneDisplay').textContent = user.displayPhone;
+                        document.getElementById('userUniversityDisplay').textContent = user.university;
+                        
+                        document.getElementById('documentsTitle').textContent = user.university + ' Materials';
+                        document.getElementById('documentsSubtitle').textContent = 'Materials from ' + user.university + ' only';
+                        
+                        loadUserDocuments();
+                        
+                        logActivity('User session restored: ' + user.phone);
+                    } else {
+                        logout();
+                        showStatus('⚠️ Your subscription has expired. Please renew.', 'warning');
+                    }
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    logout();
+                }
+            } else {
+                document.getElementById('subscriptionForm').style.display = 'block';
+                document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('pendingApproval').style.display = 'none';
+                document.getElementById('userBadge').style.display = 'none';
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('revisionvault_user');
+            
+            document.getElementById('subscriptionForm').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('pendingApproval').style.display = 'none';
+            document.getElementById('userBadge').style.display = 'none';
+            
+            showSubscribeMessageInDocuments();
+            
+            showStatus('👋 Logged out successfully', 'success');
+            logActivity('User logged out');
+        }
+
+        // ==================== SUBSCRIPTION SYSTEM ====================
+        function submitPayment() {
+            const phoneInput = document.getElementById('userPhone');
+            const txnInput = document.getElementById('txnCode');
+            const universityInput = document.getElementById('userUniversity');
+            
+            const phone = phoneInput.value.trim();
+            const txnCode = txnInput.value.trim().toUpperCase();
+            const university = universityInput.value;
+            
+            if (!phone || phone.length < 10) {
+                showStatus('Please enter a valid Kenyan phone number', 'error');
+                return;
+            }
+            
+            if (!txnCode || txnCode.length < 8) {
+                showStatus('Please enter a valid transaction code (8-10 characters)', 'error');
+                return;
+            }
+            
+            if (!university) {
+                showStatus('Please select your university', 'error');
+                return;
+            }
+            
+            const formattedPhone = formatPhoneForAPI(phone);
+            
+            const pendingApproval = {
+                id: Date.now().toString(),
+                phone: formattedPhone,
+                displayPhone: phone,
+                txnCode: txnCode,
+                university: university,
+                amount: 50,
+                submittedAt: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            let pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            pendingApprovals.push(pendingApproval);
+            localStorage.setItem('revisionvault_pending_approvals', JSON.stringify(pendingApprovals));
+            
+            document.getElementById('subscriptionForm').style.display = 'none';
+            document.getElementById('pendingApproval').style.display = 'block';
+            
+            document.getElementById('pendingDetails').innerHTML = `
+                <div class="status-message status-pending">
+                    <div style="text-align: left;">
+                        <h4 style="margin-bottom: 15px;">⏳ Waiting for Admin Approval</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div>
+                                <div style="font-size: 12px; color: #92400e; font-weight: 600;">UNIVERSITY</div>
+                                <div style="font-size: 18px; font-weight: 600;">${university}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #92400e; font-weight: 600;">PHONE</div>
+                                <div style="font-size: 18px; font-weight: 600;">${phone}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #92400e; font-weight: 600;">TRANSACTION</div>
+                                <div style="font-size: 18px; font-weight: 600;">${txnCode}</div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 20px; font-size: 14px;">
+                            <i class="fas fa-info-circle"></i> Admin approval takes 1-24 hours. You will only access materials from ${university}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            phoneInput.value = '';
+            txnInput.value = '';
+            universityInput.value = '';
+            document.querySelectorAll('.university-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            sendAdminNotification(phone, txnCode, university);
+            
+            showStatus('✅ Subscription submitted for admin approval!', 'success');
+            logActivity('Subscription submitted: ' + phone + ' (' + university + ')');
+        }
+
+        function checkApprovalStatus() {
+            const phoneInput = document.getElementById('userPhone');
+            const phone = formatPhoneForAPI(phoneInput.value.trim());
+            
+            if (!phone) {
+                showStatus('Please enter your phone number first', 'error');
+                return;
+            }
+            
+            const pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            
+            const approval = pendingApprovals.find(a => a.phone === phone && a.status === 'approved');
+            const user = users.find(u => u.phone === phone);
+            
+            if (approval || user) {
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + CONFIG.subscriptionDays);
+                
+                const userData = {
+                    phone: phone,
+                    displayPhone: approval ? approval.displayPhone : user.displayPhone,
+                    university: approval ? approval.university : user.university,
+                    joined: new Date().toISOString(),
+                    expiry: expiryDate.toISOString(),
+                    approvedAt: approval ? approval.approvedAt : user.approvedAt
+                };
+                
+                localStorage.setItem('revisionvault_user', JSON.stringify(userData));
+                currentUser = userData;
+                
+                checkUserSession();
+                
+                showStatus('🎉 Your subscription has been approved! You now have access to ' + userData.university + ' materials.', 'success');
+                logActivity('Subscription approved: ' + phone + ' (' + userData.university + ')');
+            } else {
+                showStatus('⏳ Your subscription is still pending admin approval', 'info');
+            }
+        }
+
+        function sendAdminNotification(phone, txnCode, university) {
+            const message = 
+                `📚 *NEW SUBSCRIPTION - REVISIONVAULT*\n\n` +
+                `• Phone: *${phone}*\n` +
+                `• University: *${university}*\n` +
+                `• Transaction: *${txnCode}*\n` +
+                `• Amount: *Ksh 50*\n` +
+                `• Time: *${new Date().toLocaleTimeString()}*\n\n` +
+                `Approve in admin panel.`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappURL = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodedMessage}`;
+            
+            setTimeout(() => {
+                window.open(whatsappURL, '_blank');
+            }, 1500);
+        }
+
+        // ==================== DOCUMENT MANAGEMENT - FIXED ====================
+        function loadDocuments() {
+            const cachedData = localStorage.getItem('revisionvault_documents_cache');
+            if (cachedData) {
+                try {
+                    const cache = JSON.parse(cachedData);
+                    allDocuments = cache.documents || [];
+                } catch (error) {
+                    console.error('Error loading cached documents:', error);
+                    allDocuments = [];
+                }
+            }
+            
+            updateDocumentCount(allDocuments.length);
+            
+            if (currentUser) {
+                loadUserDocuments();
+            }
+            
+            logActivity('Loaded ' + allDocuments.length + ' documents');
+        }
+
+        function loadAllDocuments() {
+            loadDocuments();
+            showAdminStatus('✅ All documents refreshed', 'success');
+        }
+
+        function loadUserDocuments() {
+            if (!currentUser) {
+                showSubscribeMessageInDocuments();
+                return;
+            }
+            
+            userDocuments = allDocuments.filter(doc => 
+                doc.university === currentUser.university
+            );
+            
+            updateDocumentCount(userDocuments.length);
+            displayDocuments(userDocuments);
+            
+            if (userDocuments.length === 0) {
+                document.getElementById('noDocumentsMessage').textContent = 
+                    'No materials available for ' + currentUser.university + ' yet. Check back soon!';
+                document.getElementById('noDocuments').style.display = 'block';
+            } else {
+                document.getElementById('noDocuments').style.display = 'none';
+            }
+        }
+
+        function displayDocuments(documents) {
+            const container = document.getElementById('documentsList');
+            
+            if (!documents || documents.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            documents.forEach(doc => {
+                const date = new Date(doc.date);
+                const dateStr = date.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                const fileType = doc.fileType || getFileTypeFromUrl(doc.url);
+                const fileIcons = {
+                    'pdf': 'fa-file-pdf',
+                    'word': 'fa-file-word',
+                    'excel': 'fa-file-excel',
+                    'ppt': 'fa-file-powerpoint',
+                    'image': 'fa-file-image',
+                    'other': 'fa-file'
+                };
+                const fileIcon = fileIcons[fileType] || 'fa-file';
+                const fileColor = fileType === 'pdf' ? '#f44336' : 
+                                fileType === 'word' ? '#2b579a' : 
+                                fileType === 'excel' ? '#217346' : 
+                                fileType === 'ppt' ? '#d24726' : 
+                                fileType === 'image' ? '#4caf50' : 
+                                '#757575';
+                
+                html += `
+                    <div class="document-card">
+                        <div class="document-university">
+                            <i class="fas fa-university"></i>
+                            ${doc.university}
+                        </div>
+                        
+                        <h3 class="document-title">
+                            <i class="fas ${fileIcon}" style="color: ${fileColor}; margin-right: 10px;"></i>
+                            ${doc.name}
+                        </h3>
+                        
+                        <div class="document-meta">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-book"></i>
+                                <span>${doc.subject || 'General'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-calendar"></i>
+                                <span>${doc.year || '2023'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-file-alt"></i>
+                                <span>${doc.size || 'PDF'}</span>
+                            </div>
+                        </div>
+                        
+                        ${doc.description ? `
+                            <p class="document-description">
+                                ${doc.description.substring(0, 150)}${doc.description.length > 150 ? '...' : ''}
+                            </p>
+                        ` : ''}
+                        
+                        <div class="document-tags">
+                            ${(doc.tags || []).slice(0, 3).map(tag => `
+                                <span class="document-tag">#${tag}</span>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="document-actions">
+                            <button class="btn btn-primary btn-small" onclick="viewDocument('${doc.id}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-success btn-small" onclick="downloadDocument('${doc.id}')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                        
+                        <div style="font-size: 12px; color: var(--gray); margin-top: 20px;">
+                            <i class="fas fa-clock"></i> Added ${dateStr}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function addDocument() {
+            const name = document.getElementById('docName').value.trim();
+            const university = document.getElementById('docUniversity').value;
+            const subject = document.getElementById('docSubject').value.trim();
+            const description = document.getElementById('docDescription').value.trim();
+            const fileType = document.getElementById('docType').value;
+            const url = document.getElementById('docUrl').value.trim();
+            const downloadUrl = document.getElementById('docDownloadUrl').value.trim();
+            
+            if (!name || !university || !subject || !url) {
+                showAdminStatus('Please fill all required fields (*)', 'error');
+                return;
+            }
+            
+            // Clean and format URL
+            let finalUrl = url;
+            if (url.includes('drive.google.com')) {
+                // Convert Google Drive link to direct download if needed
+                finalUrl = convertGoogleDriveLink(url);
+            }
+            
+            const newDoc = {
+                id: 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                name: name,
+                university: university,
+                subject: subject,
+                description: description,
+                fileType: fileType,
+                size: getFileSizeFromType(fileType),
+                year: new Date().getFullYear().toString(),
+                date: Date.now(),
+                tags: generateTags(subject, university, fileType),
+                url: finalUrl,
+                downloadUrl: downloadUrl || finalUrl,
+                uploadedAt: new Date().toISOString(),
+                uploadedBy: 'admin'
+            };
+            
+            allDocuments.unshift(newDoc);
+            saveDocumentsToCache();
+            
+            updateDocumentCount(allDocuments.length);
+            
+            if (currentUser && currentUser.university === university) {
+                loadUserDocuments();
+            }
+            
+            clearDocumentForm();
+            
+            showAdminStatus('✅ Document uploaded successfully! It will appear in the documents tab immediately.', 'success');
+            logActivity('Document uploaded: ' + name + ' (' + university + ')', 'admin');
+            
+            updateAdminStats();
+        }
+
+        function convertGoogleDriveLink(url) {
+            // Convert Google Drive link to direct download if it's a file link
+            if (url.includes('/file/d/')) {
+                const match = url.match(/\/file\/d\/([^\/]+)/);
+                if (match) {
+                    return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+                }
+            }
+            return url;
+        }
+
+        function getFileSizeFromType(fileType) {
+            const sizes = {
+                'pdf': '1-5 MB',
+                'word': '2-10 MB',
+                'excel': '1-8 MB',
+                'ppt': '3-15 MB',
+                'image': '500KB-5MB',
+                'other': '1-10 MB'
+            };
+            return sizes[fileType] || 'Unknown';
+        }
+
+        function generateTags(subject, university, fileType) {
+            const tags = [];
+            
+            // Add subject tags
+            const subjectWords = subject.toLowerCase().split(/[\s,\-]+/);
+            tags.push(...subjectWords.slice(0, 3));
+            
+            // Add university tag
+            const uniTag = university.toLowerCase().split(' ')[0];
+            tags.push(uniTag);
+            
+            // Add file type tag
+            tags.push(fileType);
+            
+            // Add common tags
+            tags.push('notes', 'study', 'materials');
+            
+            return [...new Set(tags)].slice(0, 5); // Remove duplicates, keep 5
+        }
+
+        function clearDocumentForm() {
+            document.getElementById('docName').value = '';
+            document.getElementById('docSubject').value = '';
+            document.getElementById('docDescription').value = '';
+            document.getElementById('docUrl').value = '';
+            document.getElementById('docDownloadUrl').value = '';
+        }
+
+        function addSampleDocuments() {
+            const sampleDocs = [
+                {
+                    id: 'sample_1',
+                    name: 'Mathematics 101 - Calculus Complete Notes',
+                    university: 'Egerton University',
+                    subject: 'Mathematics',
+                    description: 'Complete calculus notes covering limits, derivatives, and integrals with examples and practice problems.',
+                    fileType: 'pdf',
+                    size: '3.2 MB',
+                    year: '2023',
+                    date: Date.now() - 86400000,
+                    tags: ['calculus', 'mathematics', 'egerton', 'notes', 'pdf'],
+                    url: 'https://drive.google.com/uc?export=download&id=1samplefile1',
+                    downloadUrl: 'https://drive.google.com/uc?export=download&id=1samplefile1',
+                    uploadedAt: new Date().toISOString()
+                },
+                {
+                    id: 'sample_2',
+                    name: 'Physics Laboratory Manual 2023',
+                    university: 'University of Nairobi',
+                    subject: 'Physics',
+                    description: 'Physics laboratory experiments and procedures manual for undergraduate students.',
+                    fileType: 'pdf',
+                    size: '4.1 MB',
+                    year: '2023',
+                    date: Date.now() - 172800000,
+                    tags: ['physics', 'laboratory', 'uon', 'manual', 'experiments'],
+                    url: 'https://drive.google.com/uc?export=download&id=1samplefile2',
+                    downloadUrl: 'https://drive.google.com/uc?export=download&id=1samplefile2',
+                    uploadedAt: new Date().toISOString()
+                },
+                {
+                    id: 'sample_3',
+                    name: 'Computer Science Past Papers 2022',
+                    university: 'Kenyatta University',
+                    subject: 'Computer Science',
+                    description: 'Collection of past papers with solutions for Computer Science courses.',
+                    fileType: 'word',
+                    size: '2.8 MB',
+                    year: '2022',
+                    date: Date.now() - 259200000,
+                    tags: ['computer-science', 'past-papers', 'ku', 'exams', 'solutions'],
+                    url: 'https://drive.google.com/uc?export=download&id=1samplefile3',
+                    downloadUrl: 'https://drive.google.com/uc?export=download&id=1samplefile3',
+                    uploadedAt: new Date().toISOString()
+                }
+            ];
+            
+            sampleDocs.forEach(doc => {
+                // Check if sample already exists
+                const existing = allDocuments.find(d => d.id === doc.id);
+                if (!existing) {
+                    allDocuments.unshift(doc);
+                }
+            });
+            
+            saveDocumentsToCache();
+            updateDocumentCount(allDocuments.length);
+            
+            if (currentUser) {
+                loadUserDocuments();
+            }
+            
+            showAdminStatus('✅ Sample documents added successfully', 'success');
+            logActivity('Sample documents added', 'admin');
+        }
+
+        function clearAllDocuments() {
+            if (confirm('⚠️ Are you sure you want to delete ALL documents? This action cannot be undone.')) {
+                allDocuments = [];
+                saveDocumentsToCache();
+                updateDocumentCount(0);
+                
+                if (currentUser) {
+                    loadUserDocuments();
+                }
+                
+                showAdminStatus('✅ All documents cleared', 'success');
+                logActivity('All documents cleared', 'admin');
+            }
+        }
+
+        function exportDocuments() {
+            const dataStr = JSON.stringify(allDocuments, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'revisionvault_documents_' + new Date().toISOString().split('T')[0] + '.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showAdminStatus('✅ Document list exported successfully', 'success');
+        }
+
+        function saveDocumentsToCache() {
+            try {
+                const cacheData = {
+                    documents: allDocuments,
+                    timestamp: Date.now(),
+                    count: allDocuments.length,
+                    lastUpdated: new Date().toISOString()
+                };
+                localStorage.setItem('revisionvault_documents_cache', JSON.stringify(cacheData));
+            } catch (error) {
+                console.error('Error saving to cache:', error);
+            }
+        }
+
+        // ==================== DOCUMENT VIEWING & DOWNLOADING - FIXED ====================
+        function viewDocument(docId) {
+            if (!currentUser) {
+                showStatus('Please subscribe to view documents', 'error');
+                return;
+            }
+            
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) {
+                showStatus('Document not found', 'error');
+                return;
+            }
+            
+            document.getElementById('documentModal').style.display = 'flex';
+            document.getElementById('modalDocTitle').textContent = doc.name;
+            
+            const viewerContent = document.getElementById('documentViewerContent');
+            
+            const fileType = doc.fileType || getFileTypeFromUrl(doc.url);
+            
+            if (fileType === 'pdf') {
+                // Use PDF.js or Google Docs Viewer for PDFs
+                viewerContent.innerHTML = `
+                    <div class="document-viewer-container">
+                        <div class="document-viewer-toolbar">
+                            <div class="file-type-indicator">
+                                <i class="fas fa-file-pdf"></i> PDF Document
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-small btn-success" onclick="downloadDocument('${doc.id}')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                        <iframe 
+                            src="${getViewerUrl(doc.url, doc.fileType)}"
+                            class="document-viewer-frame"
+                            title="${doc.name}"
+                            allow="fullscreen"
+                        ></iframe>
+                    </div>
+                `;
+            } else if (fileType === 'word' || fileType === 'excel' || fileType === 'ppt') {
+                // Use Microsoft Office Online Viewer for Office documents
+                viewerContent.innerHTML = `
+                    <div class="document-viewer-container">
+                        <div class="document-viewer-toolbar">
+                            <div class="file-type-indicator">
+                                <i class="fas fa-file-${fileType === 'word' ? 'word' : fileType === 'excel' ? 'excel' : 'powerpoint'}"></i> 
+                                ${fileType === 'word' ? 'Word' : fileType === 'excel' ? 'Excel' : 'PowerPoint'} Document
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-small btn-success" onclick="downloadDocument('${doc.id}')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                        <iframe 
+                            src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(doc.url)}"
+                            class="document-viewer-frame"
+                            title="${doc.name}"
+                            allow="fullscreen"
+                        ></iframe>
+                    </div>
+                `;
+            } else if (fileType === 'image') {
+                viewerContent.innerHTML = `
+                    <div class="document-viewer-container">
+                        <div class="document-viewer-toolbar">
+                            <div class="file-type-indicator">
+                                <i class="fas fa-file-image"></i> Image
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-small btn-success" onclick="downloadDocument('${doc.id}')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                        <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: #f3f4f6; overflow: auto; padding: 20px;">
+                            <img src="${doc.url}" alt="${doc.name}" style="max-width: 100%; max-height: 100%; box-shadow: var(--shadow); border-radius: 10px;">
+                        </div>
+                    </div>
+                `;
+            } else {
+                viewerContent.innerHTML = `
+                    <div class="document-viewer-container">
+                        <div class="document-viewer-toolbar">
+                            <div class="file-type-indicator">
+                                <i class="fas fa-file-alt"></i> Document
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-small btn-success" onclick="downloadDocument('${doc.id}')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f3f4f6; padding: 40px;">
+                            <i class="fas fa-file-download" style="font-size: 80px; color: var(--primary); margin-bottom: 20px;"></i>
+                            <h3 style="font-size: 24px; color: var(--dark); margin-bottom: 15px;">${doc.name}</h3>
+                            <p style="color: var(--gray); text-align: center; margin-bottom: 30px; max-width: 600px;">
+                                This document cannot be previewed directly. Please download it to view.
+                            </p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 100%; max-width: 500px;">
+                                <div style="text-align: center; padding: 20px; background: white; border-radius: var(--radius); border: 2px solid var(--border);">
+                                    <div style="font-size: 14px; color: var(--gray); margin-bottom: 5px;">File Type</div>
+                                    <div style="font-weight: 600; color: var(--dark);">${doc.fileType || getFileType(doc.name)}</div>
+                                </div>
+                                <div style="text-align: center; padding: 20px; background: white; border-radius: var(--radius); border: 2px solid var(--border);">
+                                    <div style="font-size: 14px; color: var(--gray); margin-bottom: 5px;">File Size</div>
+                                    <div style="font-weight: 600; color: var(--dark);">${doc.size || 'Unknown'}</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="downloadDocument('${doc.id}')" style="margin-top: 30px;">
+                                <i class="fas fa-download"></i> Download Document
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            logActivity('Viewed document: ' + doc.name);
+        }
+
+        function getViewerUrl(url, fileType) {
+            if (fileType === 'pdf') {
+                // Use Google Docs Viewer for PDFs
+                return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+            }
+            return url;
+        }
+
+        function downloadDocument(docId) {
+            if (!currentUser) {
+                showStatus('Please subscribe to download documents', 'error');
+                return;
+            }
+            
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) {
+                showStatus('Document not found', 'error');
+                return;
+            }
+            
+            const downloadUrl = doc.downloadUrl || doc.url;
+            
+            // Create a temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.target = '_blank';
+            link.download = doc.name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.' + (doc.fileType || 'pdf');
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showStatus('📥 Download started for: ' + doc.name, 'success');
+            logActivity('Downloaded document: ' + doc.name);
+        }
+
+        function getFileTypeFromUrl(url) {
+            if (!url) return 'other';
+            
+            if (url.includes('.pdf')) return 'pdf';
+            if (url.includes('.doc') || url.includes('.docx')) return 'word';
+            if (url.includes('.xls') || url.includes('.xlsx')) return 'excel';
+            if (url.includes('.ppt') || url.includes('.pptx')) return 'ppt';
+            if (url.includes('.jpg') || url.includes('.jpeg') || url.includes('.png') || url.includes('.gif')) return 'image';
+            
+            return 'other';
+        }
+
+        function closeDocumentViewer() {
+            document.getElementById('documentModal').style.display = 'none';
+            document.getElementById('documentViewerContent').innerHTML = '';
+        }
+
+        function searchDocuments() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (!query) {
+                displayDocuments(userDocuments);
+                return;
+            }
+            
+            const filtered = userDocuments.filter(doc => {
+                const searchableText = `
+                    ${doc.name || ''}
+                    ${doc.description || ''}
+                    ${doc.subject || ''}
+                    ${(doc.tags || []).join(' ')}
+                `.toLowerCase();
+                
+                return searchableText.includes(query);
+            });
+            
+            displayDocuments(filtered);
+            
+            if (filtered.length === 0) {
+                document.getElementById('noDocuments').style.display = 'block';
+                document.getElementById('noDocumentsMessage').textContent = 'No documents found matching your search.';
+            }
+        }
+
+        function showSubscribeMessageInDocuments() {
+            document.getElementById('subscribeMessage').style.display = 'block';
+            document.getElementById('documentsList').style.display = 'none';
+            document.getElementById('userBadge').style.display = 'none';
+            document.getElementById('searchInput').style.display = 'none';
+        }
+
+        // ==================== ADMIN FUNCTIONS ====================
+        function loadPendingApprovals() {
+            const container = document.getElementById('pendingApprovalsList');
+            const pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            
+            let html = '';
+            
+            pendingApprovals.forEach((approval, index) => {
+                if (approval.status === 'pending') {
+                    const date = new Date(approval.submittedAt);
+                    const dateStr = date.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    html += `
+                        <div style="background: #fef3c7; padding: 25px; border-radius: 16px; border: 2px solid #fde68a; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <div>
+                                    <h4 style="color: var(--dark); margin-bottom: 5px;">${approval.displayPhone}</h4>
+                                    <p style="color: #92400e; font-size: 14px;">University: ${approval.university}</p>
+                                    <p style="color: var(--gray); font-size: 14px;">Submitted: ${dateStr}</p>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn btn-success btn-small" onclick="approvePayment(${index})">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button class="btn btn-danger btn-small" onclick="rejectPayment(${index})">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div>
+                                    <div style="font-size: 12px; color: #92400e; font-weight: 600;">TRANSACTION</div>
+                                    <div style="font-size: 16px; font-weight: 600;">${approval.txnCode}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #92400e; font-weight: 600;">AMOUNT</div>
+                                    <div style="font-size: 16px; font-weight: 600;">Ksh ${approval.amount}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (html === '') {
+                html = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 20px; color: #d1d5db;"></i>
+                        <h4 style="color: var(--dark); margin-bottom: 10px;">No pending approvals</h4>
+                        <p>All subscriptions have been processed</p>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function approvePayment(index) {
+            const pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            
+            if (pendingApprovals[index]) {
+                pendingApprovals[index].status = 'approved';
+                pendingApprovals[index].approvedAt = new Date().toISOString();
+                pendingApprovals[index].approvedBy = 'admin';
+                
+                const approval = pendingApprovals[index];
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + CONFIG.subscriptionDays);
+                
+                const user = {
+                    phone: approval.phone,
+                    displayPhone: approval.displayPhone,
+                    university: approval.university,
+                    joined: new Date().toISOString(),
+                    expiry: expiryDate.toISOString(),
+                    approvedBy: 'admin',
+                    approvedAt: approval.approvedAt,
+                    status: 'active'
+                };
+                
+                let users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+                users.push(user);
+                localStorage.setItem('revisionvault_users', JSON.stringify(users));
+                
+                localStorage.setItem('revisionvault_pending_approvals', JSON.stringify(pendingApprovals));
+                
+                loadPendingApprovals();
+                loadUsersTable();
+                updateAdminStats();
+                
+                sendApprovalNotification(approval.displayPhone, approval.university);
+                
+                showAdminStatus(`✅ Approved subscription for ${approval.displayPhone} (${approval.university})`, 'success');
+                logActivity('Approved subscription: ' + approval.displayPhone + ' (' + approval.university + ')', 'admin');
+            }
+        }
+
+        function rejectPayment(index) {
+            const pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            
+            if (pendingApprovals[index]) {
+                const phone = pendingApprovals[index].displayPhone;
+                const university = pendingApprovals[index].university;
+                pendingApprovals.splice(index, 1);
+                
+                localStorage.setItem('revisionvault_pending_approvals', JSON.stringify(pendingApprovals));
+                
+                loadPendingApprovals();
+                updateAdminStats();
+                
+                showAdminStatus(`❌ Rejected subscription for ${phone}`, 'success');
+                logActivity('Rejected subscription: ' + phone + ' (' + university + ')', 'admin');
+            }
+        }
+
+        function sendApprovalNotification(phone, university) {
+            const message = 
+                `✅ *SUBSCRIPTION APPROVED - REVISIONVAULT*\n\n` +
+                `Dear Student,\n\n` +
+                `Your subscription to ${university} materials has been approved!\n` +
+                `You can now access all study materials from your university.\n\n` +
+                `• Phone: *${phone}*\n` +
+                `• University: *${university}*\n` +
+                `• Access: *5 months*\n\n` +
+                `Visit the website to start learning!`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappURL = `https://wa.me/${formatPhoneForAPI(phone)}?text=${encodedMessage}`;
+            
+            window.open(whatsappURL, '_blank');
+        }
+
+        function loadUsersTable(filter = 'all') {
+            const tbody = document.getElementById('usersTableBody');
+            let users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            
+            const now = new Date();
+            users = users.filter(user => {
+                const expiry = new Date(user.expiry);
+                const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                
+                if (filter === 'active') return daysLeft > 0;
+                if (filter === 'expiring') return daysLeft > 0 && daysLeft <= 7;
+                if (filter === 'expired') return daysLeft <= 0;
+                return true;
+            });
+            
+            let html = '';
+            
+            users.forEach((user, index) => {
+                const expiry = new Date(user.expiry);
+                const now = new Date();
+                const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                
+                let statusText = 'Active';
+                let statusColor = '#059669';
+                
+                if (daysLeft <= 0) {
+                    statusText = 'Expired';
+                    statusColor = '#dc2626';
+                } else if (daysLeft <= 7) {
+                    statusText = 'Expiring';
+                    statusColor = '#f59e0b';
+                }
+                
+                html += `
+                    <tr>
+                        <td style="font-weight: 600; color: var(--dark);">${user.displayPhone}</td>
+                        <td style="font-weight: 500; color: var(--dark);">${user.university}</td>
+                        <td>
+                            <span style="padding: 8px 16px; background: ${statusColor}20; 
+                                  color: ${statusColor}; 
+                                  border-radius: 50px; font-size: 14px; font-weight: 600;">
+                                ${statusText}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600; color: ${statusColor}">
+                                ${daysLeft > 0 ? `${daysLeft} days` : 'Expired'}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-small btn-danger" onclick="deactivateUser(${index})" ${daysLeft <= 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-ban"></i> Deactivate
+                                </button>
+                                <button class="btn btn-small btn-info" onclick="extendSubscription(${index})">
+                                    <i class="fas fa-plus-circle"></i> Extend 30d
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            if (html === '') {
+                html = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--gray);">
+                            <i class="fas fa-users" style="font-size: 48px; margin-bottom: 20px; color: #d1d5db;"></i>
+                            <h4 style="color: var(--dark); margin-bottom: 10px;">No users found</h4>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tbody.innerHTML = html;
+        }
+
+        function filterUsers(filterType) {
+            loadUsersTable(filterType);
+        }
+
+        function deactivateUser(index) {
+            let users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            
+            if (users[index]) {
+                const userPhone = users[index].displayPhone;
+                const university = users[index].university;
+                
+                users[index].expiry = new Date().toISOString();
+                users[index].status = 'deactivated';
+                
+                localStorage.setItem('revisionvault_users', JSON.stringify(users));
+                
+                const currentUserData = localStorage.getItem('revisionvault_user');
+                if (currentUserData) {
+                    const currentUser = JSON.parse(currentUserData);
+                    if (currentUser.phone === users[index].phone) {
+                        logout();
+                    }
+                }
+                
+                loadUsersTable();
+                updateAdminStats();
+                
+                showAdminStatus(`✅ Deactivated user: ${userPhone}`, 'success');
+                logActivity('Deactivated user: ' + userPhone + ' (' + university + ')', 'admin');
+            }
+        }
+
+        function extendSubscription(index) {
+            let users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            
+            if (users[index]) {
+                const userPhone = users[index].displayPhone;
+                const currentExpiry = new Date(users[index].expiry);
+                const now = new Date();
+                
+                const newExpiry = currentExpiry > now ? 
+                    new Date(currentExpiry.getTime() + (30 * 24 * 60 * 60 * 1000)) :
+                    new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
+                
+                users[index].expiry = newExpiry.toISOString();
+                users[index].status = 'active';
+                
+                localStorage.setItem('revisionvault_users', JSON.stringify(users));
+                
+                loadUsersTable();
+                updateAdminStats();
+                
+                showAdminStatus(`✅ Extended subscription for ${userPhone} by 30 days`, 'success');
+                logActivity('Extended subscription: ' + userPhone, 'admin');
+            }
+        }
+
+        function updateAdminStats() {
+            document.getElementById('totalDocuments').textContent = allDocuments.length;
+            
+            const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            const now = new Date();
+            const activeUsers = users.filter(user => {
+                const expiry = new Date(user.expiry);
+                return expiry > now;
+            }).length;
+            
+            document.getElementById('totalStudents').textContent = activeUsers;
+            
+            const pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            const pendingCount = pendingApprovals.filter(a => a.status === 'pending').length;
+            document.getElementById('pendingApprovalsCount').textContent = pendingCount;
+            
+            const approvedCount = pendingApprovals.filter(a => a.status === 'approved').length + activeUsers;
+            const revenue = approvedCount * 50;
+            document.getElementById('revenue').textContent = `Ksh ${revenue}`;
+        }
+
+        function loadActivityLog() {
+            const tbody = document.getElementById('activityLog');
+            let activities = JSON.parse(localStorage.getItem('revisionvault_activity_log') || '[]');
+            
+            activities = activities.slice(-20);
+            
+            let html = '';
+            
+            activities.forEach(activity => {
+                html += `
+                    <tr>
+                        <td>${activity.time || new Date().toLocaleTimeString()}</td>
+                        <td>${activity.user || 'system'}</td>
+                        <td>${activity.message || ''}</td>
+                    </tr>
+                `;
+            });
+            
+            if (html === '') {
+                html = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 20px; color: var(--gray);">
+                            No activity recorded yet
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tbody.innerHTML = html;
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function formatPhoneForAPI(phone) {
+            let cleaned = phone.replace(/\s+/g, '');
+            if (cleaned.startsWith('0')) {
+                return '254' + cleaned.substring(1);
+            }
+            return cleaned;
+        }
+
+        function updateDocumentCount(count) {
+            const badge = document.getElementById('docCountBadge');
+            if (badge) {
+                badge.textContent = count + ' documents';
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+                statusDiv.className = `status-message status-${type}`;
+                statusDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showAdminStatus(message, type) {
+            const statusDiv = document.getElementById('adminStatusMessage');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+                statusDiv.className = `status-message status-${type}`;
+                statusDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function logActivity(message, user = 'system') {
+            const activities = JSON.parse(localStorage.getItem('revisionvault_activity_log') || '[]');
+            activities.push({
+                time: new Date().toLocaleTimeString(),
+                user: user,
+                message: message
+            });
+            
+            if (activities.length > 50) {
+                activities.splice(0, activities.length - 50);
+            }
+            
+            localStorage.setItem('revisionvault_activity_log', JSON.stringify(activities));
+            
+            if (isAdmin && document.getElementById('adminDashboard').style.display !== 'none') {
+                loadActivityLog();
+            }
+        }
+
+        // Auto-refresh documents every 30 seconds
+        setInterval(function() {
+            if (currentUser) {
+                loadUserDocuments();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
