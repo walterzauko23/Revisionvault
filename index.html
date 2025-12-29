@@ -602,10 +602,11 @@
         .modal-content {
             background: white;
             border-radius: 20px;
-            width: 90%;
-            max-width: 800px;
+            width: 95%;
+            height: 95%;
+            max-width: 1200px;
             max-height: 90vh;
-            overflow-y: auto;
+            overflow: hidden;
             position: relative;
         }
 
@@ -619,7 +620,10 @@
         }
 
         .modal-body {
-            padding: 30px;
+            height: calc(100% - 80px);
+            padding: 0;
+            position: relative;
+            background: white;
         }
 
         .close-modal {
@@ -698,6 +702,7 @@
             .admin-dashboard { grid-template-columns: 1fr; }
             .mpesa-number { font-size: 32px; }
             .admin-login-box { padding: 30px; }
+            .modal-content { width: 98%; height: 98%; }
         }
 
         @media (max-width: 480px) {
@@ -1208,33 +1213,18 @@
             <div class="modal-header">
                 <div style="font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
                     <i class="fas fa-file-pdf"></i>
-                    Protected Document Viewer
+                    <span id="modalDocTitle">Document Viewer</span>
                 </div>
                 <button class="close-modal" onclick="closeDocumentViewer()">×</button>
             </div>
             <div class="modal-body">
-                <div style="background: #fee2e2; color: #991b1b; padding: 15px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Anti-Save Protection Active - Screenshots and downloads are blocked</span>
-                </div>
-                
-                <div id="pdfViewer" style="height: 600px; overflow: auto; border: 2px solid var(--border); border-radius: var(--radius); background: #f8fafc; padding: 20px;">
-                    <div style="text-align: center; padding: 100px;">
-                        <i class="fas fa-file-pdf" style="font-size: 64px; color: var(--primary); margin-bottom: 20px;"></i>
-                        <h3 style="color: var(--dark); margin-bottom: 15px;">Document Loading...</h3>
-                        <p style="color: var(--gray);">The protected document viewer will display here</p>
-                    </div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-                    <div style="color: var(--gray);">
-                        <i class="fas fa-info-circle"></i> This document is watermarked and protected
-                    </div>
-                    <div>
-                        <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
-                            <i class="fas fa-times"></i> Close
-                        </button>
-                    </div>
+                <div id="pdfViewer" style="height: 100%; width: 100%;">
+                    <iframe 
+                        id="pdfFrame"
+                        style="width: 100%; height: 100%; border: none;"
+                        title="Document Viewer"
+                        allow="fullscreen"
+                    ></iframe>
                 </div>
             </div>
         </div>
@@ -1884,34 +1874,21 @@
                 return;
             }
             
-            // Show modal with iframe for PDF viewer
+            // Show modal with iframe
             document.getElementById('documentModal').style.display = 'flex';
+            document.getElementById('modalDocTitle').textContent = doc.name;
             
-            // Create iframe with Telegram PDF viewer
-            const pdfViewer = document.getElementById('pdfViewer');
-            pdfViewer.innerHTML = `
-                <div style="height: 100%; width: 100%;">
-                    <iframe 
-                        src="${doc.url || doc.directUrl}" 
-                        style="width: 100%; height: 100%; border: none;"
-                        sandbox="allow-same-origin allow-scripts"
-                        title="Protected Document Viewer"
-                    ></iframe>
-                </div>
-            `;
+            // Set iframe source directly to document URL
+            const pdfFrame = document.getElementById('pdfFrame');
+            pdfFrame.src = doc.url || doc.directUrl || `https://docs.google.com/viewer?url=${encodeURIComponent(doc.url)}&embedded=true`;
             
             logActivity('Viewed document: ' + doc.name);
         }
 
         function closeDocumentViewer() {
             document.getElementById('documentModal').style.display = 'none';
-            document.getElementById('pdfViewer').innerHTML = `
-                <div style="text-align: center; padding: 100px;">
-                    <i class="fas fa-file-pdf" style="font-size: 64px; color: var(--primary); margin-bottom: 20px;"></i>
-                    <h3 style="color: var(--dark); margin-bottom: 15px;">Document Loading...</h3>
-                    <p style="color: var(--gray);">The protected document viewer will display here</p>
-                </div>
-            `;
+            // Clear iframe source to stop any ongoing loading
+            document.getElementById('pdfFrame').src = '';
         }
 
         // ==================== ADMIN FUNCTIONS ====================
@@ -2465,6 +2442,19 @@
             saveDocumentsToCache(demoDocs);
             allDocuments = demoDocs;
             updateDocumentCount(demoDocs.length);
+        }
+        
+        function saveDocumentsToCache(docs) {
+            try {
+                const cacheData = {
+                    documents: docs || allDocuments,
+                    timestamp: Date.now(),
+                    count: (docs || allDocuments).length
+                };
+                localStorage.setItem('revisionvault_documents_cache', JSON.stringify(cacheData));
+            } catch (error) {
+                console.error('Error saving to cache:', error);
+            }
         }
     </script>
 </body>
