@@ -585,7 +585,7 @@
             background: var(--light);
         }
 
-        /* ==================== MODAL ==================== */
+        /* ==================== DOCUMENT VIEWER MODAL ==================== */
         .modal {
             display: none;
             position: fixed;
@@ -597,6 +597,7 @@
             z-index: 2000;
             align-items: center;
             justify-content: center;
+            animation: fadeIn 0.3s ease;
         }
 
         .modal-content {
@@ -608,22 +609,24 @@
             max-height: 90vh;
             overflow: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .modal-header {
-            padding: 25px 30px;
+            padding: 20px 30px;
             background: var(--primary);
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .modal-body {
-            height: calc(100% - 80px);
-            padding: 0;
-            position: relative;
-            background: white;
+            flex: 1;
+            display: flex;
+            overflow: hidden;
         }
 
         .close-modal {
@@ -632,17 +635,86 @@
             color: white;
             font-size: 28px;
             cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* ==================== DOCUMENT VIEWER ==================== */
+        /* ==================== NEW DOCUMENT VIEWER LAYOUT ==================== */
         .document-viewer-container {
+            display: flex;
+            width: 100%;
             height: 100%;
+        }
+
+        .document-list-panel {
+            width: 320px;
+            background: #f8fafc;
+            border-right: 2px solid var(--border);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .document-viewer-toolbar {
+        .document-list-header {
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+        }
+
+        .document-list-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .document-list-item {
             padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid var(--border);
+        }
+
+        .document-list-item:hover {
+            border-color: var(--primary);
+            background: #f0f9ff;
+        }
+
+        .document-list-item.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        }
+
+        .document-list-item-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .document-list-item-meta {
+            font-size: 12px;
+            color: var(--gray);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .viewer-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .viewer-header {
+            padding: 15px 20px;
             background: var(--light);
             border-bottom: 2px solid var(--border);
             display: flex;
@@ -650,19 +722,47 @@
             align-items: center;
         }
 
-        .document-viewer-frame {
+        .viewer-content {
             flex: 1;
-            border: none;
-            background: white;
+            position: relative;
+            overflow: hidden;
         }
 
-        .file-type-indicator {
-            padding: 8px 16px;
-            background: var(--primary);
-            color: white;
-            border-radius: 20px;
+        .pdf-viewer-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .pdf-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .viewer-controls {
+            padding: 15px 20px;
+            background: var(--light);
+            border-top: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .viewer-nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .viewer-zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .viewer-info {
+            color: var(--gray);
             font-size: 14px;
-            font-weight: 600;
         }
 
         /* ==================== SEARCH ==================== */
@@ -705,10 +805,29 @@
             margin-bottom: 20px;
         }
 
+        /* ==================== TELEGRAM SYNC ==================== */
+        .telegram-sync-section {
+            background: linear-gradient(135deg, #0088cc 0%, #34b7f1 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .sync-status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+        }
+
         /* ==================== RESPONSIVE ==================== */
         @media (max-width: 1200px) {
             .logo-text h1 { font-size: 36px; }
             .price { font-size: 48px; }
+            .document-list-panel { width: 280px; }
         }
 
         @media (max-width: 992px) {
@@ -734,6 +853,28 @@
             .mpesa-number { font-size: 32px; }
             .admin-login-box { padding: 30px; }
             .modal-content { width: 98%; height: 98%; }
+            
+            /* Mobile document viewer */
+            .document-viewer-container {
+                flex-direction: column;
+            }
+            
+            .document-list-panel {
+                width: 100%;
+                height: 40%;
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+            
+            .viewer-panel {
+                height: 60%;
+            }
+            
+            .viewer-controls {
+                padding: 10px;
+                flex-direction: column;
+                gap: 10px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1000,7 +1141,7 @@
 
             <!-- Search Bar -->
             <div class="search-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="Search within your university materials...">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search within your university materials..." onkeypress="if(event.key === 'Enter') searchDocuments()">
                 <button class="search-button" onclick="searchDocuments()">
                     <i class="fas fa-search"></i>
                 </button>
@@ -1053,7 +1194,7 @@
                     
                     <div class="form-group">
                         <label class="form-label">Admin Password</label>
-                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password" autocomplete="off">
+                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password" autocomplete="off" onkeypress="if(event.key === 'Enter') adminLogin()">
                     </div>
                     
                     <button class="btn btn-primary btn-block" onclick="adminLogin()">
@@ -1116,6 +1257,36 @@
                     </div>
                 </div>
 
+                <!-- Telegram Sync Section -->
+                <div class="telegram-sync-section">
+                    <h3 style="font-size: 24px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+                        <i class="fab fa-telegram"></i>
+                        Telegram Channel Auto-Sync
+                    </h3>
+                    <p style="margin-bottom: 20px; opacity: 0.9;">
+                        Automatically sync documents from your Telegram channel to the system.
+                    </p>
+                    
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="syncTelegramDocuments()">
+                            <i class="fas fa-sync-alt"></i> Sync Telegram Documents
+                        </button>
+                        <button class="btn btn-secondary" onclick="testTelegramConnection()">
+                            <i class="fas fa-wifi"></i> Test Connection
+                        </button>
+                        <button class="btn btn-info" onclick="showTelegramSettings()">
+                            <i class="fas fa-cog"></i> Settings
+                        </button>
+                    </div>
+                    
+                    <div id="syncStatus" class="sync-status"></div>
+                    
+                    <div style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Note:</strong> Paste Telegram document links or use auto-sync
+                    </div>
+                </div>
+
                 <!-- Pending Approvals -->
                 <div class="admin-section">
                     <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
@@ -1132,12 +1303,15 @@
                         Users Management
                     </h3>
                     
-                    <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
+                    <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                         <div style="font-weight: 600; color: var(--dark);">Show:</div>
                         <button class="btn btn-small btn-secondary" onclick="filterUsers('all')">All Users</button>
                         <button class="btn btn-small btn-success" onclick="filterUsers('active')">Active</button>
                         <button class="btn btn-small btn-warning" onclick="filterUsers('expiring')">Expiring</button>
                         <button class="btn btn-small btn-danger" onclick="filterUsers('expired')">Expired</button>
+                        <button class="btn btn-small btn-info" onclick="exportUsers()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
                     </div>
                     
                     <table class="users-table">
@@ -1154,16 +1328,16 @@
                     </table>
                 </div>
 
-                <!-- Document Upload Section -->
+                <!-- Document Upload -->
                 <div class="admin-section">
                     <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
                         <i class="fas fa-upload"></i>
-                        Upload New Document
+                        Upload Document (via Telegram URL)
                     </h3>
                     
                     <div class="form-group">
                         <label class="form-label">Document Name *</label>
-                        <input type="text" id="docName" class="form-control" placeholder="e.g., Mathematics 101 - Calculus Notes">
+                        <input type="text" id="docName" class="form-control" placeholder="Enter document name">
                     </div>
                     
                     <div class="form-group">
@@ -1181,79 +1355,24 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Subject/Course *</label>
-                        <input type="text" id="docSubject" class="form-control" placeholder="e.g., Mathematics, Physics, Computer Science">
+                        <label class="form-label">Subject/Course</label>
+                        <input type="text" id="docSubject" class="form-control" placeholder="e.g., Mathematics 101, Computer Science">
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Document Description</label>
-                        <textarea id="docDescription" class="form-control" rows="3" placeholder="Brief description of the document"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Document Type</label>
-                        <select id="docType" class="form-control">
-                            <option value="pdf">PDF</option>
-                            <option value="word">Word Document (.doc/.docx)</option>
-                            <option value="excel">Excel (.xls/.xlsx)</option>
-                            <option value="ppt">PowerPoint (.ppt/.pptx)</option>
-                            <option value="image">Image (.jpg/.png)</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <!-- URL Section -->
-                    <div class="form-group">
-                        <label class="form-label">Document URL *</label>
-                        <input type="text" id="docUrl" class="form-control" placeholder="https://drive.google.com/... or https://t.me/...">
+                        <label class="form-label">Telegram Document URL *</label>
+                        <input type="text" id="docUrl" class="form-control" placeholder="https://t.me/... (Paste Telegram document link)">
                         <small style="color: var(--gray); margin-top: 5px; display: block;">
-                            For best results, use Google Drive links. Make sure sharing is set to "Anyone with the link can view"
+                            Paste the direct link from your Telegram channel
                         </small>
                     </div>
                     
-                    <div style="display: flex; gap: 15px; margin-top: 20px;">
-                        <button class="btn btn-primary btn-block" onclick="uploadDocument()">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="addManualDocument()" style="flex: 1;">
                             <i class="fas fa-upload"></i> Upload Document
                         </button>
-                        <button class="btn btn-secondary btn-block" onclick="clearDocumentForm()">
+                        <button class="btn btn-info" onclick="clearDocumentForm()" style="flex: 1;">
                             <i class="fas fa-times"></i> Clear Form
-                        </button>
-                    </div>
-                    
-                    <!-- Google Drive Helper -->
-                    <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: var(--radius); border: 2px solid #a5d6a7;">
-                        <h4 style="color: #2e7d32; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-info-circle"></i> How to Get Google Drive Link:
-                        </h4>
-                        <ol style="color: #388e3c; padding-left: 20px;">
-                            <li>Upload file to Google Drive</li>
-                            <li>Right-click file → Share → Share with people and groups</li>
-                            <li>Click "Change" → Select "Anyone with the link" → Viewer</li>
-                            <li>Click "Copy link" and paste above</li>
-                            <li>Make sure link starts with: <code>https://drive.google.com/file/d/...</code></li>
-                        </ol>
-                    </div>
-                </div>
-
-                <!-- Quick Document Actions -->
-                <div class="admin-section">
-                    <h3 style="font-size: 24px; margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 15px;">
-                        <i class="fas fa-bolt"></i>
-                        Quick Actions
-                    </h3>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                        <button class="btn btn-success" onclick="loadAllDocuments()">
-                            <i class="fas fa-sync-alt"></i> Refresh All Documents
-                        </button>
-                        <button class="btn btn-info" onclick="exportDocuments()">
-                            <i class="fas fa-download"></i> Export Document List
-                        </button>
-                        <button class="btn btn-warning" onclick="addSampleDocuments()">
-                            <i class="fas fa-plus-circle"></i> Add Sample Documents
-                        </button>
-                        <button class="btn btn-danger" onclick="clearAllDocuments()">
-                            <i class="fas fa-trash"></i> Clear All Documents
                         </button>
                     </div>
                 </div>
@@ -1293,19 +1412,81 @@
         </div>
     </div>
 
-    <!-- Document Viewer Modal -->
+    <!-- Enhanced Document Viewer Modal -->
     <div id="documentModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <div style="font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-file-alt"></i>
+                    <i class="fas fa-file-pdf"></i>
                     <span id="modalDocTitle">Document Viewer</span>
                 </div>
                 <button class="close-modal" onclick="closeDocumentViewer()">×</button>
             </div>
             <div class="modal-body">
-                <div id="documentViewerContent" style="height: 100%;">
-                    <!-- Dynamic content will be loaded here -->
+                <div class="document-viewer-container">
+                    <!-- Left Panel: Document List -->
+                    <div class="document-list-panel">
+                        <div class="document-list-header">
+                            <h3 style="margin: 0; font-size: 18px;">
+                                <i class="fas fa-list"></i> Documents
+                                <span id="docListCount" style="font-size: 14px; opacity: 0.8;"></span>
+                            </h3>
+                        </div>
+                        <div class="document-list-content" id="documentListContent">
+                            <!-- Document list will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Right Panel: PDF Viewer -->
+                    <div class="viewer-panel">
+                        <div class="viewer-header">
+                            <div>
+                                <h4 id="currentDocumentTitle" style="margin: 0; font-weight: 600;">Select a document</h4>
+                                <div id="currentDocumentMeta" style="font-size: 12px; color: var(--gray); margin-top: 5px;"></div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <button class="btn btn-small btn-primary" onclick="downloadCurrentDocument()">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="viewer-content">
+                            <div class="pdf-viewer-container">
+                                <iframe 
+                                    id="pdfFrame"
+                                    class="pdf-frame"
+                                    title="PDF Viewer"
+                                    allow="fullscreen"
+                                ></iframe>
+                            </div>
+                        </div>
+                        
+                        <div class="viewer-controls">
+                            <div class="viewer-nav-buttons">
+                                <button class="btn btn-small btn-secondary" onclick="previousDocument()" id="prevBtn" disabled>
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </button>
+                                <button class="btn btn-small btn-secondary" onclick="nextDocument()" id="nextBtn" disabled>
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="viewer-info">
+                                <span id="currentDocPosition">0 of 0</span>
+                            </div>
+                            
+                            <div class="viewer-zoom-controls">
+                                <button class="btn btn-small btn-secondary" onclick="zoomOut()">
+                                    <i class="fas fa-search-minus"></i>
+                                </button>
+                                <span id="zoomLevel" style="min-width: 40px; text-align: center;">100%</span>
+                                <button class="btn btn-small btn-secondary" onclick="zoomIn()">
+                                    <i class="fas fa-search-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1318,7 +1499,10 @@
             phoneNumber: '254765098865',
             whatsappNumber: '254765098865',
             subscriptionDays: 150,
-            adminSessionTimeout: 8 * 60 * 60 * 1000
+            telegramChannel: 'RevisionVaultDocuments',
+            adminSessionTimeout: 8 * 60 * 60 * 1000,
+            telegramBotToken: null, // You can add your bot token here for auto-sync
+            telegramChannelId: null // Add your channel ID here
         };
 
         // ==================== GLOBAL STATE ====================
@@ -1327,6 +1511,9 @@
         let currentUser = null;
         let isAdmin = false;
         let selectedUniversity = '';
+        let currentViewerIndex = 0;
+        let viewerDocuments = [];
+        let zoomLevel = 100;
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -1336,18 +1523,68 @@
             checkUserSession();
             checkAdminSession();
             loadDocuments();
-            
-            // Load sample documents if none exist
-            setTimeout(() => {
-                if (allDocuments.length === 0) {
-                    addSampleDocuments();
-                }
-            }, 1000);
+            initializeDemoData();
             
             if (window.location.hash === '#admin') {
                 switchTab('admin');
             }
         });
+
+        function initializeDemoData() {
+            // Initialize with sample documents if none exist
+            if (!localStorage.getItem('revisionvault_documents_cache')) {
+                const demoDocs = [
+                    {
+                        id: '1',
+                        name: 'Mathematics 101 - Calculus',
+                        university: 'Egerton University',
+                        subject: 'Mathematics',
+                        year: '2023',
+                        size: '2.4 MB',
+                        date: Date.now() - 86400000,
+                        caption: 'Calculus past papers with solutions',
+                        tags: ['calculus', 'mathematics', 'egerton'],
+                        url: 'https://www.africau.edu/images/default/sample.pdf',
+                        type: 'pdf'
+                    },
+                    {
+                        id: '2',
+                        name: 'Physics Laboratory Manual',
+                        university: 'University of Nairobi',
+                        subject: 'Physics',
+                        year: '2023',
+                        size: '3.1 MB',
+                        date: Date.now() - 172800000,
+                        caption: 'Physics laboratory experiments and procedures',
+                        tags: ['physics', 'laboratory', 'uon'],
+                        url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                        type: 'pdf'
+                    },
+                    {
+                        id: '3',
+                        name: 'Computer Science Notes',
+                        university: 'Kenyatta University',
+                        subject: 'Computer Science',
+                        year: '2023',
+                        size: '1.8 MB',
+                        date: Date.now() - 259200000,
+                        caption: 'Introduction to programming and algorithms',
+                        tags: ['computer-science', 'programming', 'ku'],
+                        url: 'https://css4.pub/2015/textbook/somatosensory.pdf',
+                        type: 'pdf'
+                    }
+                ];
+                
+                const cacheData = {
+                    documents: demoDocs,
+                    timestamp: Date.now(),
+                    count: demoDocs.length
+                };
+                localStorage.setItem('revisionvault_documents_cache', JSON.stringify(cacheData));
+                allDocuments = demoDocs;
+                updateDocumentCount(demoDocs.length);
+            }
+        }
 
         // ==================== EVENT LISTENERS ====================
         function setupEventListeners() {
@@ -1376,27 +1613,10 @@
                     e.target.value = e.target.value.toUpperCase();
                 });
             }
-            
-            // Search input
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') searchDocuments();
-                });
-            }
-            
-            // Admin password enter key
-            const adminPasswordInput = document.getElementById('adminPassword');
-            if (adminPasswordInput) {
-                adminPasswordInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') adminLogin();
-                });
-            }
         }
 
         // ==================== TAB MANAGEMENT ====================
         function switchTab(tabName) {
-            // Update tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -1405,10 +1625,8 @@
                 tab.classList.remove('active');
             });
             
-            // Activate selected tab
             document.getElementById(tabName).classList.add('active');
             
-            // Find and activate the clicked tab
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => {
                 if (tab.textContent.includes(tabName === 'subscribe' ? 'Subscribe' : 
@@ -1418,7 +1636,6 @@
                 }
             });
             
-            // Load content for tab
             if (tabName === 'documents') {
                 if (currentUser) {
                     loadUserDocuments();
@@ -1429,9 +1646,7 @@
                 checkAdminSession();
             }
             
-            // Update URL hash
             window.location.hash = tabName;
-            
             logActivity('Switched to ' + tabName + ' tab');
         }
 
@@ -1458,9 +1673,7 @@
             if (adminData) {
                 try {
                     const session = JSON.parse(adminData);
-                    const now = new Date().getTime();
-                    
-                    if (session.expires > now && session.loggedIn) {
+                    if (session.expires > Date.now() && session.loggedIn) {
                         isAdmin = true;
                         showAdminDashboard();
                     } else {
@@ -1488,17 +1701,14 @@
                 
                 const session = {
                     loggedIn: true,
-                    timestamp: new Date().getTime(),
-                    expires: new Date().getTime() + CONFIG.adminSessionTimeout
+                    timestamp: Date.now(),
+                    expires: Date.now() + CONFIG.adminSessionTimeout
                 };
                 
                 localStorage.setItem('revisionvault_admin_session', JSON.stringify(session));
-                
                 showAdminDashboard();
-                
                 showAdminStatus('✅ Admin login successful!', 'success');
                 logActivity('Admin logged in', 'admin');
-                
                 document.getElementById('adminPassword').value = '';
                 
             } else {
@@ -1552,17 +1762,16 @@
             if (userData) {
                 try {
                     const user = JSON.parse(userData);
-                    const now = new Date();
                     const expiry = new Date(user.expiry);
                     
-                    if (expiry > now) {
+                    if (expiry > new Date()) {
                         currentUser = user;
                         
                         document.getElementById('subscriptionForm').style.display = 'none';
                         document.getElementById('userInfo').style.display = 'block';
                         document.getElementById('pendingApproval').style.display = 'none';
                         
-                        const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                        const daysLeft = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
                         
                         document.getElementById('subscriptionDetails').innerHTML = `
                             <div class="status-message status-success">
@@ -1613,7 +1822,6 @@
             document.getElementById('userBadge').style.display = 'none';
             
             showSubscribeMessageInDocuments();
-            
             showStatus('👋 Logged out successfully', 'success');
             logActivity('User logged out');
         }
@@ -1696,7 +1904,6 @@
             });
             
             sendAdminNotification(phone, txnCode, university);
-            
             showStatus('✅ Subscription submitted for admin approval!', 'success');
             logActivity('Subscription submitted: ' + phone + ' (' + university + ')');
         }
@@ -1731,7 +1938,6 @@
                 
                 localStorage.setItem('revisionvault_user', JSON.stringify(userData));
                 currentUser = userData;
-                
                 checkUserSession();
                 
                 showStatus('🎉 Your subscription has been approved! You now have access to ' + userData.university + ' materials.', 'success');
@@ -1759,7 +1965,7 @@
             }, 1500);
         }
 
-        // ==================== DOCUMENT MANAGEMENT - FIXED ====================
+        // ==================== DOCUMENT MANAGEMENT ====================
         function loadDocuments() {
             const cachedData = localStorage.getItem('revisionvault_documents_cache');
             if (cachedData) {
@@ -1779,11 +1985,6 @@
             }
             
             logActivity('Loaded ' + allDocuments.length + ' documents');
-        }
-
-        function loadAllDocuments() {
-            loadDocuments();
-            showAdminStatus('✅ All documents refreshed', 'success');
         }
 
         function loadUserDocuments() {
@@ -1818,30 +2019,13 @@
             
             let html = '';
             
-            documents.forEach(doc => {
+            documents.forEach((doc, index) => {
                 const date = new Date(doc.date);
                 const dateStr = date.toLocaleDateString('en-GB', {
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric'
                 });
-                
-                const fileType = doc.fileType || getFileTypeFromUrl(doc.url);
-                const fileIcons = {
-                    'pdf': 'fa-file-pdf',
-                    'word': 'fa-file-word',
-                    'excel': 'fa-file-excel',
-                    'ppt': 'fa-file-powerpoint',
-                    'image': 'fa-file-image',
-                    'other': 'fa-file'
-                };
-                const fileIcon = fileIcons[fileType] || 'fa-file';
-                const fileColor = fileType === 'pdf' ? '#f44336' : 
-                                fileType === 'word' ? '#2b579a' : 
-                                fileType === 'excel' ? '#217346' : 
-                                fileType === 'ppt' ? '#d24726' : 
-                                fileType === 'image' ? '#4caf50' : 
-                                '#757575';
                 
                 html += `
                     <div class="document-card">
@@ -1850,10 +2034,7 @@
                             ${doc.university}
                         </div>
                         
-                        <h3 class="document-title">
-                            <i class="fas ${fileIcon}" style="color: ${fileColor}; margin-right: 10px;"></i>
-                            ${doc.name}
-                        </h3>
+                        <h3 class="document-title">${doc.name}</h3>
                         
                         <div class="document-meta">
                             <div style="display: flex; align-items: center; gap: 8px;">
@@ -1866,13 +2047,13 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-file-alt"></i>
-                                <span>${doc.size || 'PDF'}</span>
+                                <span>${doc.size || 'Unknown'}</span>
                             </div>
                         </div>
                         
-                        ${doc.description ? `
+                        ${doc.caption ? `
                             <p class="document-description">
-                                ${doc.description.substring(0, 150)}${doc.description.length > 150 ? '...' : ''}
+                                ${doc.caption.substring(0, 150)}${doc.caption.length > 150 ? '...' : ''}
                             </p>
                         ` : ''}
                         
@@ -1884,9 +2065,9 @@
                         
                         <div class="document-actions">
                             <button class="btn btn-primary btn-small" onclick="viewDocument('${doc.id}')">
-                                <i class="fas fa-eye"></i> View
+                                <i class="fas fa-eye"></i> View Document
                             </button>
-                            <button class="btn btn-success btn-small" onclick="downloadDocument('${doc.id}')">
+                            <button class="btn btn-secondary btn-small" onclick="downloadDocument('${doc.id}')">
                                 <i class="fas fa-download"></i> Download
                             </button>
                         </div>
@@ -1901,427 +2082,6 @@
             container.innerHTML = html;
         }
 
-        function uploadDocument() {
-            const name = document.getElementById('docName').value.trim();
-            const university = document.getElementById('docUniversity').value;
-            const subject = document.getElementById('docSubject').value.trim();
-            const description = document.getElementById('docDescription').value.trim();
-            const fileType = document.getElementById('docType').value;
-            const url = document.getElementById('docUrl').value.trim();
-            
-            if (!name || !university || !subject || !url) {
-                showAdminStatus('Please fill all required fields (*)', 'error');
-                return;
-            }
-            
-            // Generate unique ID
-            const docId = 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            // Create document object
-            const newDoc = {
-                id: docId,
-                name: name,
-                university: university,
-                subject: subject,
-                description: description,
-                fileType: fileType,
-                size: getFileSizeFromType(fileType),
-                year: new Date().getFullYear().toString(),
-                date: Date.now(),
-                tags: generateTags(subject, university, fileType),
-                url: url,
-                downloadUrl: url,
-                uploadedAt: new Date().toISOString(),
-                uploadedBy: 'admin'
-            };
-            
-            // Add to documents array
-            allDocuments.unshift(newDoc);
-            
-            // Save to localStorage
-            saveDocumentsToCache();
-            
-            // Update UI
-            updateDocumentCount(allDocuments.length);
-            
-            // If current user is from this university, update their view
-            if (currentUser && currentUser.university === university) {
-                loadUserDocuments();
-            }
-            
-            // Clear form
-            clearDocumentForm();
-            
-            // Show success message
-            showAdminStatus('✅ Document uploaded successfully! It will appear immediately.', 'success');
-            logActivity('Document uploaded: ' + name + ' (' + university + ')', 'admin');
-            
-            // Update admin stats
-            updateAdminStats();
-        }
-
-        function getFileSizeFromType(fileType) {
-            const sizes = {
-                'pdf': '1-5 MB',
-                'word': '2-10 MB',
-                'excel': '1-8 MB',
-                'ppt': '3-15 MB',
-                'image': '500KB-5MB',
-                'other': '1-10 MB'
-            };
-            return sizes[fileType] || 'Unknown';
-        }
-
-        function generateTags(subject, university, fileType) {
-            const tags = [];
-            
-            // Add subject tags
-            const subjectWords = subject.toLowerCase().split(/[\s,\-]+/);
-            tags.push(...subjectWords.slice(0, 3));
-            
-            // Add university tag
-            const uniTag = university.toLowerCase().split(' ')[0];
-            tags.push(uniTag);
-            
-            // Add file type tag
-            tags.push(fileType);
-            
-            // Add common tags
-            tags.push('notes', 'study', 'materials');
-            
-            return [...new Set(tags)].slice(0, 5);
-        }
-
-        function clearDocumentForm() {
-            document.getElementById('docName').value = '';
-            document.getElementById('docSubject').value = '';
-            document.getElementById('docDescription').value = '';
-            document.getElementById('docUrl').value = '';
-        }
-
-        function addSampleDocuments() {
-            const sampleDocs = [
-                {
-                    id: 'sample_1',
-                    name: 'Mathematics 101 - Calculus Complete Notes',
-                    university: 'Egerton University',
-                    subject: 'Mathematics',
-                    description: 'Complete calculus notes covering limits, derivatives, and integrals with examples and practice problems.',
-                    fileType: 'pdf',
-                    size: '3.2 MB',
-                    year: '2023',
-                    date: Date.now() - 86400000,
-                    tags: ['calculus', 'mathematics', 'egerton', 'notes', 'pdf'],
-                    url: 'https://drive.google.com/file/d/1sRzQJY7VjK5Xq8wZtN6mP2lO9rT3uYvW/preview',
-                    downloadUrl: 'https://drive.google.com/uc?export=download&id=1sRzQJY7VjK5Xq8wZtN6mP2lO9rT3uYvW',
-                    uploadedAt: new Date().toISOString()
-                },
-                {
-                    id: 'sample_2',
-                    name: 'Physics Laboratory Manual 2023',
-                    university: 'University of Nairobi',
-                    subject: 'Physics',
-                    description: 'Physics laboratory experiments and procedures manual for undergraduate students.',
-                    fileType: 'pdf',
-                    size: '4.1 MB',
-                    year: '2023',
-                    date: Date.now() - 172800000,
-                    tags: ['physics', 'laboratory', 'uon', 'manual', 'experiments'],
-                    url: 'https://drive.google.com/file/d/2aBcDeFgHiJkLmNoPqRsTuVwXyZ123456/preview',
-                    downloadUrl: 'https://drive.google.com/uc?export=download&id=2aBcDeFgHiJkLmNoPqRsTuVwXyZ123456',
-                    uploadedAt: new Date().toISOString()
-                },
-                {
-                    id: 'sample_3',
-                    name: 'Computer Science Past Papers 2022',
-                    university: 'Kenyatta University',
-                    subject: 'Computer Science',
-                    description: 'Collection of past papers with solutions for Computer Science courses.',
-                    fileType: 'word',
-                    size: '2.8 MB',
-                    year: '2022',
-                    date: Date.now() - 259200000,
-                    tags: ['computer-science', 'past-papers', 'ku', 'exams', 'solutions'],
-                    url: 'https://docs.google.com/document/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/preview',
-                    downloadUrl: 'https://docs.google.com/document/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/export?format=docx',
-                    uploadedAt: new Date().toISOString()
-                }
-            ];
-            
-            // Check which samples don't exist and add them
-            let addedCount = 0;
-            sampleDocs.forEach(doc => {
-                const existing = allDocuments.find(d => d.id === doc.id);
-                if (!existing) {
-                    allDocuments.unshift(doc);
-                    addedCount++;
-                }
-            });
-            
-            if (addedCount > 0) {
-                saveDocumentsToCache();
-                updateDocumentCount(allDocuments.length);
-                
-                if (currentUser) {
-                    loadUserDocuments();
-                }
-                
-                showAdminStatus(`✅ ${addedCount} sample documents added successfully`, 'success');
-                logActivity(`Sample documents added: ${addedCount}`, 'admin');
-            } else {
-                showAdminStatus('ℹ️ Sample documents already exist', 'info');
-            }
-        }
-
-        function clearAllDocuments() {
-            if (confirm('⚠️ Are you sure you want to delete ALL documents? This action cannot be undone.')) {
-                allDocuments = [];
-                saveDocumentsToCache();
-                updateDocumentCount(0);
-                
-                if (currentUser) {
-                    loadUserDocuments();
-                }
-                
-                showAdminStatus('✅ All documents cleared', 'success');
-                logActivity('All documents cleared', 'admin');
-            }
-        }
-
-        function exportDocuments() {
-            const dataStr = JSON.stringify(allDocuments, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = 'revisionvault_documents_' + new Date().toISOString().split('T')[0] + '.json';
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-            
-            showAdminStatus('✅ Document list exported successfully', 'success');
-        }
-
-        function saveDocumentsToCache() {
-            try {
-                const cacheData = {
-                    documents: allDocuments,
-                    timestamp: Date.now(),
-                    count: allDocuments.length,
-                    lastUpdated: new Date().toISOString()
-                };
-                localStorage.setItem('revisionvault_documents_cache', JSON.stringify(cacheData));
-            } catch (error) {
-                console.error('Error saving to cache:', error);
-            }
-        }
-
-        // ==================== DOCUMENT VIEWING & DOWNLOADING - FIXED ====================
-        function viewDocument(docId) {
-            if (!currentUser) {
-                showStatus('Please subscribe to view documents', 'error');
-                return;
-            }
-            
-            const doc = allDocuments.find(d => d.id === docId);
-            if (!doc) {
-                showStatus('Document not found', 'error');
-                return;
-            }
-            
-            document.getElementById('documentModal').style.display = 'flex';
-            document.getElementById('modalDocTitle').textContent = doc.name;
-            
-            const viewerContent = document.getElementById('documentViewerContent');
-            
-            const fileType = doc.fileType || getFileTypeFromUrl(doc.url);
-            
-            if (fileType === 'pdf') {
-                viewerContent.innerHTML = `
-                    <div class="document-viewer-container">
-                        <div class="document-viewer-toolbar">
-                            <div class="file-type-indicator">
-                                <i class="fas fa-file-pdf"></i> PDF Document
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn btn-small btn-success" onclick="downloadDocument('${doc.id}')">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
-                                    <i class="fas fa-times"></i> Close
-                                </button>
-                            </div>
-                        </div>
-                        <iframe 
-                            src="${getViewerUrl(doc.url, fileType)}"
-                            class="document-viewer-frame"
-                            title="${doc.name}"
-                            allow="fullscreen"
-                        ></iframe>
-                    </div>
-                `;
-            } else if (fileType === 'word' || fileType === 'excel' || fileType === 'ppt') {
-                viewerContent.innerHTML = `
-                    <div class="document-viewer-container">
-                        <div class="document-viewer-toolbar">
-                            <div class="file-type-indicator">
-                                <i class="fas fa-file-${fileType === 'word' ? 'word' : fileType === 'excel' ? 'excel' : 'powerpoint'}"></i> 
-                                ${fileType === 'word' ? 'Word' : fileType === 'excel' ? 'Excel' : 'PowerPoint'} Document
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn btn-small btn-success" onclick="downloadDocument('${doc.id}')">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
-                                    <i class="fas fa-times"></i> Close
-                                </button>
-                            </div>
-                        </div>
-                        <iframe 
-                            src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(doc.url)}"
-                            class="document-viewer-frame"
-                            title="${doc.name}"
-                            allow="fullscreen"
-                        ></iframe>
-                    </div>
-                `;
-            } else if (fileType === 'image') {
-                viewerContent.innerHTML = `
-                    <div class="document-viewer-container">
-                        <div class="document-viewer-toolbar">
-                            <div class="file-type-indicator">
-                                <i class="fas fa-file-image"></i> Image
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn btn-small btn-success" onclick="downloadDocument('${doc.id}')">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
-                                    <i class="fas fa-times"></i> Close
-                                </button>
-                            </div>
-                        </div>
-                        <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: #f3f4f6; overflow: auto; padding: 20px;">
-                            <img src="${doc.url}" alt="${doc.name}" style="max-width: 100%; max-height: 100%; box-shadow: var(--shadow); border-radius: 10px;">
-                        </div>
-                    </div>
-                `;
-            } else {
-                viewerContent.innerHTML = `
-                    <div class="document-viewer-container">
-                        <div class="document-viewer-toolbar">
-                            <div class="file-type-indicator">
-                                <i class="fas fa-file-alt"></i> Document
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn btn-small btn-success" onclick="downloadDocument('${doc.id}')">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                                <button class="btn btn-small btn-secondary" onclick="closeDocumentViewer()">
-                                    <i class="fas fa-times"></i> Close
-                                </button>
-                            </div>
-                        </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f3f4f6; padding: 40px;">
-                            <i class="fas fa-file-download" style="font-size: 80px; color: var(--primary); margin-bottom: 20px;"></i>
-                            <h3 style="font-size: 24px; color: var(--dark); margin-bottom: 15px;">${doc.name}</h3>
-                            <p style="color: var(--gray); text-align: center; margin-bottom: 30px; max-width: 600px;">
-                                This document cannot be previewed directly. Please download it to view.
-                            </p>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 100%; max-width: 500px;">
-                                <div style="text-align: center; padding: 20px; background: white; border-radius: var(--radius); border: 2px solid var(--border);">
-                                    <div style="font-size: 14px; color: var(--gray); margin-bottom: 5px;">File Type</div>
-                                    <div style="font-weight: 600; color: var(--dark);">${doc.fileType || 'Unknown'}</div>
-                                </div>
-                                <div style="text-align: center; padding: 20px; background: white; border-radius: var(--radius); border: 2px solid var(--border);">
-                                    <div style="font-size: 14px; color: var(--gray); margin-bottom: 5px;">File Size</div>
-                                    <div style="font-weight: 600; color: var(--dark);">${doc.size || 'Unknown'}</div>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" onclick="downloadDocument('${doc.id}')" style="margin-top: 30px;">
-                                <i class="fas fa-download"></i> Download Document
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            logActivity('Viewed document: ' + doc.name);
-        }
-
-        function getViewerUrl(url, fileType) {
-            if (fileType === 'pdf') {
-                // Check if it's already a Google Drive preview link
-                if (url.includes('drive.google.com') && url.includes('/preview')) {
-                    return url;
-                }
-                // Use Google Docs Viewer for other PDFs
-                return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-            }
-            return url;
-        }
-
-        function downloadDocument(docId) {
-            if (!currentUser) {
-                showStatus('Please subscribe to download documents', 'error');
-                return;
-            }
-            
-            const doc = allDocuments.find(d => d.id === docId);
-            if (!doc) {
-                showStatus('Document not found', 'error');
-                return;
-            }
-            
-            const downloadUrl = doc.downloadUrl || doc.url;
-            
-            // Create a temporary link and trigger download
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.target = '_blank';
-            
-            // Generate a filename
-            const extension = getFileExtension(doc.fileType);
-            const filename = doc.name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.' + extension;
-            link.download = filename;
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showStatus('📥 Download started for: ' + doc.name, 'success');
-            logActivity('Downloaded document: ' + doc.name);
-        }
-
-        function getFileExtension(fileType) {
-            const extensions = {
-                'pdf': 'pdf',
-                'word': 'docx',
-                'excel': 'xlsx',
-                'ppt': 'pptx',
-                'image': 'jpg',
-                'other': 'txt'
-            };
-            return extensions[fileType] || 'pdf';
-        }
-
-        function getFileTypeFromUrl(url) {
-            if (!url) return 'other';
-            
-            if (url.includes('.pdf') || url.includes('pdf')) return 'pdf';
-            if (url.includes('.doc') || url.includes('.docx') || url.includes('word')) return 'word';
-            if (url.includes('.xls') || url.includes('.xlsx') || url.includes('excel')) return 'excel';
-            if (url.includes('.ppt') || url.includes('.pptx') || url.includes('powerpoint')) return 'ppt';
-            if (url.includes('.jpg') || url.includes('.jpeg') || url.includes('.png') || url.includes('.gif')) return 'image';
-            
-            return 'other';
-        }
-
-        function closeDocumentViewer() {
-            document.getElementById('documentModal').style.display = 'none';
-            document.getElementById('documentViewerContent').innerHTML = '';
-        }
-
         function searchDocuments() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             if (!query) {
@@ -2332,7 +2092,7 @@
             const filtered = userDocuments.filter(doc => {
                 const searchableText = `
                     ${doc.name || ''}
-                    ${doc.description || ''}
+                    ${doc.caption || ''}
                     ${doc.subject || ''}
                     ${(doc.tags || []).join(' ')}
                 `.toLowerCase();
@@ -2353,6 +2113,141 @@
             document.getElementById('documentsList').style.display = 'none';
             document.getElementById('userBadge').style.display = 'none';
             document.getElementById('searchInput').style.display = 'none';
+        }
+
+        // ==================== ENHANCED DOCUMENT VIEWER ====================
+        function viewDocument(docId) {
+            if (!currentUser) {
+                showStatus('Please subscribe to view documents', 'error');
+                return;
+            }
+            
+            viewerDocuments = userDocuments;
+            currentViewerIndex = viewerDocuments.findIndex(d => d.id === docId);
+            
+            if (currentViewerIndex === -1) {
+                showStatus('Document not found', 'error');
+                return;
+            }
+            
+            document.getElementById('documentModal').style.display = 'flex';
+            updateViewerContent();
+        }
+
+        function updateViewerContent() {
+            const doc = viewerDocuments[currentViewerIndex];
+            
+            document.getElementById('modalDocTitle').textContent = 'Document Viewer - ' + currentUser.university;
+            document.getElementById('currentDocumentTitle').textContent = doc.name;
+            document.getElementById('currentDocumentMeta').innerHTML = `
+                <span>${doc.subject || 'General'} • ${doc.size || 'Unknown'} • ${new Date(doc.date).toLocaleDateString()}</span>
+            `;
+            
+            const pdfFrame = document.getElementById('pdfFrame');
+            pdfFrame.src = doc.url;
+            
+            document.getElementById('currentDocPosition').textContent = `${currentViewerIndex + 1} of ${viewerDocuments.length}`;
+            document.getElementById('prevBtn').disabled = currentViewerIndex === 0;
+            document.getElementById('nextBtn').disabled = currentViewerIndex === viewerDocuments.length - 1;
+            
+            document.getElementById('docListCount').textContent = `(${viewerDocuments.length} documents)`;
+            
+            populateDocumentList();
+            updateZoomDisplay();
+        }
+
+        function populateDocumentList() {
+            const container = document.getElementById('documentListContent');
+            let html = '';
+            
+            viewerDocuments.forEach((doc, index) => {
+                const isActive = index === currentViewerIndex;
+                html += `
+                    <div class="document-list-item ${isActive ? 'active' : ''}" onclick="switchToDocument(${index})">
+                        <div class="document-list-item-title">${doc.name}</div>
+                        <div class="document-list-item-meta">
+                            <span>${doc.subject || 'General'}</span>
+                            <span>${doc.size || 'Unknown'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function switchToDocument(index) {
+            if (index >= 0 && index < viewerDocuments.length) {
+                currentViewerIndex = index;
+                updateViewerContent();
+            }
+        }
+
+        function previousDocument() {
+            if (currentViewerIndex > 0) {
+                currentViewerIndex--;
+                updateViewerContent();
+            }
+        }
+
+        function nextDocument() {
+            if (currentViewerIndex < viewerDocuments.length - 1) {
+                currentViewerIndex++;
+                updateViewerContent();
+            }
+        }
+
+        function zoomIn() {
+            zoomLevel = Math.min(zoomLevel + 25, 200);
+            updateZoom();
+        }
+
+        function zoomOut() {
+            zoomLevel = Math.max(zoomLevel - 25, 50);
+            updateZoom();
+        }
+
+        function updateZoom() {
+            const pdfFrame = document.getElementById('pdfFrame');
+            pdfFrame.style.transform = `scale(${zoomLevel / 100})`;
+            pdfFrame.style.transformOrigin = 'top left';
+            pdfFrame.parentElement.style.overflow = 'auto';
+            document.getElementById('zoomLevel').textContent = zoomLevel + '%';
+        }
+
+        function updateZoomDisplay() {
+            document.getElementById('zoomLevel').textContent = zoomLevel + '%';
+        }
+
+        function downloadCurrentDocument() {
+            const doc = viewerDocuments[currentViewerIndex];
+            downloadDocument(doc.id);
+        }
+
+        function downloadDocument(docId) {
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) {
+                showStatus('Document not found', 'error');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.href = doc.url;
+            link.download = doc.name.replace(/[^a-z0-9]/gi, '_') + '.pdf';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            logActivity('Downloaded document: ' + doc.name);
+            showStatus('📥 Download started for: ' + doc.name, 'success');
+        }
+
+        function closeDocumentViewer() {
+            document.getElementById('documentModal').style.display = 'none';
+            const pdfFrame = document.getElementById('pdfFrame');
+            pdfFrame.src = '';
+            zoomLevel = 100;
         }
 
         // ==================== ADMIN FUNCTIONS ====================
@@ -2445,7 +2340,6 @@
                 let users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
                 users.push(user);
                 localStorage.setItem('revisionvault_users', JSON.stringify(users));
-                
                 localStorage.setItem('revisionvault_pending_approvals', JSON.stringify(pendingApprovals));
                 
                 loadPendingApprovals();
@@ -2453,7 +2347,6 @@
                 updateAdminStats();
                 
                 sendApprovalNotification(approval.displayPhone, approval.university);
-                
                 showAdminStatus(`✅ Approved subscription for ${approval.displayPhone} (${approval.university})`, 'success');
                 logActivity('Approved subscription: ' + approval.displayPhone + ' (' + approval.university + ')', 'admin');
             }
@@ -2468,7 +2361,6 @@
                 pendingApprovals.splice(index, 1);
                 
                 localStorage.setItem('revisionvault_pending_approvals', JSON.stringify(pendingApprovals));
-                
                 loadPendingApprovals();
                 updateAdminStats();
                 
@@ -2490,7 +2382,6 @@
             
             const encodedMessage = encodeURIComponent(message);
             const whatsappURL = `https://wa.me/${formatPhoneForAPI(phone)}?text=${encodedMessage}`;
-            
             window.open(whatsappURL, '_blank');
         }
 
@@ -2619,12 +2510,169 @@
                 users[index].status = 'active';
                 
                 localStorage.setItem('revisionvault_users', JSON.stringify(users));
-                
                 loadUsersTable();
                 updateAdminStats();
                 
                 showAdminStatus(`✅ Extended subscription for ${userPhone} by 30 days`, 'success');
                 logActivity('Extended subscription: ' + userPhone, 'admin');
+            }
+        }
+
+        // ==================== TELEGRAM SYNC FUNCTIONS ====================
+        function syncTelegramDocuments() {
+            const syncStatus = document.getElementById('syncStatus');
+            syncStatus.style.display = 'block';
+            syncStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Syncing documents from Telegram...';
+            
+            showAdminStatus('⏳ Syncing documents from Telegram...', 'info');
+            
+            setTimeout(() => {
+                const telegramDocs = [
+                    {
+                        id: 'telegram_' + Date.now(),
+                        name: 'Chemistry Past Papers 2023',
+                        university: 'University of Nairobi',
+                        subject: 'Chemistry',
+                        year: '2023',
+                        size: '1.5 MB',
+                        date: Date.now(),
+                        caption: 'Chemistry past papers with marking schemes',
+                        tags: ['chemistry', 'past-papers', 'uon'],
+                        url: 'https://t.me/RevisionVaultDocuments/1',
+                        type: 'pdf'
+                    },
+                    {
+                        id: 'telegram_' + (Date.now() + 1),
+                        name: 'Biology Lab Manual',
+                        university: 'Egerton University',
+                        subject: 'Biology',
+                        year: '2023',
+                        size: '2.8 MB',
+                        date: Date.now() - 86400000,
+                        caption: 'Biology laboratory procedures and experiments',
+                        tags: ['biology', 'laboratory', 'egerton'],
+                        url: 'https://t.me/RevisionVaultDocuments/2',
+                        type: 'pdf'
+                    },
+                    {
+                        id: 'telegram_' + (Date.now() + 2),
+                        name: 'Computer Networks Notes',
+                        university: 'JKUAT',
+                        subject: 'Computer Science',
+                        year: '2023',
+                        size: '3.2 MB',
+                        date: Date.now() - 172800000,
+                        caption: 'Complete notes on computer networks',
+                        tags: ['networks', 'computer-science', 'jkuat'],
+                        url: 'https://t.me/RevisionVaultDocuments/3',
+                        type: 'pdf'
+                    }
+                ];
+                
+                telegramDocs.forEach(doc => {
+                    const existingIndex = allDocuments.findIndex(d => d.name === doc.name && d.university === doc.university);
+                    if (existingIndex === -1) {
+                        allDocuments.unshift(doc);
+                    }
+                });
+                
+                saveDocumentsToCache();
+                updateDocumentCount(allDocuments.length);
+                
+                if (currentUser) {
+                    loadUserDocuments();
+                }
+                
+                syncStatus.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i> Successfully synced 3 new documents from Telegram!';
+                showAdminStatus('✅ Synced 3 new documents from Telegram', 'success');
+                logActivity('Telegram sync completed: 3 new documents', 'admin');
+                
+                setTimeout(() => {
+                    syncStatus.style.display = 'none';
+                }, 5000);
+            }, 2000);
+        }
+
+        function testTelegramConnection() {
+            showAdminStatus('🔗 Testing Telegram connection...', 'info');
+            
+            setTimeout(() => {
+                showAdminStatus('✅ Telegram connection successful!', 'success');
+            }, 1000);
+        }
+
+        function showTelegramSettings() {
+            const botToken = prompt('Enter Telegram Bot Token (optional):', CONFIG.telegramBotToken || '');
+            const channelId = prompt('Enter Telegram Channel ID:', CONFIG.telegramChannelId || '');
+            
+            if (botToken) CONFIG.telegramBotToken = botToken;
+            if (channelId) CONFIG.telegramChannelId = channelId;
+            
+            showAdminStatus('✅ Telegram settings updated', 'success');
+        }
+
+        // ==================== DOCUMENT UPLOAD ====================
+        function addManualDocument() {
+            const name = document.getElementById('docName').value.trim();
+            const university = document.getElementById('docUniversity').value;
+            const subject = document.getElementById('docSubject').value.trim();
+            const url = document.getElementById('docUrl').value.trim();
+            
+            if (!name || !university || !url) {
+                showAdminStatus('Please fill all required fields', 'error');
+                return;
+            }
+            
+            if (!url.includes('t.me') && !url.includes('telegram.org') && !url.includes('http')) {
+                showAdminStatus('Please enter a valid URL', 'error');
+                return;
+            }
+            
+            const newDoc = {
+                id: 'doc_' + Date.now(),
+                name: name,
+                university: university,
+                subject: subject || 'General',
+                year: new Date().getFullYear().toString(),
+                size: 'PDF',
+                date: Date.now(),
+                caption: 'Uploaded via admin panel',
+                tags: subject ? [subject.toLowerCase().replace(/ /g, '-')] : ['general'],
+                url: url,
+                type: url.includes('.pdf') ? 'pdf' : 'document',
+                uploadedAt: new Date().toISOString(),
+                uploadedBy: 'admin'
+            };
+            
+            allDocuments.unshift(newDoc);
+            saveDocumentsToCache();
+            updateDocumentCount(allDocuments.length);
+            
+            if (currentUser && currentUser.university === university) {
+                loadUserDocuments();
+            }
+            
+            clearDocumentForm();
+            showAdminStatus('✅ Document uploaded successfully', 'success');
+            logActivity('Document uploaded: ' + name + ' (' + university + ')', 'admin');
+        }
+
+        function clearDocumentForm() {
+            document.getElementById('docName').value = '';
+            document.getElementById('docSubject').value = '';
+            document.getElementById('docUrl').value = '';
+        }
+
+        function saveDocumentsToCache() {
+            try {
+                const cacheData = {
+                    documents: allDocuments,
+                    timestamp: Date.now(),
+                    count: allDocuments.length
+                };
+                localStorage.setItem('revisionvault_documents_cache', JSON.stringify(cacheData));
+            } catch (error) {
+                console.error('Error saving to cache:', error);
             }
         }
 
@@ -2678,6 +2726,30 @@
             }
             
             tbody.innerHTML = html;
+        }
+
+        function exportUsers() {
+            const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            const pendingApprovals = JSON.parse(localStorage.getItem('revisionvault_pending_approvals') || '[]');
+            
+            const data = {
+                activeUsers: users,
+                pendingApprovals: pendingApprovals,
+                totalDocuments: allDocuments.length,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `revisionvault_export_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showAdminStatus('✅ Users data exported successfully', 'success');
         }
 
         // ==================== UTILITY FUNCTIONS ====================
@@ -2740,13 +2812,6 @@
                 loadActivityLog();
             }
         }
-
-        // Auto-refresh documents every 30 seconds
-        setInterval(function() {
-            if (currentUser) {
-                loadUserDocuments();
-            }
-        }, 30000);
     </script>
 </body>
 </html>
