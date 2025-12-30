@@ -1722,6 +1722,9 @@
                                         <div class="form-group">
                                             <label class="form-label">Document URL (From Telegram) *</label>
                                             <input type="text" class="form-input" id="docUrl" placeholder="https://t.me/..." required>
+                                            <small style="color: #666; font-size: 0.8rem; margin-top: 5px; display: block;">
+                                                <i class="fas fa-info-circle"></i> Enter Telegram document link. The app will convert it to direct download link.
+                                            </small>
                                         </div>
                                         
                                         <div class="form-group">
@@ -1964,7 +1967,7 @@
                         university: "All",
                         course: "Mathematics",
                         type: "pdf",
-                        url: "https://www.africau.edu/images/default/sample.pdf",
+                        url: "https://t.me/RevisionVaultDocuments/1",
                         description: "Basic calculus concepts and formulas for first year students",
                         date: new Date().toISOString(),
                         tags: ["mathematics", "calculus", "year1"],
@@ -1976,7 +1979,7 @@
                         university: "University of Nairobi",
                         course: "Computer Science",
                         type: "pdf",
-                        url: "https://www.africau.edu/images/default/sample.pdf",
+                        url: "https://t.me/RevisionVaultDocuments/2",
                         description: "Complete notes on data structures and algorithms",
                         date: new Date().toISOString(),
                         tags: ["computerscience", "datastructures", "year2"],
@@ -1988,7 +1991,7 @@
                         university: "Kenyatta University",
                         course: "Chemistry",
                         type: "pdf",
-                        url: "https://www.africau.edu/images/default/sample.pdf",
+                        url: "https://t.me/RevisionVaultDocuments/3",
                         description: "Comprehensive organic chemistry notes with diagrams",
                         date: new Date().toISOString(),
                         tags: ["chemistry", "organic", "year1"],
@@ -2008,6 +2011,401 @@
             allPayments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
             allUniversities = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.universities) || '[]');
             allDocuments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+        }
+
+        // ===== FIXED: TELEGRAM LINK CONVERTER =====
+        // Function to convert Telegram message links to direct download links
+        function convertTelegramLink(telegramUrl) {
+            console.log("Converting Telegram link:", telegramUrl);
+            
+            // If it's already a direct PDF link, return it
+            if (telegramUrl.toLowerCase().endsWith('.pdf')) {
+                return telegramUrl;
+            }
+            
+            // Check if it's a Telegram message link
+            const telegramRegex = /https:\/\/t\.me\/([^/]+)\/(\d+)/;
+            const match = telegramUrl.match(telegramRegex);
+            
+            if (match) {
+                const channel = match[1];
+                const messageId = match[2];
+                
+                // Method 1: Try to get direct link through Telegram's API
+                // For public channels, we can use this pattern
+                const directLink = `https://t.me/${channel}/${messageId}?embed=1&mode=tme`;
+                
+                console.log("Converted to:", directLink);
+                return directLink;
+            }
+            
+            // If not a Telegram link or pattern doesn't match, return original
+            return telegramUrl;
+        }
+
+        // ===== FIXED: PDF VIEWER WITH TELEGRAM SUPPORT =====
+        function openDocument(docId) {
+            console.log("Opening document with ID:", docId);
+            
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) {
+                showStatus("Document not found", "error");
+                return;
+            }
+            
+            // Convert Telegram link to direct download link
+            let pdfUrl = doc.url;
+            console.log("Original URL:", pdfUrl);
+            
+            if (pdfUrl.includes('t.me/')) {
+                pdfUrl = convertTelegramLink(pdfUrl);
+                console.log("Converted URL:", pdfUrl);
+            }
+            
+            // Enable screenshot protection
+            document.getElementById('screenshotOverlay').style.display = 'block';
+            
+            // Set current PDF
+            currentPDF = doc;
+            
+            // Update viewer title
+            document.getElementById('pdfTitle').textContent = doc.title;
+            document.getElementById('pdfWatermark').textContent = `${currentUser?.phone || 'USER'} - REVISIONVAULT - DO NOT COPY`;
+            
+            // Reset PDF viewer state
+            currentPage = 1;
+            pdfScale = 1.0;
+            
+            // Show loading
+            document.getElementById('pdfLoading').style.display = 'flex';
+            document.getElementById('pdfProgressFill').style.width = '0%';
+            
+            // Clear canvas container
+            const container = document.getElementById('pdfCanvasContainer');
+            container.innerHTML = '<div class="pdf-loading" id="pdfLoading" style="display: flex;"><div class="loading-spinner"></div><div>Loading PDF Document...</div><div class="pdf-progress-bar"><div class="pdf-progress-fill" id="pdfProgressFill"></div></div></div>';
+            
+            // Show PDF viewer
+            document.getElementById('pdfViewer').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Load PDF with converted URL
+            loadPDF(pdfUrl);
+            
+            // Increment view count
+            incrementViewCount(docId);
+        }
+
+        function loadPDF(url) {
+            console.log("Loading PDF from URL:", url);
+            
+            // Configure PDF.js
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            
+            // Add CORS proxy for Telegram links
+            let finalUrl = url;
+            if (url.includes('t.me/')) {
+                // Use CORS proxy for Telegram links
+                finalUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                console.log("Using CORS proxy URL:", finalUrl);
+            }
+            
+            // Load the PDF
+            const loadingTask = pdfjsLib.getDocument({
+                url: finalUrl,
+                cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+                cMapPacked: true,
+                withCredentials: false
+            });
+            
+            loadingTask.promise.then(
+                function(pdf) {
+                    pdfDocument = pdf;
+                    totalPages = pdf.numPages;
+                    
+                    // Update page info
+                    document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+                    document.getElementById('pdfZoomLevel').textContent = '100%';
+                    
+                    // Update loading progress
+                    document.getElementById('pdfProgressFill').style.width = '50%';
+                    
+                    // Render all pages
+                    renderAllPages();
+                },
+                function(error) {
+                    console.error("Error loading PDF:", error);
+                    
+                    // Try alternative method for Telegram links
+                    if (url.includes('t.me/')) {
+                        document.getElementById('pdfLoading').innerHTML = `
+                            <div style="text-align: center;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b; margin-bottom: 15px;"></i>
+                                <div style="margin-bottom: 10px;">Direct loading failed</div>
+                                <div style="font-size: 0.9rem; color: #ccc; margin-bottom: 20px;">
+                                    Trying alternative method...
+                                </div>
+                                <div class="loading-spinner"></div>
+                            </div>
+                        `;
+                        
+                        // Try alternative proxy
+                        setTimeout(() => {
+                            const alternativeProxy = `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`;
+                            console.log("Trying alternative proxy:", alternativeProxy);
+                            retryLoadPDF(alternativeProxy);
+                        }, 2000);
+                    } else {
+                        document.getElementById('pdfLoading').innerHTML = `
+                            <div style="text-align: center;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
+                                <div>Error loading PDF document</div>
+                                <div style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">${error.message}</div>
+                                <div style="margin-top: 20px;">
+                                    <button class="btn btn-primary" onclick="closePDFViewer()" style="margin-right: 10px;">
+                                        <i class="fas fa-times"></i> Close Viewer
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="window.open('${url}', '_blank')">
+                                        <i class="fas fa-external-link-alt"></i> Open in New Tab
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            );
+            
+            // Track loading progress
+            loadingTask.onProgress = function(progressData) {
+                if (progressData.total) {
+                    const progress = (progressData.loaded / progressData.total) * 100;
+                    document.getElementById('pdfProgressFill').style.width = progress + '%';
+                }
+            };
+        }
+
+        function retryLoadPDF(url) {
+            console.log("Retrying PDF load with URL:", url);
+            
+            const loadingTask = pdfjsLib.getDocument({
+                url: url,
+                cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+                cMapPacked: true,
+                withCredentials: false
+            });
+            
+            loadingTask.promise.then(
+                function(pdf) {
+                    pdfDocument = pdf;
+                    totalPages = pdf.numPages;
+                    
+                    // Update page info
+                    document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+                    document.getElementById('pdfZoomLevel').textContent = '100%';
+                    
+                    // Render all pages
+                    renderAllPages();
+                },
+                function(error) {
+                    console.error("Retry failed:", error);
+                    document.getElementById('pdfLoading').innerHTML = `
+                        <div style="text-align: center;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
+                            <div>Failed to load PDF</div>
+                            <div style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">
+                                Please try opening the link directly or contact admin.
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <button class="btn btn-primary" onclick="closePDFViewer()" style="margin-right: 10px;">
+                                    <i class="fas fa-times"></i> Close Viewer
+                                </button>
+                                <button class="btn btn-secondary" onclick="window.open('${currentPDF.url}', '_blank')">
+                                    <i class="fas fa-external-link-alt"></i> Open in Telegram
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            );
+        }
+
+        // ===== REST OF THE FUNCTIONS (Keep the same as before but with Telegram link handling) =====
+        function renderAllPages() {
+            if (!pdfDocument) return;
+            
+            const container = document.getElementById('pdfCanvasContainer');
+            
+            // Hide loading
+            document.getElementById('pdfLoading').style.display = 'none';
+            
+            // Clear container
+            container.innerHTML = '';
+            
+            // Render all pages
+            for (let i = 1; i <= totalPages; i++) {
+                renderPage(i, container);
+            }
+            
+            // Add scroll listener to update current page
+            container.addEventListener('scroll', updateCurrentPageFromScroll);
+        }
+
+        function renderPage(pageNum, container) {
+            pdfDocument.getPage(pageNum).then(function(page) {
+                const viewport = page.getViewport({ scale: pdfScale });
+                
+                // Create canvas for page
+                const canvas = document.createElement('canvas');
+                canvas.id = `pdf-page-${pageNum}`;
+                canvas.className = 'pdf-page-canvas';
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                // Add user watermark to canvas
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+                ctx.font = 'bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.save();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(-45 * Math.PI / 180);
+                ctx.fillText(`${currentUser?.phone || 'USER'} - REVISIONVAULT`, 0, 0);
+                ctx.restore();
+                
+                // Add canvas to container
+                container.appendChild(canvas);
+                
+                // Render page on canvas
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                page.render(renderContext);
+            });
+        }
+
+        function updateCurrentPageFromScroll() {
+            const container = document.getElementById('pdfCanvasContainer');
+            const canvases = container.querySelectorAll('.pdf-page-canvas');
+            
+            if (canvases.length === 0) return;
+            
+            const scrollTop = container.scrollTop;
+            const containerHeight = container.clientHeight;
+            let newPage = currentPage;
+            
+            for (let i = 0; i < canvases.length; i++) {
+                const canvas = canvases[i];
+                const rect = canvas.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                // Check if canvas is at least 30% visible
+                const visibleHeight = Math.min(rect.bottom, containerRect.bottom) - Math.max(rect.top, containerRect.top);
+                if (visibleHeight > canvas.clientHeight * 0.3) {
+                    newPage = i + 1;
+                    break;
+                }
+            }
+            
+            if (newPage !== currentPage) {
+                currentPage = newPage;
+                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            }
+        }
+
+        function prevPDFPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                scrollToPage(currentPage);
+                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            }
+        }
+
+        function nextPDFPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                scrollToPage(currentPage);
+                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            }
+        }
+
+        function scrollToPage(pageNum) {
+            const container = document.getElementById('pdfCanvasContainer');
+            const canvas = document.getElementById(`pdf-page-${pageNum}`);
+            
+            if (canvas) {
+                canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function zoomInPDF() {
+            if (pdfScale < 3.0) {
+                pdfScale += 0.1;
+                rerenderAllPages();
+            }
+        }
+
+        function zoomOutPDF() {
+            if (pdfScale > 0.5) {
+                pdfScale -= 0.1;
+                rerenderAllPages();
+            }
+        }
+
+        function fitPDFToWidth() {
+            const container = document.getElementById('pdfCanvasContainer');
+            const firstCanvas = container.querySelector('.pdf-page-canvas');
+            
+            if (firstCanvas) {
+                const containerWidth = container.clientWidth - 40; // Account for padding
+                pdfScale = containerWidth / firstCanvas.width;
+                rerenderAllPages();
+            }
+        }
+
+        function rerenderAllPages() {
+            // Clear all canvases
+            const container = document.getElementById('pdfCanvasContainer');
+            container.innerHTML = '';
+            
+            // Re-render all pages
+            for (let i = 1; i <= totalPages; i++) {
+                renderPage(i, container);
+            }
+            
+            // Update zoom display
+            document.getElementById('pdfZoomLevel').textContent = Math.round(pdfScale * 100) + '%';
+            
+            // Scroll back to current page
+            setTimeout(() => {
+                scrollToPage(currentPage);
+            }, 100);
+        }
+
+        function closePDFViewer() {
+            document.getElementById('pdfViewer').classList.remove('active');
+            document.getElementById('screenshotOverlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Clean up
+            currentPDF = null;
+            pdfDocument = null;
+            currentPage = 1;
+            pdfScale = 1.0;
+            
+            // Remove scroll listener
+            const container = document.getElementById('pdfCanvasContainer');
+            container.removeEventListener('scroll', updateCurrentPageFromScroll);
+        }
+
+        function incrementViewCount(docId) {
+            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+            const docIndex = docs.findIndex(d => d.id === docId);
+            if (docIndex !== -1) {
+                docs[docIndex].views = (docs[docIndex].views || 0) + 1;
+                localStorage.setItem(APP_CONFIG.storageKeys.documents, JSON.stringify(docs));
+            }
         }
 
         // ===== USER STATUS CHECK =====
@@ -2100,6 +2498,164 @@
                 // Hide user menu
                 document.getElementById('userMenu').style.display = 'none';
             }
+        }
+
+        // ===== DOCUMENT FUNCTIONS =====
+        function loadDocuments() {
+            if (!currentUser) {
+                showSection('subscription');
+                return;
+            }
+            
+            // Check if user has active subscription
+            if (currentUser.subscription !== 'active') {
+                // Show access restricted message
+                document.getElementById('filterBar').style.display = 'none';
+                document.getElementById('documentsContainer').innerHTML = '';
+                document.getElementById('noDocuments').style.display = 'none';
+                document.getElementById('subscriptionRequired').style.display = 'block';
+                
+                // Show appropriate message based on status
+                const messageDiv = document.getElementById('accessControlMessage');
+                messageDiv.innerHTML = '';
+                
+                if (currentUser.subscription === 'pending') {
+                    messageDiv.innerHTML = `
+                        <div class="status-message status-warning">
+                            <i class="fas fa-clock"></i>
+                            <span>Your subscription is pending approval. Please wait for admin verification.</span>
+                            <button class="btn btn-small btn-outline" onclick="checkApprovalStatus()" style="margin-left: auto;">
+                                Check Status
+                            </button>
+                        </div>
+                    `;
+                    messageDiv.style.display = 'block';
+                } else if (currentUser.subscription === 'expired') {
+                    messageDiv.innerHTML = `
+                        <div class="status-message status-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Your subscription has expired. Please renew to access materials.</span>
+                            <button class="btn btn-small btn-primary" onclick="showSection('subscription')" style="margin-left: auto;">
+                                Renew Now
+                            </button>
+                        </div>
+                    `;
+                    messageDiv.style.display = 'block';
+                }
+                
+                return;
+            }
+            
+            // User has active subscription - show documents
+            showLoading();
+            
+            try {
+                const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+                allDocuments = docs;
+                
+                // Filter documents for user's university
+                const filteredDocs = docs.filter(doc => 
+                    doc.university === 'All' || 
+                    doc.university === currentUser.university
+                );
+                
+                displayDocuments(filteredDocs);
+                
+                // Show filters
+                document.getElementById('filterBar').style.display = 'flex';
+                document.getElementById('subscriptionRequired').style.display = 'none';
+                document.getElementById('accessControlMessage').style.display = 'none';
+                
+            } catch (e) {
+                console.error("Error loading documents:", e);
+                showStatus("Error loading documents", "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayDocuments(documents) {
+            const container = document.getElementById('documentsContainer');
+            const noDocsDiv = document.getElementById('noDocuments');
+            
+            if (!documents || documents.length === 0) {
+                container.innerHTML = '';
+                noDocsDiv.style.display = 'block';
+                return;
+            }
+            
+            noDocsDiv.style.display = 'none';
+            
+            // Apply filter
+            let filteredDocs = documents;
+            if (currentFilter !== 'all') {
+                filteredDocs = documents.filter(doc => {
+                    if (currentFilter === 'pdf') return doc.type === 'pdf';
+                    if (currentFilter === 'notes') return doc.description?.toLowerCase().includes('note') || doc.title?.toLowerCase().includes('note');
+                    if (currentFilter === 'past') return doc.description?.toLowerCase().includes('past paper') || doc.title?.toLowerCase().includes('past');
+                    if (currentFilter === 'books') return doc.description?.toLowerCase().includes('textbook') || doc.title?.toLowerCase().includes('book');
+                    return true;
+                });
+            }
+            
+            if (filteredDocs.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <i class="fas fa-search" style="font-size: 2.5rem; margin-bottom: 15px;"></i>
+                        <h3 style="margin-bottom: 10px;">No documents found</h3>
+                        <p>Try selecting a different filter or check back later.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="documents-grid">';
+            
+            filteredDocs.forEach(doc => {
+                const fileIcon = getFileIcon(doc.type);
+                const formattedDate = formatDate(doc.date);
+                
+                html += `
+                    <div class="document-card">
+                        <div class="document-header">
+                            <div class="document-title">${doc.title}</div>
+                            <div class="document-meta">
+                                <span><i class="fas ${fileIcon}"></i> ${doc.type.toUpperCase()}</span>
+                                ${doc.university !== 'All' ? `<span><i class="fas fa-university"></i> ${doc.university}</span>` : ''}
+                                <span><i class="fas fa-calendar"></i> ${formattedDate}</span>
+                            </div>
+                        </div>
+                        <div class="document-body">
+                            <div class="document-description">${doc.description || 'No description available'}</div>
+                            <div class="document-tags">
+                                <span class="tag">${doc.course}</span>
+                                ${doc.tags ? doc.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
+                            </div>
+                            <div class="document-actions">
+                                <button class="btn btn-success btn-small" onclick="openDocument(${doc.id})">
+                                    <i class="fas fa-eye"></i> View Document
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function filterDocuments(filter) {
+            currentFilter = filter;
+            
+            // Update active filter chip
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reload documents with filter
+            loadDocuments();
         }
 
         // ===== SUBSCRIPTION FUNCTIONS =====
@@ -2308,447 +2864,6 @@ Please approve this subscription.
             const date = new Date();
             date.setDate(date.getDate() + APP_CONFIG.subscriptionDays);
             return date.toISOString();
-        }
-
-        // ===== DOCUMENT FUNCTIONS =====
-        function loadDocuments() {
-            if (!currentUser) {
-                showSection('subscription');
-                return;
-            }
-            
-            // Check if user has active subscription
-            if (currentUser.subscription !== 'active') {
-                // Show access restricted message
-                document.getElementById('filterBar').style.display = 'none';
-                document.getElementById('documentsContainer').innerHTML = '';
-                document.getElementById('noDocuments').style.display = 'none';
-                document.getElementById('subscriptionRequired').style.display = 'block';
-                
-                // Show appropriate message based on status
-                const messageDiv = document.getElementById('accessControlMessage');
-                messageDiv.innerHTML = '';
-                
-                if (currentUser.subscription === 'pending') {
-                    messageDiv.innerHTML = `
-                        <div class="status-message status-warning">
-                            <i class="fas fa-clock"></i>
-                            <span>Your subscription is pending approval. Please wait for admin verification.</span>
-                            <button class="btn btn-small btn-outline" onclick="checkApprovalStatus()" style="margin-left: auto;">
-                                Check Status
-                            </button>
-                        </div>
-                    `;
-                    messageDiv.style.display = 'block';
-                } else if (currentUser.subscription === 'expired') {
-                    messageDiv.innerHTML = `
-                        <div class="status-message status-error">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <span>Your subscription has expired. Please renew to access materials.</span>
-                            <button class="btn btn-small btn-primary" onclick="showSection('subscription')" style="margin-left: auto;">
-                                Renew Now
-                            </button>
-                        </div>
-                    `;
-                    messageDiv.style.display = 'block';
-                }
-                
-                return;
-            }
-            
-            // User has active subscription - show documents
-            showLoading();
-            
-            try {
-                const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
-                allDocuments = docs;
-                
-                // Filter documents for user's university
-                const filteredDocs = docs.filter(doc => 
-                    doc.university === 'All' || 
-                    doc.university === currentUser.university
-                );
-                
-                displayDocuments(filteredDocs);
-                
-                // Show filters
-                document.getElementById('filterBar').style.display = 'flex';
-                document.getElementById('subscriptionRequired').style.display = 'none';
-                document.getElementById('accessControlMessage').style.display = 'none';
-                
-            } catch (e) {
-                console.error("Error loading documents:", e);
-                showStatus("Error loading documents", "error");
-            } finally {
-                hideLoading();
-            }
-        }
-
-        function displayDocuments(documents) {
-            const container = document.getElementById('documentsContainer');
-            const noDocsDiv = document.getElementById('noDocuments');
-            
-            if (!documents || documents.length === 0) {
-                container.innerHTML = '';
-                noDocsDiv.style.display = 'block';
-                return;
-            }
-            
-            noDocsDiv.style.display = 'none';
-            
-            // Apply filter
-            let filteredDocs = documents;
-            if (currentFilter !== 'all') {
-                filteredDocs = documents.filter(doc => {
-                    if (currentFilter === 'pdf') return doc.type === 'pdf';
-                    if (currentFilter === 'notes') return doc.description?.toLowerCase().includes('note') || doc.title?.toLowerCase().includes('note');
-                    if (currentFilter === 'past') return doc.description?.toLowerCase().includes('past paper') || doc.title?.toLowerCase().includes('past');
-                    if (currentFilter === 'books') return doc.description?.toLowerCase().includes('textbook') || doc.title?.toLowerCase().includes('book');
-                    return true;
-                });
-            }
-            
-            if (filteredDocs.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <i class="fas fa-search" style="font-size: 2.5rem; margin-bottom: 15px;"></i>
-                        <h3 style="margin-bottom: 10px;">No documents found</h3>
-                        <p>Try selecting a different filter or check back later.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '<div class="documents-grid">';
-            
-            filteredDocs.forEach(doc => {
-                const fileIcon = getFileIcon(doc.type);
-                const formattedDate = formatDate(doc.date);
-                
-                html += `
-                    <div class="document-card">
-                        <div class="document-header">
-                            <div class="document-title">${doc.title}</div>
-                            <div class="document-meta">
-                                <span><i class="fas ${fileIcon}"></i> ${doc.type.toUpperCase()}</span>
-                                ${doc.university !== 'All' ? `<span><i class="fas fa-university"></i> ${doc.university}</span>` : ''}
-                                <span><i class="fas fa-calendar"></i> ${formattedDate}</span>
-                            </div>
-                        </div>
-                        <div class="document-body">
-                            <div class="document-description">${doc.description || 'No description available'}</div>
-                            <div class="document-tags">
-                                <span class="tag">${doc.course}</span>
-                                ${doc.tags ? doc.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
-                            </div>
-                            <div class="document-actions">
-                                <button class="btn btn-success btn-small" onclick="openDocument(${doc.id})">
-                                    <i class="fas fa-eye"></i> View Document
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        function filterDocuments(filter) {
-            currentFilter = filter;
-            
-            // Update active filter chip
-            document.querySelectorAll('.filter-chip').forEach(chip => {
-                chip.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Reload documents with filter
-            loadDocuments();
-        }
-
-        // ===== FIXED: PDF VIEWER FUNCTIONS =====
-        function openDocument(docId) {
-            const doc = allDocuments.find(d => d.id === docId);
-            if (!doc) {
-                showStatus("Document not found", "error");
-                return;
-            }
-            
-            // Enable screenshot protection
-            document.getElementById('screenshotOverlay').style.display = 'block';
-            
-            // Set current PDF
-            currentPDF = doc;
-            
-            // Update viewer title
-            document.getElementById('pdfTitle').textContent = doc.title;
-            document.getElementById('pdfWatermark').textContent = `${currentUser?.phone || 'USER'} - REVISIONVAULT - DO NOT COPY`;
-            
-            // Reset PDF viewer state
-            currentPage = 1;
-            pdfScale = 1.0;
-            
-            // Show loading
-            document.getElementById('pdfLoading').style.display = 'flex';
-            document.getElementById('pdfProgressFill').style.width = '0%';
-            
-            // Clear canvas container
-            const container = document.getElementById('pdfCanvasContainer');
-            container.innerHTML = '<div class="pdf-loading" id="pdfLoading" style="display: flex;"><div class="loading-spinner"></div><div>Loading PDF Document...</div><div class="pdf-progress-bar"><div class="pdf-progress-fill" id="pdfProgressFill"></div></div></div>';
-            
-            // Show PDF viewer
-            document.getElementById('pdfViewer').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            // Load PDF
-            loadPDF(doc.url);
-            
-            // Increment view count
-            incrementViewCount(docId);
-        }
-
-        function loadPDF(url) {
-            // Configure PDF.js
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            
-            // Validate URL
-            if (!url || !url.startsWith('http')) {
-                document.getElementById('pdfLoading').innerHTML = `
-                    <div style="text-align: center;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
-                        <div>Invalid PDF URL</div>
-                        <div style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">The document link is not valid.</div>
-                        <button class="btn btn-primary" onclick="closePDFViewer()" style="margin-top: 20px;">
-                            <i class="fas fa-times"></i> Close Viewer
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Load the PDF
-            const loadingTask = pdfjsLib.getDocument({
-                url: url,
-                cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
-                cMapPacked: true
-            });
-            
-            loadingTask.promise.then(
-                function(pdf) {
-                    pdfDocument = pdf;
-                    totalPages = pdf.numPages;
-                    
-                    // Update page info
-                    document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
-                    document.getElementById('pdfZoomLevel').textContent = '100%';
-                    
-                    // Update loading progress
-                    document.getElementById('pdfProgressFill').style.width = '50%';
-                    
-                    // Render all pages
-                    renderAllPages();
-                },
-                function(error) {
-                    console.error("Error loading PDF:", error);
-                    document.getElementById('pdfLoading').innerHTML = `
-                        <div style="text-align: center;">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
-                            <div>Error loading PDF document</div>
-                            <div style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">${error.message}</div>
-                            <button class="btn btn-primary" onclick="closePDFViewer()" style="margin-top: 20px;">
-                                <i class="fas fa-times"></i> Close Viewer
-                            </button>
-                        </div>
-                    `;
-                }
-            );
-            
-            // Track loading progress
-            loadingTask.onProgress = function(progressData) {
-                const progress = (progressData.loaded / progressData.total) * 100;
-                document.getElementById('pdfProgressFill').style.width = progress + '%';
-            };
-        }
-
-        function renderAllPages() {
-            if (!pdfDocument) return;
-            
-            const container = document.getElementById('pdfCanvasContainer');
-            
-            // Hide loading
-            document.getElementById('pdfLoading').style.display = 'none';
-            
-            // Clear container
-            container.innerHTML = '';
-            
-            // Render all pages
-            for (let i = 1; i <= totalPages; i++) {
-                renderPage(i, container);
-            }
-            
-            // Add scroll listener to update current page
-            container.addEventListener('scroll', updateCurrentPageFromScroll);
-        }
-
-        function renderPage(pageNum, container) {
-            pdfDocument.getPage(pageNum).then(function(page) {
-                const viewport = page.getViewport({ scale: pdfScale });
-                
-                // Create canvas for page
-                const canvas = document.createElement('canvas');
-                canvas.id = `pdf-page-${pageNum}`;
-                canvas.className = 'pdf-page-canvas';
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
-                
-                // Add user watermark to canvas
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
-                ctx.font = 'bold 40px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.save();
-                ctx.translate(canvas.width / 2, canvas.height / 2);
-                ctx.rotate(-45 * Math.PI / 180);
-                ctx.fillText(`${currentUser?.phone || 'USER'} - REVISIONVAULT`, 0, 0);
-                ctx.restore();
-                
-                // Add canvas to container
-                container.appendChild(canvas);
-                
-                // Render page on canvas
-                const renderContext = {
-                    canvasContext: ctx,
-                    viewport: viewport
-                };
-                
-                page.render(renderContext);
-            });
-        }
-
-        function updateCurrentPageFromScroll() {
-            const container = document.getElementById('pdfCanvasContainer');
-            const canvases = container.querySelectorAll('.pdf-page-canvas');
-            
-            if (canvases.length === 0) return;
-            
-            const scrollTop = container.scrollTop;
-            const containerHeight = container.clientHeight;
-            let newPage = currentPage;
-            
-            for (let i = 0; i < canvases.length; i++) {
-                const canvas = canvases[i];
-                const rect = canvas.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-                
-                // Check if canvas is at least 30% visible
-                const visibleHeight = Math.min(rect.bottom, containerRect.bottom) - Math.max(rect.top, containerRect.top);
-                if (visibleHeight > canvas.clientHeight * 0.3) {
-                    newPage = i + 1;
-                    break;
-                }
-            }
-            
-            if (newPage !== currentPage) {
-                currentPage = newPage;
-                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
-            }
-        }
-
-        function prevPDFPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                scrollToPage(currentPage);
-                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
-            }
-        }
-
-        function nextPDFPage() {
-            if (currentPage < totalPages) {
-                currentPage++;
-                scrollToPage(currentPage);
-                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
-            }
-        }
-
-        function scrollToPage(pageNum) {
-            const container = document.getElementById('pdfCanvasContainer');
-            const canvas = document.getElementById(`pdf-page-${pageNum}`);
-            
-            if (canvas) {
-                canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-
-        function zoomInPDF() {
-            if (pdfScale < 3.0) {
-                pdfScale += 0.1;
-                rerenderAllPages();
-            }
-        }
-
-        function zoomOutPDF() {
-            if (pdfScale > 0.5) {
-                pdfScale -= 0.1;
-                rerenderAllPages();
-            }
-        }
-
-        function fitPDFToWidth() {
-            const container = document.getElementById('pdfCanvasContainer');
-            const firstCanvas = container.querySelector('.pdf-page-canvas');
-            
-            if (firstCanvas) {
-                const containerWidth = container.clientWidth - 40; // Account for padding
-                pdfScale = containerWidth / firstCanvas.width;
-                rerenderAllPages();
-            }
-        }
-
-        function rerenderAllPages() {
-            // Clear all canvases
-            const container = document.getElementById('pdfCanvasContainer');
-            container.innerHTML = '';
-            
-            // Re-render all pages
-            for (let i = 1; i <= totalPages; i++) {
-                renderPage(i, container);
-            }
-            
-            // Update zoom display
-            document.getElementById('pdfZoomLevel').textContent = Math.round(pdfScale * 100) + '%';
-            
-            // Scroll back to current page
-            setTimeout(() => {
-                scrollToPage(currentPage);
-            }, 100);
-        }
-
-        function closePDFViewer() {
-            document.getElementById('pdfViewer').classList.remove('active');
-            document.getElementById('screenshotOverlay').style.display = 'none';
-            document.body.style.overflow = 'auto';
-            
-            // Clean up
-            currentPDF = null;
-            pdfDocument = null;
-            currentPage = 1;
-            pdfScale = 1.0;
-            
-            // Remove scroll listener
-            const container = document.getElementById('pdfCanvasContainer');
-            container.removeEventListener('scroll', updateCurrentPageFromScroll);
-        }
-
-        function incrementViewCount(docId) {
-            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
-            const docIndex = docs.findIndex(d => d.id === docId);
-            if (docIndex !== -1) {
-                docs[docIndex].views = (docs[docIndex].views || 0) + 1;
-                localStorage.setItem(APP_CONFIG.storageKeys.documents, JSON.stringify(docs));
-            }
         }
 
         // ===== ADMIN FUNCTIONS =====
@@ -2989,7 +3104,7 @@ Please approve this subscription.
             }
         }
 
-        // ===== NEW: ADMIN DOCUMENT MANAGEMENT =====
+        // ===== ADMIN DOCUMENT MANAGEMENT =====
         function loadAdminDocuments() {
             const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
             const container = document.getElementById('adminDocumentsList');
@@ -3871,6 +3986,7 @@ Please approve this subscription.
 ║ Admin Password: ${APP_CONFIG.adminPassword}                ║
 ║ M-Pesa: ${APP_CONFIG.mpesaNumber}                        ║
 ║ Phone Format: 10 digits (07XXXXXXXX)              ║
+║ Telegram Support: Documents from Telegram channels║
 ╚═══════════════════════════════════════════════════╝
         `);
     </script>
