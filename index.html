@@ -583,7 +583,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.97);
+            background: #525659;
             z-index: 9999;
             display: none;
             flex-direction: column;
@@ -594,7 +594,7 @@
         }
         
         .pdf-viewer-header {
-            background: #111;
+            background: #1a2980;
             padding: 12px 15px;
             display: flex;
             justify-content: space-between;
@@ -671,6 +671,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             max-width: 100%;
             position: relative;
+            background: white;
         }
         
         .pdf-watermark {
@@ -2466,7 +2467,7 @@ Please approve this subscription.
             loadDocuments();
         }
 
-        // ===== PDF VIEWER FUNCTIONS =====
+        // ===== SIMPLE PDF VIEWER =====
         function openDocument(docId) {
             const doc = allDocuments.find(d => d.id === docId);
             if (!doc) return;
@@ -2484,8 +2485,6 @@ Please approve this subscription.
             // Reset PDF viewer state
             currentPage = 1;
             pdfScale = 1.0;
-            pdfRenderQueue = [];
-            isRendering = false;
             
             // Show loading
             document.getElementById('pdfLoading').style.display = 'flex';
@@ -2524,12 +2523,13 @@ Please approve this subscription.
                     
                     // Update page info
                     document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+                    document.getElementById('pdfZoomLevel').textContent = '100%';
                     
                     // Update loading progress
                     document.getElementById('pdfProgressFill').style.width = '50%';
                     
-                    // Render first few pages
-                    renderPDFPages();
+                    // Render all pages
+                    renderAllPages();
                 },
                 function(error) {
                     console.error("Error loading PDF:", error);
@@ -2553,47 +2553,27 @@ Please approve this subscription.
             };
         }
 
-        function renderPDFPages() {
-            if (!pdfDocument || isRendering) return;
+        function renderAllPages() {
+            if (!pdfDocument) return;
             
-            isRendering = true;
             const container = document.getElementById('pdfCanvasContainer');
             
-            // Hide loading when done
+            // Hide loading
             document.getElementById('pdfLoading').style.display = 'none';
             
-            // Clear container except watermark
+            // Clear container
             container.innerHTML = '';
             
-            // Render pages (we'll render a few pages at a time for performance)
-            const pagesToRender = Math.min(totalPages, 10); // Render first 10 pages initially
-            
-            for (let i = 1; i <= pagesToRender; i++) {
-                renderPage(i);
+            // Render all pages
+            for (let i = 1; i <= totalPages; i++) {
+                renderPage(i, container);
             }
             
-            // Add scroll listener to render more pages as user scrolls
-            container.addEventListener('scroll', handlePDFScroll);
+            // Add scroll listener to update current page
+            container.addEventListener('scroll', updateCurrentPageFromScroll);
         }
 
-        function renderPage(pageNum) {
-            if (pageNum > totalPages || pageNum < 1) return;
-            
-            // Check if page is already rendered
-            if (document.getElementById(`pdf-page-${pageNum}`)) return;
-            
-            // Add to render queue
-            pdfRenderQueue.push(pageNum);
-            
-            // Process render queue
-            processRenderQueue();
-        }
-
-        function processRenderQueue() {
-            if (pdfRenderQueue.length === 0) return;
-            
-            const pageNum = pdfRenderQueue.shift();
-            
+        function renderPage(pageNum, container) {
             pdfDocument.getPage(pageNum).then(function(page) {
                 const viewport = page.getViewport({ scale: pdfScale });
                 
@@ -2604,55 +2584,39 @@ Please approve this subscription.
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
                 
+                // Add user watermark to canvas
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+                ctx.font = 'bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.save();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(-45 * Math.PI / 180);
+                ctx.fillText(`${currentUser?.phone || 'USER'} - REVISIONVAULT`, 0, 0);
+                ctx.restore();
+                
                 // Add canvas to container
-                const container = document.getElementById('pdfCanvasContainer');
                 container.appendChild(canvas);
                 
                 // Render page on canvas
-                const context = canvas.getContext('2d');
                 const renderContext = {
-                    canvasContext: context,
+                    canvasContext: ctx,
                     viewport: viewport
                 };
                 
-                page.render(renderContext).promise.then(function() {
-                    // Update zoom level display
-                    document.getElementById('pdfZoomLevel').textContent = Math.round(pdfScale * 100) + '%';
-                    
-                    // Process next in queue
-                    setTimeout(processRenderQueue, 100);
-                });
+                page.render(renderContext);
             });
-        }
-
-        function handlePDFScroll() {
-            const container = document.getElementById('pdfCanvasContainer');
-            const scrollTop = container.scrollTop;
-            const scrollHeight = container.scrollHeight;
-            const clientHeight = container.clientHeight;
-            
-            // If user is near bottom, render more pages
-            if (scrollTop + clientHeight >= scrollHeight - 500) {
-                // Find which pages are visible and render next ones
-                const renderedPages = Array.from(container.querySelectorAll('.pdf-page-canvas')).length;
-                if (renderedPages < totalPages) {
-                    for (let i = renderedPages + 1; i <= Math.min(renderedPages + 5, totalPages); i++) {
-                        renderPage(i);
-                    }
-                }
-            }
-            
-            // Update current page based on scroll position
-            updateCurrentPageFromScroll();
         }
 
         function updateCurrentPageFromScroll() {
             const container = document.getElementById('pdfCanvasContainer');
-            const canvases = Array.from(container.querySelectorAll('.pdf-page-canvas'));
+            const canvases = container.querySelectorAll('.pdf-page-canvas');
             
             if (canvases.length === 0) return;
             
             const scrollTop = container.scrollTop;
+            const containerHeight = container.clientHeight;
             let newPage = currentPage;
             
             for (let i = 0; i < canvases.length; i++) {
@@ -2660,7 +2624,9 @@ Please approve this subscription.
                 const rect = canvas.getBoundingClientRect();
                 const containerRect = container.getBoundingClientRect();
                 
-                if (rect.top <= containerRect.top + 100 && rect.bottom >= containerRect.top + 100) {
+                // Check if canvas is at least 30% visible
+                const visibleHeight = Math.min(rect.bottom, containerRect.bottom) - Math.max(rect.top, containerRect.top);
+                if (visibleHeight > canvas.clientHeight * 0.3) {
                     newPage = i + 1;
                     break;
                 }
@@ -2694,15 +2660,6 @@ Please approve this subscription.
             
             if (canvas) {
                 canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                // If page not rendered yet, render it first
-                renderPage(pageNum);
-                setTimeout(() => {
-                    const canvas = document.getElementById(`pdf-page-${pageNum}`);
-                    if (canvas) {
-                        canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 500);
             }
         }
 
@@ -2736,17 +2693,18 @@ Please approve this subscription.
             const container = document.getElementById('pdfCanvasContainer');
             container.innerHTML = '';
             
-            // Reset render queue
-            pdfRenderQueue = [];
-            
-            // Re-render pages
-            const pagesToRender = Math.min(totalPages, 10);
-            for (let i = 1; i <= pagesToRender; i++) {
-                renderPage(i);
+            // Re-render all pages
+            for (let i = 1; i <= totalPages; i++) {
+                renderPage(i, container);
             }
             
             // Update zoom display
             document.getElementById('pdfZoomLevel').textContent = Math.round(pdfScale * 100) + '%';
+            
+            // Scroll back to current page
+            setTimeout(() => {
+                scrollToPage(currentPage);
+            }, 100);
         }
 
         function closePDFViewer() {
@@ -2759,12 +2717,10 @@ Please approve this subscription.
             pdfDocument = null;
             currentPage = 1;
             pdfScale = 1.0;
-            pdfRenderQueue = [];
-            isRendering = false;
             
             // Remove scroll listener
             const container = document.getElementById('pdfCanvasContainer');
-            container.removeEventListener('scroll', handlePDFScroll);
+            container.removeEventListener('scroll', updateCurrentPageFromScroll);
         }
 
         function incrementViewCount(docId) {
