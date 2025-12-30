@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RevisionVault - Study Materials</title>
     
+    <!-- Add PDF.js library for PDF rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         /* ===== RESET & BASE ===== */
         * {
@@ -574,8 +576,8 @@
             gap: 8px;
         }
         
-        /* ===== DOCUMENT VIEWER ===== */
-        .document-viewer {
+        /* ===== PDF VIEWER ===== */
+        .pdf-viewer {
             position: fixed;
             top: 0;
             left: 0;
@@ -587,47 +589,91 @@
             flex-direction: column;
         }
         
-        .document-viewer.active {
+        .pdf-viewer.active {
             display: flex;
         }
         
-        .viewer-header {
+        .pdf-viewer-header {
             background: #111;
             padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #333;
+            flex-shrink: 0;
         }
         
-        .viewer-title {
+        .pdf-viewer-title {
             color: white;
             font-size: 1rem;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
-        .viewer-controls {
+        .pdf-viewer-controls {
             display: flex;
             gap: 8px;
             align-items: center;
         }
         
-        .viewer-body {
+        .pdf-viewer-body {
             flex: 1;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+            flex-direction: column;
             overflow: hidden;
+            position: relative;
         }
         
-        .viewer-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
+        .pdf-controls-bar {
+            background: #222;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            flex-shrink: 0;
         }
         
-        .watermark {
+        .pdf-nav-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .pdf-page-info {
+            color: white;
+            font-size: 0.9rem;
+            margin: 0 15px;
+        }
+        
+        .pdf-zoom-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .pdf-canvas-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #525659;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .pdf-page-canvas {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 100%;
+            position: relative;
+        }
+        
+        .pdf-watermark {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -639,6 +685,34 @@
             white-space: nowrap;
             z-index: 1;
             font-weight: bold;
+        }
+        
+        .pdf-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .pdf-progress-bar {
+            width: 200px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .pdf-progress-fill {
+            height: 100%;
+            background: #1a2980;
+            width: 0%;
+            transition: width 0.3s;
         }
         
         /* ===== ADMIN SECTION ===== */
@@ -1037,6 +1111,15 @@
                 width: 100%;
                 justify-content: flex-end;
             }
+            
+            .pdf-controls-bar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .pdf-nav-controls, .pdf-zoom-controls {
+                flex-wrap: wrap;
+            }
         }
         
         @media (max-width: 480px) {
@@ -1067,6 +1150,16 @@
             
             .search-box {
                 flex-direction: column;
+            }
+            
+            .pdf-controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            
+            .pdf-nav-controls, .pdf-zoom-controls {
+                justify-content: center;
             }
         }
     </style>
@@ -1714,26 +1807,54 @@
         </div>
     </div>
     
-    <!-- Document Viewer -->
-    <div class="document-viewer" id="documentViewer">
-        <div class="viewer-header">
-            <div class="viewer-title" id="viewerTitle">Loading Document...</div>
-            <div class="viewer-controls">
-                <button class="btn btn-small" onclick="prevPage()">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <span style="color: white; margin: 0 8px; font-size: 0.9rem;" id="pageInfo">Page 1</span>
-                <button class="btn btn-small" onclick="nextPage()">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                <button class="btn btn-small" onclick="closeViewer()">
+    <!-- PDF Viewer -->
+    <div class="pdf-viewer" id="pdfViewer">
+        <div class="pdf-viewer-header">
+            <div class="pdf-viewer-title" id="pdfTitle">Loading PDF...</div>
+            <div class="pdf-viewer-controls">
+                <button class="btn btn-small" onclick="closePDFViewer()">
                     <i class="fas fa-times"></i> Close
                 </button>
             </div>
         </div>
-        <div class="viewer-body">
-            <div class="watermark" id="documentWatermark">REVISIONVAULT - DO NOT COPY</div>
-            <iframe class="viewer-iframe" id="documentFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+        
+        <div class="pdf-controls-bar">
+            <div class="pdf-nav-controls">
+                <button class="btn btn-small" onclick="prevPDFPage()">
+                    <i class="fas fa-chevron-left"></i> Prev
+                </button>
+                <span class="pdf-page-info" id="pdfPageInfo">Page 1 of 1</span>
+                <button class="btn btn-small" onclick="nextPDFPage()">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="pdf-zoom-controls">
+                <button class="btn btn-small" onclick="zoomOutPDF()">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <span style="color: white; margin: 0 10px; font-size: 0.9rem;" id="pdfZoomLevel">100%</span>
+                <button class="btn btn-small" onclick="zoomInPDF()">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button class="btn btn-small" onclick="fitPDFToWidth()">
+                    <i class="fas fa-expand-alt"></i> Fit Width
+                </button>
+            </div>
+        </div>
+        
+        <div class="pdf-viewer-body">
+            <div class="pdf-watermark" id="pdfWatermark">REVISIONVAULT - DO NOT COPY</div>
+            <div class="pdf-canvas-container" id="pdfCanvasContainer">
+                <div class="pdf-loading" id="pdfLoading">
+                    <div class="loading-spinner"></div>
+                    <div>Loading PDF Document...</div>
+                    <div class="pdf-progress-bar">
+                        <div class="pdf-progress-fill" id="pdfProgressFill"></div>
+                    </div>
+                </div>
+                <!-- PDF pages will be rendered here -->
+            </div>
         </div>
     </div>
 
@@ -1773,6 +1894,15 @@
         let allUniversities = [];
         let currentFilter = 'all';
         let approvalCheckInterval = null;
+        
+        // ===== PDF VIEWER STATE =====
+        let currentPDF = null;
+        let pdfDocument = null;
+        let currentPage = 1;
+        let totalPages = 1;
+        let pdfScale = 1.0;
+        let pdfRenderQueue = [];
+        let isRendering = false;
 
         // ===== INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', function() {
@@ -1833,7 +1963,7 @@
                         university: "All",
                         course: "Mathematics",
                         type: "pdf",
-                        url: "https://example.com/sample.pdf",
+                        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
                         description: "Basic calculus concepts and formulas for first year students",
                         date: new Date().toISOString(),
                         tags: ["mathematics", "calculus", "year1"],
@@ -1845,7 +1975,7 @@
                         university: "University of Nairobi",
                         course: "Computer Science",
                         type: "pdf",
-                        url: "https://example.com/datastructures.pdf",
+                        url: "https://www.africau.edu/images/default/sample.pdf",
                         description: "Complete notes on data structures and algorithms",
                         date: new Date().toISOString(),
                         tags: ["computerscience", "datastructures", "year2"],
@@ -1857,7 +1987,7 @@
                         university: "Kenyatta University",
                         course: "Chemistry",
                         type: "pdf",
-                        url: "https://example.com/chemistry.pdf",
+                        url: "https://www.orimi.com/pdf-test.pdf",
                         description: "Comprehensive organic chemistry notes with diagrams",
                         date: new Date().toISOString(),
                         tags: ["chemistry", "organic", "year1"],
@@ -2336,6 +2466,316 @@ Please approve this subscription.
             loadDocuments();
         }
 
+        // ===== PDF VIEWER FUNCTIONS =====
+        function openDocument(docId) {
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) return;
+            
+            // Enable screenshot protection
+            document.getElementById('screenshotOverlay').style.display = 'block';
+            
+            // Set current PDF
+            currentPDF = doc;
+            
+            // Update viewer title
+            document.getElementById('pdfTitle').textContent = doc.title;
+            document.getElementById('pdfWatermark').textContent = `${currentUser?.phone || 'USER'} - REVISIONVAULT - DO NOT COPY`;
+            
+            // Reset PDF viewer state
+            currentPage = 1;
+            pdfScale = 1.0;
+            pdfRenderQueue = [];
+            isRendering = false;
+            
+            // Show loading
+            document.getElementById('pdfLoading').style.display = 'flex';
+            document.getElementById('pdfProgressFill').style.width = '0%';
+            
+            // Clear canvas container
+            const container = document.getElementById('pdfCanvasContainer');
+            container.innerHTML = '<div class="pdf-loading" id="pdfLoading" style="display: flex;"><div class="loading-spinner"></div><div>Loading PDF Document...</div><div class="pdf-progress-bar"><div class="pdf-progress-fill" id="pdfProgressFill"></div></div></div>';
+            
+            // Show PDF viewer
+            document.getElementById('pdfViewer').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Load PDF
+            loadPDF(doc.url);
+            
+            // Increment view count
+            incrementViewCount(docId);
+        }
+
+        function loadPDF(url) {
+            // Configure PDF.js
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            
+            // Load the PDF
+            const loadingTask = pdfjsLib.getDocument({
+                url: url,
+                cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+                cMapPacked: true
+            });
+            
+            loadingTask.promise.then(
+                function(pdf) {
+                    pdfDocument = pdf;
+                    totalPages = pdf.numPages;
+                    
+                    // Update page info
+                    document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+                    
+                    // Update loading progress
+                    document.getElementById('pdfProgressFill').style.width = '50%';
+                    
+                    // Render first few pages
+                    renderPDFPages();
+                },
+                function(error) {
+                    console.error("Error loading PDF:", error);
+                    document.getElementById('pdfLoading').innerHTML = `
+                        <div style="text-align: center;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
+                            <div>Error loading PDF document</div>
+                            <div style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">${error.message}</div>
+                            <button class="btn btn-primary" onclick="closePDFViewer()" style="margin-top: 20px;">
+                                <i class="fas fa-times"></i> Close Viewer
+                            </button>
+                        </div>
+                    `;
+                }
+            );
+            
+            // Track loading progress
+            loadingTask.onProgress = function(progressData) {
+                const progress = (progressData.loaded / progressData.total) * 100;
+                document.getElementById('pdfProgressFill').style.width = progress + '%';
+            };
+        }
+
+        function renderPDFPages() {
+            if (!pdfDocument || isRendering) return;
+            
+            isRendering = true;
+            const container = document.getElementById('pdfCanvasContainer');
+            
+            // Hide loading when done
+            document.getElementById('pdfLoading').style.display = 'none';
+            
+            // Clear container except watermark
+            container.innerHTML = '';
+            
+            // Render pages (we'll render a few pages at a time for performance)
+            const pagesToRender = Math.min(totalPages, 10); // Render first 10 pages initially
+            
+            for (let i = 1; i <= pagesToRender; i++) {
+                renderPage(i);
+            }
+            
+            // Add scroll listener to render more pages as user scrolls
+            container.addEventListener('scroll', handlePDFScroll);
+        }
+
+        function renderPage(pageNum) {
+            if (pageNum > totalPages || pageNum < 1) return;
+            
+            // Check if page is already rendered
+            if (document.getElementById(`pdf-page-${pageNum}`)) return;
+            
+            // Add to render queue
+            pdfRenderQueue.push(pageNum);
+            
+            // Process render queue
+            processRenderQueue();
+        }
+
+        function processRenderQueue() {
+            if (pdfRenderQueue.length === 0) return;
+            
+            const pageNum = pdfRenderQueue.shift();
+            
+            pdfDocument.getPage(pageNum).then(function(page) {
+                const viewport = page.getViewport({ scale: pdfScale });
+                
+                // Create canvas for page
+                const canvas = document.createElement('canvas');
+                canvas.id = `pdf-page-${pageNum}`;
+                canvas.className = 'pdf-page-canvas';
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                // Add canvas to container
+                const container = document.getElementById('pdfCanvasContainer');
+                container.appendChild(canvas);
+                
+                // Render page on canvas
+                const context = canvas.getContext('2d');
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                
+                page.render(renderContext).promise.then(function() {
+                    // Update zoom level display
+                    document.getElementById('pdfZoomLevel').textContent = Math.round(pdfScale * 100) + '%';
+                    
+                    // Process next in queue
+                    setTimeout(processRenderQueue, 100);
+                });
+            });
+        }
+
+        function handlePDFScroll() {
+            const container = document.getElementById('pdfCanvasContainer');
+            const scrollTop = container.scrollTop;
+            const scrollHeight = container.scrollHeight;
+            const clientHeight = container.clientHeight;
+            
+            // If user is near bottom, render more pages
+            if (scrollTop + clientHeight >= scrollHeight - 500) {
+                // Find which pages are visible and render next ones
+                const renderedPages = Array.from(container.querySelectorAll('.pdf-page-canvas')).length;
+                if (renderedPages < totalPages) {
+                    for (let i = renderedPages + 1; i <= Math.min(renderedPages + 5, totalPages); i++) {
+                        renderPage(i);
+                    }
+                }
+            }
+            
+            // Update current page based on scroll position
+            updateCurrentPageFromScroll();
+        }
+
+        function updateCurrentPageFromScroll() {
+            const container = document.getElementById('pdfCanvasContainer');
+            const canvases = Array.from(container.querySelectorAll('.pdf-page-canvas'));
+            
+            if (canvases.length === 0) return;
+            
+            const scrollTop = container.scrollTop;
+            let newPage = currentPage;
+            
+            for (let i = 0; i < canvases.length; i++) {
+                const canvas = canvases[i];
+                const rect = canvas.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                if (rect.top <= containerRect.top + 100 && rect.bottom >= containerRect.top + 100) {
+                    newPage = i + 1;
+                    break;
+                }
+            }
+            
+            if (newPage !== currentPage) {
+                currentPage = newPage;
+                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            }
+        }
+
+        function prevPDFPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                scrollToPage(currentPage);
+                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            }
+        }
+
+        function nextPDFPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                scrollToPage(currentPage);
+                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            }
+        }
+
+        function scrollToPage(pageNum) {
+            const container = document.getElementById('pdfCanvasContainer');
+            const canvas = document.getElementById(`pdf-page-${pageNum}`);
+            
+            if (canvas) {
+                canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                // If page not rendered yet, render it first
+                renderPage(pageNum);
+                setTimeout(() => {
+                    const canvas = document.getElementById(`pdf-page-${pageNum}`);
+                    if (canvas) {
+                        canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 500);
+            }
+        }
+
+        function zoomInPDF() {
+            if (pdfScale < 3.0) {
+                pdfScale += 0.1;
+                rerenderAllPages();
+            }
+        }
+
+        function zoomOutPDF() {
+            if (pdfScale > 0.5) {
+                pdfScale -= 0.1;
+                rerenderAllPages();
+            }
+        }
+
+        function fitPDFToWidth() {
+            const container = document.getElementById('pdfCanvasContainer');
+            const firstCanvas = container.querySelector('.pdf-page-canvas');
+            
+            if (firstCanvas) {
+                const containerWidth = container.clientWidth - 40; // Account for padding
+                pdfScale = containerWidth / firstCanvas.width;
+                rerenderAllPages();
+            }
+        }
+
+        function rerenderAllPages() {
+            // Clear all canvases
+            const container = document.getElementById('pdfCanvasContainer');
+            container.innerHTML = '';
+            
+            // Reset render queue
+            pdfRenderQueue = [];
+            
+            // Re-render pages
+            const pagesToRender = Math.min(totalPages, 10);
+            for (let i = 1; i <= pagesToRender; i++) {
+                renderPage(i);
+            }
+            
+            // Update zoom display
+            document.getElementById('pdfZoomLevel').textContent = Math.round(pdfScale * 100) + '%';
+        }
+
+        function closePDFViewer() {
+            document.getElementById('pdfViewer').classList.remove('active');
+            document.getElementById('screenshotOverlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Clean up
+            currentPDF = null;
+            pdfDocument = null;
+            currentPage = 1;
+            pdfScale = 1.0;
+            pdfRenderQueue = [];
+            isRendering = false;
+            
+            // Remove scroll listener
+            const container = document.getElementById('pdfCanvasContainer');
+            container.removeEventListener('scroll', handlePDFScroll);
+        }
+
+        function incrementViewCount(docId) {
+            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+            const docIndex = docs.findIndex(d => d.id === docId);
+            if (docIndex !== -1) {
+                docs[docIndex].views = (docs[docIndex].views || 0) + 1;
+                localStorage.setItem(APP_CONFIG.storageKeys.documents, JSON.stringify(docs));
+            }
+        }
+
         // ===== ADMIN FUNCTIONS =====
         function adminLogin() {
             const password = document.getElementById('adminPassword').value.trim();
@@ -2770,11 +3210,28 @@ Please approve this subscription.
                 });
             }
             
-            // Keyboard shortcuts
+            // Keyboard shortcuts for PDF viewer
             document.addEventListener('keydown', function(e) {
-                // Escape to close viewer
-                if (e.key === 'Escape' && document.getElementById('documentViewer').classList.contains('active')) {
-                    closeViewer();
+                // Escape to close PDF viewer
+                if (e.key === 'Escape' && document.getElementById('pdfViewer').classList.contains('active')) {
+                    closePDFViewer();
+                }
+                
+                // Arrow keys for navigation in PDF viewer
+                if (document.getElementById('pdfViewer').classList.contains('active')) {
+                    if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                        prevPDFPage();
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+                        nextPDFPage();
+                        e.preventDefault();
+                    } else if (e.key === '+' || e.key === '=') {
+                        zoomInPDF();
+                        e.preventDefault();
+                    } else if (e.key === '-') {
+                        zoomOutPDF();
+                        e.preventDefault();
+                    }
                 }
                 
                 // Ctrl+Shift+A to focus admin password
