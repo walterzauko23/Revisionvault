@@ -1964,7 +1964,7 @@
                         university: "All",
                         course: "Mathematics",
                         type: "pdf",
-                        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+                        url: "https://www.africau.edu/images/default/sample.pdf",
                         description: "Basic calculus concepts and formulas for first year students",
                         date: new Date().toISOString(),
                         tags: ["mathematics", "calculus", "year1"],
@@ -1988,7 +1988,7 @@
                         university: "Kenyatta University",
                         course: "Chemistry",
                         type: "pdf",
-                        url: "https://www.orimi.com/pdf-test.pdf",
+                        url: "https://www.africau.edu/images/default/sample.pdf",
                         description: "Comprehensive organic chemistry notes with diagrams",
                         date: new Date().toISOString(),
                         tags: ["chemistry", "organic", "year1"],
@@ -2007,6 +2007,7 @@
             allUsers = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
             allPayments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
             allUniversities = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.universities) || '[]');
+            allDocuments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
         }
 
         // ===== USER STATUS CHECK =====
@@ -2467,10 +2468,13 @@ Please approve this subscription.
             loadDocuments();
         }
 
-        // ===== SIMPLE PDF VIEWER =====
+        // ===== FIXED: PDF VIEWER FUNCTIONS =====
         function openDocument(docId) {
             const doc = allDocuments.find(d => d.id === docId);
-            if (!doc) return;
+            if (!doc) {
+                showStatus("Document not found", "error");
+                return;
+            }
             
             // Enable screenshot protection
             document.getElementById('screenshotOverlay').style.display = 'block';
@@ -2508,6 +2512,21 @@ Please approve this subscription.
         function loadPDF(url) {
             // Configure PDF.js
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            
+            // Validate URL
+            if (!url || !url.startsWith('http')) {
+                document.getElementById('pdfLoading').innerHTML = `
+                    <div style="text-align: center;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
+                        <div>Invalid PDF URL</div>
+                        <div style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">The document link is not valid.</div>
+                        <button class="btn btn-primary" onclick="closePDFViewer()" style="margin-top: 20px;">
+                            <i class="fas fa-times"></i> Close Viewer
+                        </button>
+                    </div>
+                `;
+                return;
+            }
             
             // Load the PDF
             const loadingTask = pdfjsLib.getDocument({
@@ -2764,7 +2783,61 @@ Please approve this subscription.
             loadAdminUsers();
             loadAdminPayments();
             loadAdminDocuments();
-            updateAdminStats();
+        }
+
+        function loadAdminDashboard() {
+            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
+            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
+            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+
+            // Total users
+            document.getElementById('totalUsers').textContent = users.length;
+            
+            // Active users (subscription active and not expired)
+            const now = new Date();
+            const activeUsers = users.filter(user => {
+                if (user.subscription !== 'active') return false;
+                const expiry = new Date(user.subscriptionExpiry);
+                return expiry > now;
+            });
+            document.getElementById('activeUsers').textContent = activeUsers.length;
+            
+            // Pending approvals
+            const pendingUsers = users.filter(user => user.subscription === 'pending' || user.status === 'pending_approval');
+            document.getElementById('pendingApprovals').textContent = pendingUsers.length;
+            
+            // Total earnings (sum of approved payments)
+            const totalEarnings = payments
+                .filter(p => p.status === 'approved')
+                .reduce((sum, p) => sum + (p.amount || 0), 0);
+            document.getElementById('totalEarnings').textContent = totalEarnings;
+
+            // Recent activities (last 5 payments)
+            const recentPayments = payments.slice(-5).reverse();
+            const activitiesContainer = document.getElementById('recentActivities');
+            if (recentPayments.length === 0) {
+                activitiesContainer.innerHTML = `<p style="color: #666; text-align: center;">No recent activities</p>`;
+            } else {
+                let html = '';
+                recentPayments.forEach(p => {
+                    const date = formatDate(p.date);
+                    const phoneDisplay = formatPhoneForDisplay(p.phone);
+                    html += `
+                        <div style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+                            <div>
+                                <strong>${phoneDisplay}</strong> - ${p.university}
+                            </div>
+                            <div>
+                                <span class="badge ${p.status === 'approved' ? 'badge-success' : p.status === 'pending' ? 'badge-warning' : 'badge-danger'}">
+                                    ${p.status}
+                                </span>
+                                <span style="margin-left: 10px;">Ksh ${p.amount}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                activitiesContainer.innerHTML = html;
+            }
         }
 
         function loadPendingApprovals() {
@@ -2916,6 +2989,285 @@ Please approve this subscription.
             }
         }
 
+        // ===== NEW: ADMIN DOCUMENT MANAGEMENT =====
+        function loadAdminDocuments() {
+            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+            const container = document.getElementById('adminDocumentsList');
+            
+            if (docs.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <i class="fas fa-file-alt" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                        <h3 style="margin-bottom: 10px;">No Documents</h3>
+                        <p>Upload documents to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            docs.forEach(doc => {
+                const formattedDate = formatDate(doc.date);
+                html += `
+                    <div class="document-card" style="margin-bottom: 15px;">
+                        <div class="document-header">
+                            <div class="document-title">${doc.title}</div>
+                            <div class="document-meta">
+                                <span><i class="fas fa-university"></i> ${doc.university}</span>
+                                <span><i class="fas fa-book"></i> ${doc.course}</span>
+                                <span><i class="fas fa-calendar"></i> ${formattedDate}</span>
+                                <span><i class="fas fa-eye"></i> ${doc.views || 0} views</span>
+                            </div>
+                        </div>
+                        <div class="document-body">
+                            <div class="document-description">${doc.description || 'No description'}</div>
+                            <div class="document-tags">
+                                ${doc.tags ? doc.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
+                            </div>
+                            <div class="document-actions">
+                                <button class="btn btn-success btn-small" onclick="openDocument(${doc.id})">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="btn btn-warning btn-small" onclick="editDocument(${doc.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-danger btn-small" onclick="deleteDocument(${doc.id})">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function uploadDocument() {
+            const title = document.getElementById('docTitle').value.trim();
+            const universitySelect = document.getElementById('docUniversity');
+            const newUniversityInput = document.getElementById('newDocUniversity');
+            const course = document.getElementById('docCourse').value.trim();
+            const url = document.getElementById('docUrl').value.trim();
+            const description = document.getElementById('docDescription').value.trim();
+
+            // Validate
+            if (!title) {
+                showStatus("Please enter a document title", "error", "uploadStatus");
+                return;
+            }
+
+            let university = universitySelect.value;
+            if (university === "Add New University") {
+                university = newUniversityInput.value.trim();
+                if (!university) {
+                    showStatus("Please enter the new university name", "error", "uploadStatus");
+                    return;
+                }
+                university = saveUniversity(university);
+            }
+
+            if (!university) {
+                showStatus("Please select a university", "error", "uploadStatus");
+                return;
+            }
+
+            if (!course) {
+                showStatus("Please enter a course/subject", "error", "uploadStatus");
+                return;
+            }
+
+            if (!url) {
+                showStatus("Please enter a document URL", "error", "uploadStatus");
+                return;
+            }
+
+            // Validate URL format
+            try {
+                new URL(url);
+            } catch (e) {
+                showStatus("Please enter a valid URL", "error", "uploadStatus");
+                return;
+            }
+
+            // Create document object
+            const doc = {
+                id: generateId(),
+                title: title,
+                university: university,
+                course: course,
+                type: 'pdf',
+                url: url,
+                description: description,
+                date: new Date().toISOString(),
+                tags: [course.toLowerCase()],
+                views: 0
+            };
+
+            // Save to localStorage
+            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+            docs.push(doc);
+            localStorage.setItem(APP_CONFIG.storageKeys.documents, JSON.stringify(docs));
+            allDocuments = docs;
+
+            showStatus("Document uploaded successfully", "success", "uploadStatus");
+
+            // Clear form
+            document.getElementById('docTitle').value = '';
+            document.getElementById('docUniversity').value = 'All';
+            document.getElementById('newDocUniversity').style.display = 'none';
+            document.getElementById('newDocUniversity').value = '';
+            document.getElementById('docCourse').value = '';
+            document.getElementById('docUrl').value = '';
+            document.getElementById('docDescription').value = '';
+
+            // Refresh admin documents list
+            loadAdminDocuments();
+        }
+
+        function deleteDocument(docId) {
+            if (confirm("Are you sure you want to delete this document?")) {
+                const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+                const filteredDocs = docs.filter(d => d.id !== docId);
+                localStorage.setItem(APP_CONFIG.storageKeys.documents, JSON.stringify(filteredDocs));
+                allDocuments = filteredDocs;
+                showStatus("Document deleted successfully", "success");
+                loadAdminDocuments();
+            }
+        }
+
+        function editDocument(docId) {
+            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+            const doc = docs.find(d => d.id === docId);
+            if (!doc) {
+                showStatus("Document not found", "error");
+                return;
+            }
+
+            // Populate the upload form with the document's data
+            document.getElementById('docTitle').value = doc.title;
+            document.getElementById('docUniversity').value = doc.university;
+            document.getElementById('docCourse').value = doc.course;
+            document.getElementById('docUrl').value = doc.url;
+            document.getElementById('docDescription').value = doc.description || '';
+
+            // Show the upload tab and change the upload button to update
+            showAdminTab('upload');
+
+            // Change the upload button to update
+            const uploadButton = document.querySelector('#adminUpload .btn-success');
+            uploadButton.innerHTML = '<i class="fas fa-save"></i> Update Document';
+            uploadButton.onclick = function() { updateDocument(docId); };
+
+            // Also add a cancel button
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'btn btn-outline btn-block';
+            cancelButton.style.marginTop = '10px';
+            cancelButton.innerHTML = '<i class="fas fa-times"></i> Cancel Edit';
+            cancelButton.onclick = function() {
+                // Reset the form and button
+                document.getElementById('docTitle').value = '';
+                document.getElementById('docUniversity').value = 'All';
+                document.getElementById('docCourse').value = '';
+                document.getElementById('docUrl').value = '';
+                document.getElementById('docDescription').value = '';
+                uploadButton.innerHTML = '<i class="fas fa-upload"></i> Upload Document';
+                uploadButton.onclick = function() { uploadDocument(); };
+                cancelButton.remove();
+            };
+
+            const formContainer = document.querySelector('#adminUpload .form-container');
+            formContainer.appendChild(cancelButton);
+        }
+
+        function updateDocument(docId) {
+            const title = document.getElementById('docTitle').value.trim();
+            const universitySelect = document.getElementById('docUniversity');
+            const newUniversityInput = document.getElementById('newDocUniversity');
+            const course = document.getElementById('docCourse').value.trim();
+            const url = document.getElementById('docUrl').value.trim();
+            const description = document.getElementById('docDescription').value.trim();
+
+            // Validate (same as upload)
+            if (!title) {
+                showStatus("Please enter a document title", "error", "uploadStatus");
+                return;
+            }
+
+            let university = universitySelect.value;
+            if (university === "Add New University") {
+                university = newUniversityInput.value.trim();
+                if (!university) {
+                    showStatus("Please enter the new university name", "error", "uploadStatus");
+                    return;
+                }
+                university = saveUniversity(university);
+            }
+
+            if (!university) {
+                showStatus("Please select a university", "error", "uploadStatus");
+                return;
+            }
+
+            if (!course) {
+                showStatus("Please enter a course/subject", "error", "uploadStatus");
+                return;
+            }
+
+            if (!url) {
+                showStatus("Please enter a document URL", "error", "uploadStatus");
+                return;
+            }
+
+            try {
+                new URL(url);
+            } catch (e) {
+                showStatus("Please enter a valid URL", "error", "uploadStatus");
+                return;
+            }
+
+            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
+            const docIndex = docs.findIndex(d => d.id === docId);
+            if (docIndex === -1) {
+                showStatus("Document not found", "error", "uploadStatus");
+                return;
+            }
+
+            docs[docIndex] = {
+                ...docs[docIndex],
+                title: title,
+                university: university,
+                course: course,
+                url: url,
+                description: description
+            };
+
+            localStorage.setItem(APP_CONFIG.storageKeys.documents, JSON.stringify(docs));
+            allDocuments = docs;
+
+            showStatus("Document updated successfully", "success", "uploadStatus");
+
+            // Reset the form and button
+            document.getElementById('docTitle').value = '';
+            document.getElementById('docUniversity').value = 'All';
+            document.getElementById('newDocUniversity').style.display = 'none';
+            document.getElementById('newDocUniversity').value = '';
+            document.getElementById('docCourse').value = '';
+            document.getElementById('docUrl').value = '';
+            document.getElementById('docDescription').value = '';
+
+            const uploadButton = document.querySelector('#adminUpload .btn-success');
+            uploadButton.innerHTML = '<i class="fas fa-upload"></i> Upload Document';
+            uploadButton.onclick = function() { uploadDocument(); };
+
+            // Remove cancel button if exists
+            const cancelButton = document.querySelector('#adminUpload .form-container .btn-outline');
+            if (cancelButton) cancelButton.remove();
+
+            // Refresh admin documents list
+            loadAdminDocuments();
+        }
+
         // ===== UTILITY FUNCTIONS =====
         function showSection(sectionId) {
             // Hide all sections
@@ -2940,6 +3292,44 @@ Please approve this subscription.
                 document.getElementById('adminPanel').classList.remove('active');
                 document.getElementById('adminPassword').value = '';
                 document.getElementById('adminLoginStatus').innerHTML = '';
+            }
+        }
+
+        function showAdminTab(tabName) {
+            // Hide all admin tabs
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all admin menu items
+            document.querySelectorAll('.admin-menu a').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const tabId = `admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`;
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to the clicked menu item
+            event.target.classList.add('active');
+
+            // If the upload tab is shown, reset the form (unless we are editing)
+            if (tabName === 'upload') {
+                // Check if we are in edit mode by looking for the update button text
+                const uploadButton = document.querySelector('#adminUpload .btn-success');
+                if (uploadButton && uploadButton.innerHTML.includes('Update')) {
+                    // We are in edit mode, do not reset
+                } else {
+                    // Reset the form
+                    document.getElementById('docTitle').value = '';
+                    document.getElementById('docUniversity').value = 'All';
+                    document.getElementById('newDocUniversity').style.display = 'none';
+                    document.getElementById('newDocUniversity').value = '';
+                    document.getElementById('docCourse').value = '';
+                    document.getElementById('docUrl').value = '';
+                    document.getElementById('docDescription').value = '';
+                    document.getElementById('uploadStatus').innerHTML = '';
+                }
             }
         }
 
@@ -2991,6 +3381,13 @@ Please approve this subscription.
             document.getElementById('userMenu').style.display = 'none';
             stopApprovalCheck();
             showStatus("Logged out successfully", "success");
+        }
+
+        function adminLogout() {
+            isAdmin = false;
+            localStorage.removeItem(APP_CONFIG.storageKeys.adminSession);
+            showSection('subscription');
+            showStatus("Admin logged out", "success");
         }
 
         function showStatus(message, type, containerId = null) {
@@ -3132,6 +3529,264 @@ Please approve this subscription.
             } catch (e) {
                 return "Recent";
             }
+        }
+
+        // ===== ADDITIONAL FUNCTIONS =====
+        function refreshDocuments() {
+            showLoading();
+            setTimeout(() => {
+                loadDocuments();
+                hideLoading();
+                showStatus("Documents refreshed", "success");
+            }, 500);
+        }
+
+        function requestDocument() {
+            if (!currentUser) {
+                showStatus("Please login first", "error");
+                return;
+            }
+            
+            const subject = prompt("Enter the subject or title of the document you need:");
+            if (!subject) return;
+
+            const message = `📚 Document Request\n\nUser: ${currentUser.phone}\nUniversity: ${currentUser.university}\nRequest: ${subject}`;
+            const telegramUrl = `https://t.me/Walterzauko23?text=${encodeURIComponent(message)}`;
+            window.open(telegramUrl, '_blank');
+            showStatus("Telegram opened for your request. Please send the message to admin.", "info");
+        }
+
+        function exportData() {
+            const data = {
+                users: allUsers,
+                documents: allDocuments,
+                payments: allPayments,
+                universities: allUniversities,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `revisionvault_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showStatus("Data exported successfully", "success");
+        }
+
+        function clearAllData() {
+            if (confirm("Are you sure you want to clear ALL data? This will delete all users, documents, payments, and universities. This action cannot be undone.")) {
+                localStorage.clear();
+                initializeStorage();
+                currentUser = null;
+                isAdmin = false;
+                showSection('subscription');
+                showStatus("All data cleared. App reset to default.", "success");
+            }
+        }
+
+        function updateAdminPassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!newPassword || !confirmPassword) {
+                showStatus("Please enter and confirm the new password", "error");
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showStatus("Passwords do not match", "error");
+                return;
+            }
+
+            // In a real app, you would update the password in a secure way
+            // For this demo, we'll just show a message
+            showStatus("Admin password updated successfully. Note: Password is not persisted in this demo version.", "success");
+
+            // Clear the fields
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        function loadAdminUsers() {
+            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
+            const tbody = document.getElementById('usersTable');
+            let html = '';
+            users.forEach(user => {
+                const phoneDisplay = formatPhoneForDisplay(user.phone);
+                const expiry = new Date(user.subscriptionExpiry);
+                const now = new Date();
+                const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                const status = user.subscription === 'active' && expiry > now ? 'active' : 
+                               user.subscription === 'pending' ? 'pending' : 'expired';
+                html += `
+                    <tr>
+                        <td>${phoneDisplay}</td>
+                        <td>${user.university}</td>
+                        <td>
+                            <span class="badge ${status === 'active' ? 'badge-success' : status === 'pending' ? 'badge-warning' : 'badge-danger'}">
+                                ${status}
+                            </span>
+                        </td>
+                        <td>${formatDate(user.subscriptionExpiry)} (${daysLeft} days)</td>
+                        <td>
+                            <button class="btn btn-small btn-success" onclick="approveUser('${user.id}')" ${status !== 'pending' ? 'disabled' : ''}>
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-small btn-danger" onclick="rejectUser('${user.id}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function loadAdminPayments() {
+            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
+            const tbody = document.getElementById('paymentsTable');
+            let html = '';
+            payments.forEach(p => {
+                const phoneDisplay = formatPhoneForDisplay(p.phone);
+                const date = formatDate(p.date);
+                html += `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${phoneDisplay}</td>
+                        <td>${p.university}</td>
+                        <td>${p.transactionCode}</td>
+                        <td>Ksh ${p.amount}</td>
+                        <td>
+                            <span class="badge ${p.status === 'approved' ? 'badge-success' : p.status === 'pending' ? 'badge-warning' : 'badge-danger'}">
+                                ${p.status}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-small btn-success" onclick="approvePayment('${p.id}')" ${p.status === 'approved' ? 'disabled' : ''}>
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function approvePayment(paymentId) {
+            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
+            const paymentIndex = payments.findIndex(p => p.id === paymentId);
+            if (paymentIndex !== -1) {
+                payments[paymentIndex].status = 'approved';
+                payments[paymentIndex].approved = true;
+                payments[paymentIndex].approvedDate = new Date().toISOString();
+                localStorage.setItem(APP_CONFIG.storageKeys.payments, JSON.stringify(payments));
+                loadAdminPayments();
+                loadAdminDashboard();
+                showStatus("Payment approved", "success");
+            }
+        }
+
+        function refreshAdminData() {
+            showLoading();
+            setTimeout(() => {
+                loadAdminData();
+                hideLoading();
+                showStatus("Admin data refreshed", "success");
+            }, 500);
+        }
+
+        function exportUsers() {
+            const dataStr = JSON.stringify(allUsers, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `revisionvault_users_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showStatus("Users exported successfully", "success");
+        }
+
+        function refreshUsers() {
+            loadAdminUsers();
+            showStatus("Users list refreshed", "success");
+        }
+
+        function searchPending() {
+            const searchTerm = document.getElementById('pendingSearch').value.toLowerCase();
+            const pendingItems = document.querySelectorAll('.pending-item');
+            pendingItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function searchUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const filter = document.getElementById('userFilter').value;
+            const rows = document.querySelectorAll('#usersTable tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const status = row.querySelector('.badge')?.textContent.toLowerCase();
+                let shouldShow = true;
+                if (searchTerm && !text.includes(searchTerm)) {
+                    shouldShow = false;
+                }
+                if (filter !== 'all') {
+                    if (filter === 'active' && status !== 'active') shouldShow = false;
+                    if (filter === 'pending' && status !== 'pending') shouldShow = false;
+                    if (filter === 'expired' && status !== 'expired') shouldShow = false;
+                }
+                row.style.display = shouldShow ? '' : 'none';
+            });
+        }
+
+        function searchPayments() {
+            const searchTerm = document.getElementById('paymentSearch').value.toLowerCase();
+            const dateFilter = document.getElementById('paymentDate').value;
+            const rows = document.querySelectorAll('#paymentsTable tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const date = row.cells[0].textContent;
+                let shouldShow = true;
+                if (searchTerm && !text.includes(searchTerm)) {
+                    shouldShow = false;
+                }
+                if (dateFilter && date !== dateFilter) {
+                    shouldShow = false;
+                }
+                row.style.display = shouldShow ? '' : 'none';
+            });
+        }
+
+        function searchDocuments() {
+            const searchTerm = document.getElementById('docSearch').value.toLowerCase();
+            const universityFilter = document.getElementById('docUniversityFilter').value;
+            const docs = document.querySelectorAll('#adminDocumentsList .document-card');
+            docs.forEach(doc => {
+                const text = doc.textContent.toLowerCase();
+                const university = doc.querySelector('.fa-university')?.nextSibling?.textContent?.trim();
+                let shouldShow = true;
+                if (searchTerm && !text.includes(searchTerm)) {
+                    shouldShow = false;
+                }
+                if (universityFilter !== 'all' && university !== universityFilter) {
+                    shouldShow = false;
+                }
+                doc.style.display = shouldShow ? '' : 'none';
+            });
         }
 
         function setupEventListeners() {
