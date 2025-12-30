@@ -174,6 +174,33 @@
             color: #1a2980;
         }
         
+        /* Approval Status Indicator */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-expired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
         /* ===== CONTENT SECTIONS ===== */
         .content-section {
             display: none;
@@ -1079,11 +1106,15 @@
                         <button class="user-btn" id="userMenuBtn">
                             <i class="fas fa-user-circle"></i>
                             <span id="userName">User</span>
+                            <span class="status-indicator" id="userStatusIndicator"></span>
                             <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-menu" id="userDropdown">
                             <div class="dropdown-item" onclick="showSection('profile')">
                                 <i class="fas fa-user"></i> My Profile
+                            </div>
+                            <div class="dropdown-item" onclick="showSection('documents')">
+                                <i class="fas fa-file-alt"></i> Study Materials
                             </div>
                             <div class="dropdown-item" onclick="logout()">
                                 <i class="fas fa-sign-out-alt"></i> Logout
@@ -1270,8 +1301,11 @@
                         </div>
                     </div>
                     
+                    <!-- Access Control Message -->
+                    <div id="accessControlMessage" style="display: none;"></div>
+                    
                     <!-- Filters -->
-                    <div class="filter-bar">
+                    <div class="filter-bar" id="filterBar" style="display: none;">
                         <div class="filter-chip active" onclick="filterDocuments('all')">All Documents</div>
                         <div class="filter-chip" onclick="filterDocuments('pdf')">PDF Files</div>
                         <div class="filter-chip" onclick="filterDocuments('notes')">Lecture Notes</div>
@@ -1292,6 +1326,23 @@
                         <button class="btn btn-primary" onclick="requestDocument()" style="max-width: 250px; margin: 0 auto;">
                             <i class="fas fa-comment"></i> Request Specific Notes
                         </button>
+                    </div>
+                    
+                    <!-- Subscription Required Message -->
+                    <div id="subscriptionRequired" style="text-align: center; padding: 60px 20px; display: none;">
+                        <i class="fas fa-lock" style="font-size: 4rem; color: #1a2980; margin-bottom: 20px;"></i>
+                        <h3 style="color: #1a2980; margin-bottom: 15px;">Access Restricted</h3>
+                        <p style="color: #666; margin-bottom: 25px; max-width: 500px; margin-left: auto; margin-right: auto;">
+                            You need an active subscription to access study materials. Subscribe now to unlock thousands of documents from your university.
+                        </p>
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showSection('subscription')">
+                                <i class="fas fa-credit-card"></i> Subscribe Now
+                            </button>
+                            <button class="btn btn-outline" onclick="checkApprovalStatus()">
+                                <i class="fas fa-sync-alt"></i> Check Approval Status
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1721,6 +1772,7 @@
         let allPayments = [];
         let allUniversities = [];
         let currentFilter = 'all';
+        let approvalCheckInterval = null;
 
         // ===== INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', function() {
@@ -1735,12 +1787,12 @@
             // Setup event listeners
             setupEventListeners();
             
-            // Auto-refresh documents every 10 minutes if user is logged in
+            // Auto-check approval status every 30 seconds for pending users
             setInterval(() => {
-                if (currentUser && currentUser.subscription === 'active') {
-                    loadDocuments();
+                if (currentUser && currentUser.subscription === 'pending') {
+                    checkApprovalStatus();
                 }
-            }, 10 * 60 * 1000);
+            }, 30000);
         });
 
         // ===== STORAGE FUNCTIONS =====
@@ -1826,46 +1878,7 @@
             allUniversities = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.universities) || '[]');
         }
 
-        // ===== UNIVERSITY MANAGEMENT =====
-        function loadUniversities() {
-            const universities = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.universities) || '[]');
-            allUniversities = universities;
-            return universities;
-        }
-
-        function saveUniversity(universityName) {
-            if (!universityName || universityName.trim() === '') return;
-            
-            const universities = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.universities) || '[]');
-            const university = universityName.trim();
-            
-            // Check if university already exists
-            if (!universities.includes(university)) {
-                universities.push(university);
-                localStorage.setItem(APP_CONFIG.storageKeys.universities, JSON.stringify(universities));
-                allUniversities = universities;
-            }
-            
-            return university;
-        }
-
-        function toggleNewUniversityInput(selectId, inputId) {
-            const select = document.getElementById(selectId);
-            const input = document.getElementById(inputId);
-            
-            if (select && input) {
-                if (select.value === "Add New University") {
-                    input.style.display = 'block';
-                    input.required = true;
-                } else {
-                    input.style.display = 'none';
-                    input.required = false;
-                    input.value = '';
-                }
-            }
-        }
-
-        // ===== USER MANAGEMENT =====
+        // ===== USER STATUS CHECK =====
         function checkUserStatus() {
             // Check for admin session first
             const adminSession = localStorage.getItem(APP_CONFIG.storageKeys.adminSession);
@@ -1892,22 +1905,30 @@
                     const subscriptionExpiry = new Date(user.subscriptionExpiry);
                     const now = new Date();
                     
-                    if (subscriptionExpiry > now && user.subscription === 'active') {
+                    if (user.subscription === 'active' && subscriptionExpiry > now) {
                         // User has active subscription
                         currentUser = user;
                         updateUserUI();
                         showSection('documents');
                         loadDocuments();
-                    } else {
-                        // Subscription expired or pending
-                        currentUser = { ...user, subscription: subscriptionExpiry > now ? 'active' : 'expired' };
+                    } else if (user.subscription === 'pending') {
+                        // Subscription pending approval
+                        currentUser = user;
                         updateUserUI();
                         showSection('subscription');
-                        if (user.subscription !== 'active') {
-                            showStatus("Your subscription is pending approval", "warning");
-                        } else {
-                            showStatus("Your subscription has expired. Please renew.", "warning");
-                        }
+                        showStatus("Your subscription is pending approval. Admin will verify within minutes.", "warning");
+                        
+                        // Start checking approval status
+                        startApprovalCheck();
+                    } else if (user.subscription === 'expired' || subscriptionExpiry < now) {
+                        // Subscription expired
+                        currentUser = user;
+                        updateUserUI();
+                        showSection('subscription');
+                        showStatus("Your subscription has expired. Please renew to continue accessing materials.", "warning");
+                    } else {
+                        // Unknown status
+                        showSection('subscription');
                     }
                 } catch (e) {
                     console.error("User data error:", e);
@@ -1924,6 +1945,19 @@
                 // Show user menu
                 document.getElementById('userMenu').style.display = 'block';
                 document.getElementById('userName').textContent = currentUser.phone || "User";
+                
+                // Update status indicator
+                const statusIndicator = document.getElementById('userStatusIndicator');
+                if (currentUser.subscription === 'active') {
+                    statusIndicator.className = 'status-indicator status-active';
+                    statusIndicator.innerHTML = '<i class="fas fa-check-circle"></i> Active';
+                } else if (currentUser.subscription === 'pending') {
+                    statusIndicator.className = 'status-indicator status-pending';
+                    statusIndicator.innerHTML = '<i class="fas fa-clock"></i> Pending';
+                } else if (currentUser.subscription === 'expired') {
+                    statusIndicator.className = 'status-indicator status-expired';
+                    statusIndicator.innerHTML = '<i class="fas fa-exclamation-circle"></i> Expired';
+                }
                 
                 // Update university badge if available
                 if (currentUser.university) {
@@ -2032,7 +2066,7 @@ Please approve this subscription.
                 
                 const whatsappUrl = `https://wa.me/${APP_CONFIG.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
                 
-                showStatus("Subscription submitted! Admin will approve shortly. Check back in a few minutes.", "success", "subscriptionStatus");
+                showStatus("Subscription submitted successfully! Admin will verify within minutes.", "success", "subscriptionStatus");
                 
                 // Open WhatsApp for admin notification
                 setTimeout(() => {
@@ -2049,12 +2083,78 @@ Please approve this subscription.
                 if (newUniversityInput) newUniversityInput.value = '';
                 newUniversityInput.style.display = 'none';
                 
+                // Start checking approval status
+                startApprovalCheck();
+                
                 // Refresh admin data if admin is logged in
                 if (isAdmin) {
                     refreshAdminData();
                 }
                 
             }, 1500);
+        }
+
+        function checkApprovalStatus() {
+            if (!currentUser) return;
+            
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                // Check if user has been approved in localStorage
+                const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
+                const user = users.find(u => u.phone === currentUser.phone);
+                
+                if (user) {
+                    if (user.subscription === 'active') {
+                        // User has been approved!
+                        currentUser = user;
+                        localStorage.setItem(APP_CONFIG.storageKeys.currentUser, JSON.stringify(user));
+                        updateUserUI();
+                        
+                        // Show success message and redirect to documents
+                        showStatus("Your subscription has been approved! Redirecting to materials...", "success");
+                        
+                        setTimeout(() => {
+                            showSection('documents');
+                            loadDocuments();
+                        }, 2000);
+                        
+                        // Stop checking approval
+                        stopApprovalCheck();
+                    } else {
+                        // Still pending
+                        showStatus("Your subscription is still pending approval. Please wait.", "info");
+                    }
+                } else {
+                    // User not found
+                    showStatus("User not found. Please contact admin.", "error");
+                }
+            }, 1000);
+        }
+
+        function startApprovalCheck() {
+            // Clear any existing interval
+            if (approvalCheckInterval) {
+                clearInterval(approvalCheckInterval);
+            }
+            
+            // Check every 15 seconds
+            approvalCheckInterval = setInterval(() => {
+                if (currentUser && currentUser.subscription === 'pending') {
+                    checkApprovalStatus();
+                } else {
+                    stopApprovalCheck();
+                }
+            }, 15000);
+        }
+
+        function stopApprovalCheck() {
+            if (approvalCheckInterval) {
+                clearInterval(approvalCheckInterval);
+                approvalCheckInterval = null;
+            }
         }
 
         function formatPhone(phone) {
@@ -2080,11 +2180,51 @@ Please approve this subscription.
 
         // ===== DOCUMENT FUNCTIONS =====
         function loadDocuments() {
-            if (!currentUser || currentUser.subscription !== 'active') {
+            if (!currentUser) {
                 showSection('subscription');
                 return;
             }
             
+            // Check if user has active subscription
+            if (currentUser.subscription !== 'active') {
+                // Show access restricted message
+                document.getElementById('filterBar').style.display = 'none';
+                document.getElementById('documentsContainer').innerHTML = '';
+                document.getElementById('noDocuments').style.display = 'none';
+                document.getElementById('subscriptionRequired').style.display = 'block';
+                
+                // Show appropriate message based on status
+                const messageDiv = document.getElementById('accessControlMessage');
+                messageDiv.innerHTML = '';
+                
+                if (currentUser.subscription === 'pending') {
+                    messageDiv.innerHTML = `
+                        <div class="status-message status-warning">
+                            <i class="fas fa-clock"></i>
+                            <span>Your subscription is pending approval. Please wait for admin verification.</span>
+                            <button class="btn btn-small btn-outline" onclick="checkApprovalStatus()" style="margin-left: auto;">
+                                Check Status
+                            </button>
+                        </div>
+                    `;
+                    messageDiv.style.display = 'block';
+                } else if (currentUser.subscription === 'expired') {
+                    messageDiv.innerHTML = `
+                        <div class="status-message status-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Your subscription has expired. Please renew to access materials.</span>
+                            <button class="btn btn-small btn-primary" onclick="showSection('subscription')" style="margin-left: auto;">
+                                Renew Now
+                            </button>
+                        </div>
+                    `;
+                    messageDiv.style.display = 'block';
+                }
+                
+                return;
+            }
+            
+            // User has active subscription - show documents
             showLoading();
             
             try {
@@ -2098,6 +2238,11 @@ Please approve this subscription.
                 );
                 
                 displayDocuments(filteredDocs);
+                
+                // Show filters
+                document.getElementById('filterBar').style.display = 'flex';
+                document.getElementById('subscriptionRequired').style.display = 'none';
+                document.getElementById('accessControlMessage').style.display = 'none';
                 
             } catch (e) {
                 console.error("Error loading documents:", e);
@@ -2191,178 +2336,6 @@ Please approve this subscription.
             loadDocuments();
         }
 
-        function getFileIcon(type) {
-            const icons = {
-                'pdf': 'fa-file-pdf',
-                'doc': 'fa-file-word',
-                'docx': 'fa-file-word',
-                'ppt': 'fa-file-powerpoint',
-                'txt': 'fa-file-alt',
-                'zip': 'fa-file-archive',
-                'rar': 'fa-file-archive'
-            };
-            return icons[type] || 'fa-file';
-        }
-
-        function formatDate(dateString) {
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('en-GB', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric'
-                });
-            } catch (e) {
-                return "Recent";
-            }
-        }
-
-        function refreshDocuments() {
-            showLoading();
-            setTimeout(() => {
-                loadDocuments();
-                showStatus("Documents refreshed", "success");
-            }, 800);
-        }
-
-        function requestDocument() {
-            const course = prompt("Which course notes do you need? (e.g., Calculus, Physics):");
-            if (course) {
-                const message = `📚 *DOCUMENT REQUEST*\n\nCourse: ${course}\nUniversity: ${currentUser?.university || 'Not specified'}\nPhone: ${currentUser?.phone || 'Not specified'}\nDate: ${new Date().toLocaleDateString()}`;
-                const whatsappUrl = `https://wa.me/${APP_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
-                window.open(whatsappUrl, '_blank');
-                showStatus("Document request sent to admin", "success");
-            }
-        }
-
-        // ===== DOCUMENT VIEWER =====
-        function openDocument(docId) {
-            const doc = allDocuments.find(d => d.id === docId);
-            if (!doc) return;
-            
-            // Enable screenshot protection
-            document.getElementById('screenshotOverlay').style.display = 'block';
-            
-            // Update viewer
-            document.getElementById('viewerTitle').textContent = doc.title;
-            document.getElementById('documentWatermark').textContent = `${currentUser?.phone || 'USER'} - REVISIONVAULT - DO NOT COPY`;
-            
-            // Load document (for demo, we'll show a preview)
-            const demoContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <style>
-                        body { 
-                            margin: 0; 
-                            padding: 40px; 
-                            font-family: Arial, sans-serif;
-                            -webkit-user-select: none;
-                            -moz-user-select: none;
-                            -ms-user-select: none;
-                            user-select: none;
-                            background: #f8f9ff;
-                        }
-                        h1 { 
-                            color: #1a2980; 
-                            margin-bottom: 20px;
-                            border-bottom: 2px solid #e2e8f0;
-                            padding-bottom: 10px;
-                        }
-                        .content {
-                            background: white;
-                            padding: 30px;
-                            border-radius: 10px;
-                            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                            line-height: 1.6;
-                        }
-                        .watermark { 
-                            position: fixed; 
-                            top: 50%; 
-                            left: 50%; 
-                            transform: translate(-50%, -50%) rotate(-45deg); 
-                            font-size: 4rem; 
-                            color: rgba(255,0,0,0.1); 
-                            pointer-events: none; 
-                            z-index: 9999;
-                            white-space: nowrap;
-                            font-weight: bold;
-                        }
-                        .meta {
-                            background: #f1f5f9;
-                            padding: 15px;
-                            border-radius: 8px;
-                            margin: 20px 0;
-                            font-size: 0.9rem;
-                            color: #64748b;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="watermark">REVISIONVAULT - DO NOT COPY</div>
-                    <div class="content">
-                        <h1>${doc.title}</h1>
-                        <div class="meta">
-                            <strong>Course:</strong> ${doc.course}<br>
-                            <strong>University:</strong> ${doc.university}<br>
-                            <strong>Uploaded:</strong> ${formatDate(doc.date)}<br>
-                            <strong>Type:</strong> ${doc.type.toUpperCase()}
-                        </div>
-                        <p><strong>Description:</strong> ${doc.description}</p>
-                        <hr>
-                        <h3>Document Content Preview</h3>
-                        <p>This is a secure preview of the document. In the actual app, the full document would be displayed here.</p>
-                        <p>The document is protected by:</p>
-                        <ul>
-                            <li>Screenshot protection</li>
-                            <li>Watermarking</li>
-                            <li>No download option</li>
-                            <li>View-only access</li>
-                        </ul>
-                        <p style="color: #ef4444; font-weight: bold; margin-top: 30px; text-align: center;">
-                            <i class="fas fa-exclamation-triangle"></i> Screenshots are disabled for this document
-                        </p>
-                    </div>
-                </body>
-                </html>
-            `;
-            
-            document.getElementById('documentFrame').srcdoc = demoContent;
-            
-            // Show viewer
-            document.getElementById('documentViewer').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            // Increment view count
-            incrementViewCount(docId);
-        }
-
-        function closeViewer() {
-            document.getElementById('documentViewer').classList.remove('active');
-            document.getElementById('screenshotOverlay').style.display = 'none';
-            document.body.style.overflow = 'auto';
-            document.getElementById('documentFrame').srcdoc = '';
-        }
-
-        function incrementViewCount(docId) {
-            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
-            const docIndex = docs.findIndex(d => d.id === docId);
-            if (docIndex !== -1) {
-                docs[docIndex].views = (docs[docIndex].views || 0) + 1;
-                localStorage.setItem(APP_CONFIG.storageKeys.documents, JSON.stringify(docs));
-            }
-        }
-
-        function prevPage() {
-            // For demo purposes
-            showStatus("Previous page (demo)", "info");
-        }
-
-        function nextPage() {
-            // For demo purposes
-            showStatus("Next page (demo)", "info");
-        }
-
         // ===== ADMIN FUNCTIONS =====
         function adminLogin() {
             const password = document.getElementById('adminPassword').value.trim();
@@ -2389,61 +2362,6 @@ Please approve this subscription.
             loadAdminData();
         }
 
-        function adminLogout() {
-            isAdmin = false;
-            localStorage.removeItem(APP_CONFIG.storageKeys.adminSession);
-            document.getElementById('adminLoginBox').style.display = 'block';
-            document.getElementById('adminPanel').classList.remove('active');
-            document.getElementById('adminPassword').value = '';
-            showSection('subscription');
-            showStatus("Admin logged out", "success");
-        }
-
-        function showAdminTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.admin-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Remove active class from all menu items
-            document.querySelectorAll('.admin-menu a').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Show selected tab
-            const tabElement = document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
-            if (tabElement) {
-                tabElement.classList.add('active');
-            }
-            
-            // Add active class to clicked menu item
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
-            
-            // Load tab data
-            switch(tabName) {
-                case 'dashboard':
-                    loadAdminDashboard();
-                    break;
-                case 'pending':
-                    loadPendingApprovals();
-                    break;
-                case 'users':
-                    loadAdminUsers();
-                    break;
-                case 'payments':
-                    loadAdminPayments();
-                    break;
-                case 'documents':
-                    loadAdminDocuments();
-                    break;
-                case 'settings':
-                    loadAdminSettings();
-                    break;
-            }
-        }
-
         function loadAdminData() {
             loadAdminDashboard();
             loadPendingApprovals();
@@ -2451,106 +2369,6 @@ Please approve this subscription.
             loadAdminPayments();
             loadAdminDocuments();
             updateAdminStats();
-        }
-
-        function refreshAdminData() {
-            loadAdminData();
-            showStatus("Admin data refreshed", "success");
-        }
-
-        function loadAdminDashboard() {
-            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
-            const documents = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
-            
-            // Count active users
-            const activeUsers = users.filter(user => {
-                if (user.subscription !== 'active') return false;
-                const expiry = new Date(user.subscriptionExpiry);
-                return expiry > new Date();
-            }).length;
-            
-            // Count pending approvals
-            const pendingApprovals = users.filter(user => 
-                user.subscription === 'pending' || user.status === 'pending_approval'
-            ).length;
-            
-            // Calculate total earnings
-            const totalEarnings = payments
-                .filter(p => p.status === 'approved' || p.approved)
-                .reduce((sum, p) => sum + (p.amount || APP_CONFIG.subscriptionPrice), 0);
-            
-            // Update stats
-            document.getElementById('totalUsers').textContent = users.length;
-            document.getElementById('activeUsers').textContent = activeUsers;
-            document.getElementById('pendingApprovals').textContent = pendingApprovals;
-            document.getElementById('totalEarnings').textContent = totalEarnings;
-            
-            // Update pending count badge
-            document.getElementById('pendingCount').textContent = pendingApprovals;
-            
-            // Load recent activities
-            loadRecentActivities();
-        }
-
-        function loadRecentActivities() {
-            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
-            const activities = [];
-            
-            // Add recent user registrations
-            users.slice(-5).forEach(user => {
-                activities.push({
-                    type: 'user',
-                    message: `New user registered: ${formatPhoneForDisplay(user.phone)}`,
-                    date: user.registeredDate,
-                    status: user.subscription
-                });
-            });
-            
-            // Add recent payments
-            payments.slice(-5).forEach(payment => {
-                activities.push({
-                    type: 'payment',
-                    message: `Payment received: ${formatPhoneForDisplay(payment.phone)} - Ksh ${payment.amount}`,
-                    date: payment.date,
-                    status: payment.status
-                });
-            });
-            
-            // Sort by date (newest first)
-            activities.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // Display activities
-            const container = document.getElementById('recentActivities');
-            let html = '';
-            
-            activities.slice(0, 10).forEach(activity => {
-                const date = formatDate(activity.date);
-                const statusClass = activity.status === 'active' || activity.status === 'approved' ? 'badge-success' : 'badge-warning';
-                
-                html += `
-                    <div style="background: #f8f9ff; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #1a2980;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <strong>${activity.message}</strong>
-                                <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">${date}</div>
-                            </div>
-                            <span class="badge ${statusClass}" style="font-size: 0.7rem;">${activity.status}</span>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html || '<div style="text-align: center; color: #666; padding: 20px;">No recent activities</div>';
-        }
-
-        function formatPhoneForDisplay(phone) {
-            // Convert 254 format to 0xxx xxx xxx
-            if (phone.startsWith('254')) {
-                return '0' + phone.substring(3);
-            }
-            return phone;
         }
 
         function loadPendingApprovals() {
@@ -2598,57 +2416,9 @@ Please approve this subscription.
             });
             
             container.innerHTML = html;
-        }
-
-        function searchPending() {
-            const searchTerm = document.getElementById('pendingSearch').value.toLowerCase();
-            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-            const pendingUsers = users.filter(user => 
-                (user.subscription === 'pending' || user.status === 'pending_approval') &&
-                (user.phone.toLowerCase().includes(searchTerm) || 
-                 user.university.toLowerCase().includes(searchTerm) ||
-                 (user.transactionCode && user.transactionCode.toLowerCase().includes(searchTerm)))
-            );
             
-            const container = document.getElementById('pendingApprovalsList');
-            
-            if (pendingUsers.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <i class="fas fa-search" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
-                        <h3 style="margin-bottom: 10px;">No matching approvals found</h3>
-                        <p>Try a different search term</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            pendingUsers.forEach(user => {
-                const phoneDisplay = formatPhoneForDisplay(user.phone);
-                const date = formatDate(user.registeredDate);
-                
-                html += `
-                    <div class="pending-item">
-                        <div class="pending-info">
-                            <h4>${phoneDisplay}</h4>
-                            <p><strong>University:</strong> ${user.university}</p>
-                            <p><strong>Transaction Code:</strong> ${user.transactionCode || 'N/A'}</p>
-                            <p><strong>Registered:</strong> ${date}</p>
-                        </div>
-                        <div class="pending-actions">
-                            <button class="btn btn-success btn-small" onclick="approveUser('${user.id}')">
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-                            <button class="btn btn-danger btn-small" onclick="rejectUser('${user.id}')">
-                                <i class="fas fa-times"></i> Reject
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
+            // Update pending count
+            document.getElementById('pendingCount').textContent = pendingUsers.length;
         }
 
         function approveUser(userId) {
@@ -2677,6 +2447,22 @@ Please approve this subscription.
                 loadPendingApprovals();
                 loadAdminUsers();
                 loadAdminPayments();
+                
+                // If the approved user is the current user, update their status
+                if (currentUser && currentUser.phone === users[userIndex].phone) {
+                    currentUser = users[userIndex];
+                    localStorage.setItem(APP_CONFIG.storageKeys.currentUser, JSON.stringify(users[userIndex]));
+                    updateUserUI();
+                    
+                    // Show notification that user has been approved
+                    if (document.querySelector('.content-section.active').id === 'subscriptionSection') {
+                        showStatus("Your subscription has been approved! You can now access materials.", "success");
+                        setTimeout(() => {
+                            showSection('documents');
+                            loadDocuments();
+                        }, 2000);
+                    }
+                }
             }
         }
 
@@ -2734,521 +2520,6 @@ Please approve this subscription.
             }
         }
 
-        function loadAdminUsers() {
-            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-            const table = document.getElementById('usersTable');
-            
-            let html = '';
-            users.forEach(user => {
-                const expiry = new Date(user.subscriptionExpiry);
-                const now = new Date();
-                const isActive = expiry > now && user.subscription === 'active';
-                const phoneDisplay = formatPhoneForDisplay(user.phone);
-                
-                html += `
-                    <tr>
-                        <td>${phoneDisplay}</td>
-                        <td>${user.university}</td>
-                        <td>
-                            <span class="badge ${isActive ? 'badge-success' : user.subscription === 'pending' ? 'badge-warning' : 'badge-danger'}">
-                                ${isActive ? 'Active' : user.subscription || 'Pending'}
-                            </span>
-                        </td>
-                        <td>${formatDate(user.subscriptionExpiry)}</td>
-                        <td>
-                            ${!isActive && user.subscription === 'pending' ? 
-                                `<button class="btn btn-success btn-small" onclick="approveUser('${user.id}')" style="margin-right: 5px;">
-                                    <i class="fas fa-check"></i>
-                                </button>` : ''
-                            }
-                            <button class="btn btn-danger btn-small" onclick="deleteUser('${user.id}')">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            table.innerHTML = html || '<tr><td colspan="5" style="text-align: center; padding: 30px; color: #666;">No users found</td></tr>';
-        }
-
-        function searchUsers() {
-            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-            const filter = document.getElementById('userFilter').value;
-            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-            
-            let filteredUsers = users.filter(user => {
-                const phoneDisplay = formatPhoneForDisplay(user.phone);
-                const matchesSearch = searchTerm === '' || 
-                    phoneDisplay.toLowerCase().includes(searchTerm) || 
-                    user.university.toLowerCase().includes(searchTerm);
-                
-                if (filter === 'all') return matchesSearch;
-                if (filter === 'active') {
-                    const expiry = new Date(user.subscriptionExpiry);
-                    const now = new Date();
-                    return matchesSearch && expiry > now && user.subscription === 'active';
-                }
-                if (filter === 'pending') return matchesSearch && user.subscription === 'pending';
-                if (filter === 'expired') {
-                    const expiry = new Date(user.subscriptionExpiry);
-                    const now = new Date();
-                    return matchesSearch && expiry < now;
-                }
-                return matchesSearch;
-            });
-            
-            const table = document.getElementById('usersTable');
-            let html = '';
-            
-            filteredUsers.forEach(user => {
-                const expiry = new Date(user.subscriptionExpiry);
-                const now = new Date();
-                const isActive = expiry > now && user.subscription === 'active';
-                const phoneDisplay = formatPhoneForDisplay(user.phone);
-                
-                html += `
-                    <tr>
-                        <td>${phoneDisplay}</td>
-                        <td>${user.university}</td>
-                        <td>
-                            <span class="badge ${isActive ? 'badge-success' : user.subscription === 'pending' ? 'badge-warning' : 'badge-danger'}">
-                                ${isActive ? 'Active' : user.subscription || 'Pending'}
-                            </span>
-                        </td>
-                        <td>${formatDate(user.subscriptionExpiry)}</td>
-                        <td>
-                            ${!isActive && user.subscription === 'pending' ? 
-                                `<button class="btn btn-success btn-small" onclick="approveUser('${user.id}')" style="margin-right: 5px;">
-                                    <i class="fas fa-check"></i>
-                                </button>` : ''
-                            }
-                            <button class="btn btn-danger btn-small" onclick="deleteUser('${user.id}')">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            table.innerHTML = html || '<tr><td colspan="5" style="text-align: center; padding: 30px; color: #666;">No matching users found</td></tr>';
-        }
-
-        function loadAdminPayments() {
-            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
-            const table = document.getElementById('paymentsTable');
-            
-            let html = '';
-            payments.forEach(payment => {
-                const phoneDisplay = formatPhoneForDisplay(payment.phone);
-                html += `
-                    <tr>
-                        <td>${formatDate(payment.date)}</td>
-                        <td>${phoneDisplay}</td>
-                        <td>${payment.university}</td>
-                        <td>${payment.transactionCode}</td>
-                        <td>Ksh ${payment.amount || APP_CONFIG.subscriptionPrice}</td>
-                        <td>
-                            <span class="badge ${payment.status === 'approved' ? 'badge-success' : payment.status === 'pending_verification' ? 'badge-warning' : 'badge-danger'}">
-                                ${payment.status.replace('_', ' ')}
-                            </span>
-                        </td>
-                        <td>
-                            ${payment.status === 'pending_verification' ? 
-                                `<button class="btn btn-success btn-small" onclick="approvePayment('${payment.id}')">
-                                    <i class="fas fa-check"></i>
-                                </button>` : ''
-                            }
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            table.innerHTML = html || '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #666;">No payments found</td></tr>';
-        }
-
-        function searchPayments() {
-            const searchTerm = document.getElementById('paymentSearch').value.toLowerCase();
-            const dateFilter = document.getElementById('paymentDate').value;
-            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
-            
-            let filteredPayments = payments.filter(payment => {
-                const phoneDisplay = formatPhoneForDisplay(payment.phone);
-                const matchesSearch = searchTerm === '' || 
-                    phoneDisplay.toLowerCase().includes(searchTerm) || 
-                    payment.university.toLowerCase().includes(searchTerm) ||
-                    payment.transactionCode.toLowerCase().includes(searchTerm);
-                
-                const matchesDate = dateFilter === '' || 
-                    new Date(payment.date).toISOString().split('T')[0] === dateFilter;
-                
-                return matchesSearch && matchesDate;
-            });
-            
-            const table = document.getElementById('paymentsTable');
-            let html = '';
-            
-            filteredPayments.forEach(payment => {
-                const phoneDisplay = formatPhoneForDisplay(payment.phone);
-                html += `
-                    <tr>
-                        <td>${formatDate(payment.date)}</td>
-                        <td>${phoneDisplay}</td>
-                        <td>${payment.university}</td>
-                        <td>${payment.transactionCode}</td>
-                        <td>Ksh ${payment.amount || APP_CONFIG.subscriptionPrice}</td>
-                        <td>
-                            <span class="badge ${payment.status === 'approved' ? 'badge-success' : payment.status === 'pending_verification' ? 'badge-warning' : 'badge-danger'}">
-                                ${payment.status.replace('_', ' ')}
-                            </span>
-                        </td>
-                        <td>
-                            ${payment.status === 'pending_verification' ? 
-                                `<button class="btn btn-success btn-small" onclick="approvePayment('${payment.id}')">
-                                    <i class="fas fa-check"></i>
-                                </button>` : ''
-                            }
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            table.innerHTML = html || '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #666;">No matching payments found</td></tr>';
-        }
-
-        function approvePayment(paymentId) {
-            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
-            const paymentIndex = payments.findIndex(p => p.id === paymentId);
-            
-            if (paymentIndex !== -1) {
-                payments[paymentIndex].status = 'approved';
-                payments[paymentIndex].approved = true;
-                payments[paymentIndex].approvedDate = new Date().toISOString();
-                localStorage.setItem(APP_CONFIG.storageKeys.payments, JSON.stringify(payments));
-                
-                // Also approve the corresponding user
-                const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-                const userIndex = users.findIndex(u => u.phone === payments[paymentIndex].phone);
-                if (userIndex !== -1) {
-                    users[userIndex].subscription = 'active';
-                    users[userIndex].status = 'approved';
-                    users[userIndex].subscriptionExpiry = getSubscriptionExpiryDate();
-                    users[userIndex].approvedDate = new Date().toISOString();
-                    localStorage.setItem(APP_CONFIG.storageKeys.users, JSON.stringify(users));
-                }
-                
-                showStatus("Payment approved successfully", "success");
-                loadAdminPayments();
-                loadAdminUsers();
-                loadAdminDashboard();
-            }
-        }
-
-        function loadAdminDocuments() {
-            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
-            const container = document.getElementById('adminDocumentsList');
-            
-            // Load university filter options
-            const universityFilter = document.getElementById('docUniversityFilter');
-            const universities = [...new Set(docs.map(doc => doc.university))];
-            universityFilter.innerHTML = '<option value="all">All Universities</option>' +
-                universities.map(uni => `<option value="${uni}">${uni}</option>`).join('');
-            
-            if (docs.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No documents uploaded yet</div>';
-                return;
-            }
-            
-            let html = '<div class="documents-grid">';
-            docs.forEach(doc => {
-                html += `
-                    <div class="document-card">
-                        <div class="document-header">
-                            <div class="document-title">${doc.title}</div>
-                            <div class="document-meta">
-                                <span><i class="fas ${getFileIcon(doc.type)}"></i> ${doc.type.toUpperCase()}</span>
-                                <span><i class="fas fa-university"></i> ${doc.university}</span>
-                                <span><i class="fas fa-eye"></i> ${doc.views || 0} views</span>
-                            </div>
-                        </div>
-                        <div class="document-body">
-                            <div class="document-description" style="font-size: 0.9rem;">${doc.description}</div>
-                            <div class="document-meta" style="margin-top: 10px; font-size: 0.8rem;">
-                                <span><i class="fas fa-book"></i> ${doc.course}</span>
-                                <span><i class="fas fa-calendar"></i> ${formatDate(doc.date)}</span>
-                            </div>
-                            <div class="document-actions">
-                                <button class="btn btn-danger btn-small" onclick="deleteDocument(${doc.id})">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        function searchDocuments() {
-            const searchTerm = document.getElementById('docSearch').value.toLowerCase();
-            const universityFilter = document.getElementById('docUniversityFilter').value;
-            const docs = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
-            
-            let filteredDocs = docs.filter(doc => {
-                const matchesSearch = searchTerm === '' || 
-                    doc.title.toLowerCase().includes(searchTerm) || 
-                    doc.course.toLowerCase().includes(searchTerm) ||
-                    doc.description.toLowerCase().includes(searchTerm);
-                
-                const matchesUniversity = universityFilter === 'all' || doc.university === universityFilter;
-                
-                return matchesSearch && matchesUniversity;
-            });
-            
-            const container = document.getElementById('adminDocumentsList');
-            
-            if (filteredDocs.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No matching documents found</div>';
-                return;
-            }
-            
-            let html = '<div class="documents-grid">';
-            filteredDocs.forEach(doc => {
-                html += `
-                    <div class="document-card">
-                        <div class="document-header">
-                            <div class="document-title">${doc.title}</div>
-                            <div class="document-meta">
-                                <span><i class="fas ${getFileIcon(doc.type)}"></i> ${doc.type.toUpperCase()}</span>
-                                <span><i class="fas fa-university"></i> ${doc.university}</span>
-                                <span><i class="fas fa-eye"></i> ${doc.views || 0} views</span>
-                            </div>
-                        </div>
-                        <div class="document-body">
-                            <div class="document-description" style="font-size: 0.9rem;">${doc.description}</div>
-                            <div class="document-meta" style="margin-top: 10px; font-size: 0.8rem;">
-                                <span><i class="fas fa-book"></i> ${doc.course}</span>
-                                <span><i class="fas fa-calendar"></i> ${formatDate(doc.date)}</span>
-                            </div>
-                            <div class="document-actions">
-                                <button class="btn btn-danger btn-small" onclick="deleteDocument(${doc.id})">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        function loadAdminSettings() {
-            // Settings are already loaded in the HTML
-        }
-
-        function updateAdminStats() {
-            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
-            const documents = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
-            
-            // Count active users
-            const activeUsers = users.filter(user => {
-                if (user.subscription !== 'active') return false;
-                const expiry = new Date(user.subscriptionExpiry);
-                return expiry > new Date();
-            }).length;
-            
-            // Today's payments
-            const today = new Date().toDateString();
-            const todayPayments = payments.filter(p => 
-                new Date(p.date).toDateString() === today
-            ).length;
-            
-            // Calculate total earnings
-            const totalEarnings = payments
-                .filter(p => p.status === 'approved' || p.approved)
-                .reduce((sum, p) => sum + (p.amount || APP_CONFIG.subscriptionPrice), 0);
-            
-            document.getElementById('totalUsers').textContent = users.length;
-            document.getElementById('activeUsers').textContent = activeUsers;
-            document.getElementById('totalDocuments').textContent = documents.length;
-            document.getElementById('totalEarnings').textContent = totalEarnings;
-        }
-
-        function deleteUser(userId) {
-            if (confirm("Are you sure you want to delete this user? This cannot be undone.")) {
-                const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-                const userIndex = users.findIndex(u => u.id === userId);
-                
-                if (userIndex !== -1) {
-                    // Also remove the corresponding payment
-                    const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
-                    const filteredPayments = payments.filter(p => p.phone !== users[userIndex].phone);
-                    localStorage.setItem(APP_CONFIG.storageKeys.payments, JSON.stringify(filteredPayments));
-                    
-                    // Remove the user
-                    users.splice(userIndex, 1);
-                    localStorage.setItem(APP_CONFIG.storageKeys.users, JSON.stringify(users));
-                    
-                    showStatus("User deleted successfully", "success");
-                    loadAdminUsers();
-                    loadAdminDashboard();
-                    loadAdminPayments();
-                }
-            }
-        }
-
-        function uploadDocument() {
-            const title = document.getElementById('docTitle').value.trim();
-            const universitySelect = document.getElementById('docUniversity');
-            const newUniversityInput = document.getElementById('newDocUniversity');
-            const course = document.getElementById('docCourse').value.trim();
-            const url = document.getElementById('docUrl').value.trim();
-            const description = document.getElementById('docDescription').value.trim();
-            
-            if (!title || !course || !url) {
-                showStatus("Please fill all required fields", "error", "uploadStatus");
-                return;
-            }
-            
-            let university = universitySelect.value;
-            
-            // Handle new university
-            if (university === "Add New University") {
-                university = newUniversityInput.value.trim();
-                if (!university) {
-                    showStatus("Please enter the new university name", "error", "uploadStatus");
-                    return;
-                }
-                // Save new university
-                university = saveUniversity(university);
-            }
-            
-            if (!university) {
-                showStatus("Please select or enter a university", "error", "uploadStatus");
-                return;
-            }
-            
-            const documents = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
-            
-            const newDoc = {
-                id: generateId(),
-                title: title,
-                university: university,
-                course: course,
-                url: url,
-                description: description,
-                type: url.includes('.pdf') ? 'pdf' : url.includes('.doc') ? 'doc' : 'pdf',
-                date: new Date().toISOString(),
-                tags: [course.toLowerCase().replace(/\s+/g, ''), university.toLowerCase().replace(/\s+/g, '')],
-                views: 0
-            };
-            
-            documents.push(newDoc);
-            localStorage.setItem(APP_CONFIG.storageKeys.documents, JSON.stringify(documents));
-            
-            // Clear form
-            document.getElementById('docTitle').value = '';
-            document.getElementById('docCourse').value = '';
-            document.getElementById('docUrl').value = '';
-            document.getElementById('docDescription').value = '';
-            if (newUniversityInput) newUniversityInput.value = '';
-            newUniversityInput.style.display = 'none';
-            universitySelect.value = 'All';
-            
-            showStatus("Document uploaded successfully", "success", "uploadStatus");
-            loadAdminDocuments();
-            loadAdminDashboard();
-        }
-
-        function deleteDocument(docId) {
-            if (confirm("Are you sure you want to delete this document?")) {
-                const documents = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.documents) || '[]');
-                const filteredDocs = documents.filter(d => d.id !== docId);
-                localStorage.setItem(APP_CONFIG.storageKeys.documents, JSON.stringify(filteredDocs));
-                showStatus("Document deleted", "success");
-                loadAdminDocuments();
-                loadAdminDashboard();
-            }
-        }
-
-        function updateAdminPassword() {
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (!newPassword || !confirmPassword) {
-                showStatus("Please enter both password fields", "error");
-                return;
-            }
-            
-            if (newPassword !== confirmPassword) {
-                showStatus("Passwords do not match", "error");
-                return;
-            }
-            
-            // In a real app, you would save this securely
-            // For demo, we'll just update the config
-            showStatus("Password updated successfully", "success");
-            
-            // Clear fields
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-        }
-
-        function clearAllData() {
-            if (confirm("⚠️ DANGER ZONE ⚠️\n\nAre you absolutely sure you want to delete ALL data?\n\nThis will delete:\n• All users\n• All payment records\n• All documents\n\nThis action cannot be undone!")) {
-                localStorage.removeItem(APP_CONFIG.storageKeys.users);
-                localStorage.removeItem(APP_CONFIG.storageKeys.payments);
-                localStorage.removeItem(APP_CONFIG.storageKeys.documents);
-                localStorage.removeItem(APP_CONFIG.storageKeys.currentUser);
-                localStorage.removeItem(APP_CONFIG.storageKeys.adminSession);
-                
-                // Reinitialize
-                initializeStorage();
-                
-                showStatus("All data cleared. App has been reset.", "success");
-                showSection('subscription');
-                adminLogout();
-            }
-        }
-
-        function exportUsers() {
-            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-            const csv = convertToCSV(users);
-            downloadCSV(csv, 'revisionvault_users.csv');
-            showStatus("Users exported to CSV file", "success");
-        }
-
-        function exportData() {
-            const users = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.users) || '[]');
-            const payments = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.payments) || '[]');
-            
-            // Create combined data
-            const data = {
-                export_date: new Date().toISOString(),
-                app_name: APP_CONFIG.appName,
-                version: APP_CONFIG.version,
-                users: users,
-                payments: payments,
-                total_users: users.length,
-                total_payments: payments.length,
-                total_earnings: payments
-                    .filter(p => p.status === 'approved' || p.approved)
-                    .reduce((sum, p) => sum + (p.amount || APP_CONFIG.subscriptionPrice), 0)
-            };
-            
-            const jsonData = JSON.stringify(data, null, 2);
-            downloadJSON(jsonData, 'revisionvault_export.json');
-            showStatus("All data exported", "success");
-        }
-
-        function refreshUsers() {
-            loadAdminUsers();
-            showStatus("Users list refreshed", "success");
-        }
-
         // ===== UTILITY FUNCTIONS =====
         function showSection(sectionId) {
             // Hide all sections
@@ -3263,7 +2534,7 @@ Please approve this subscription.
             document.getElementById(`${sectionId}Section`).classList.add('active');
             
             // Load data for section
-            if (sectionId === 'documents' && currentUser?.subscription === 'active') {
+            if (sectionId === 'documents') {
                 loadDocuments();
             } else if (sectionId === 'profile') {
                 loadProfile();
@@ -3301,10 +2572,16 @@ Please approve this subscription.
                     <p><strong>Expiry Date:</strong> ${formatDate(currentUser.subscriptionExpiry)}</p>
                     <p><strong>Days Left:</strong> ${daysLeft > 0 ? daysLeft + ' days' : 'Expired'}</p>
                     <p><strong>Transaction Code:</strong> ${currentUser.transactionCode || 'N/A'}</p>
+                    ${currentUser.approvedDate ? `<p><strong>Approved Date:</strong> ${formatDate(currentUser.approvedDate)}</p>` : ''}
                 </div>
-                <button class="btn btn-primary" onclick="showSection('subscription')" style="margin-top: 20px;">
-                    <i class="fas fa-redo"></i> Renew Subscription
-                </button>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="showSection('subscription')">
+                        <i class="fas fa-redo"></i> Renew Subscription
+                    </button>
+                    <button class="btn btn-outline" onclick="checkApprovalStatus()">
+                        <i class="fas fa-sync-alt"></i> Check Status
+                    </button>
+                </div>
             `;
             
             document.getElementById('profileContent').innerHTML = html;
@@ -3316,6 +2593,7 @@ Please approve this subscription.
             localStorage.removeItem(APP_CONFIG.storageKeys.adminSession);
             showSection('subscription');
             document.getElementById('userMenu').style.display = 'none';
+            stopApprovalCheck();
             showStatus("Logged out successfully", "success");
         }
 
@@ -3394,40 +2672,70 @@ Please approve this subscription.
             allPayments = payments;
         }
 
-        function convertToCSV(data) {
-            const headers = ['Phone', 'University', 'Transaction Code', 'Subscription Status', 'Expiry Date', 'Registered Date'];
-            const rows = data.map(user => [
-                formatPhoneForDisplay(user.phone),
-                user.university,
-                user.transactionCode,
-                user.subscription,
-                formatDate(user.subscriptionExpiry),
-                formatDate(user.registeredDate)
-            ]);
+        function saveUniversity(universityName) {
+            if (!universityName || universityName.trim() === '') return;
             
-            return [headers, ...rows].map(row => 
-                row.map(cell => `"${cell}"`).join(',')
-            ).join('\n');
+            const universities = JSON.parse(localStorage.getItem(APP_CONFIG.storageKeys.universities) || '[]');
+            const university = universityName.trim();
+            
+            // Check if university already exists
+            if (!universities.includes(university)) {
+                universities.push(university);
+                localStorage.setItem(APP_CONFIG.storageKeys.universities, JSON.stringify(universities));
+                allUniversities = universities;
+            }
+            
+            return university;
         }
 
-        function downloadCSV(csv, filename) {
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            link.click();
-            URL.revokeObjectURL(url);
+        function toggleNewUniversityInput(selectId, inputId) {
+            const select = document.getElementById(selectId);
+            const input = document.getElementById(inputId);
+            
+            if (select && input) {
+                if (select.value === "Add New University") {
+                    input.style.display = 'block';
+                    input.required = true;
+                } else {
+                    input.style.display = 'none';
+                    input.required = false;
+                    input.value = '';
+                }
+            }
         }
 
-        function downloadJSON(jsonData, filename) {
-            const blob = new Blob([jsonData], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            link.click();
-            URL.revokeObjectURL(url);
+        function formatPhoneForDisplay(phone) {
+            // Convert 254 format to 0xxx xxx xxx
+            if (phone.startsWith('254')) {
+                return '0' + phone.substring(3);
+            }
+            return phone;
+        }
+
+        function getFileIcon(type) {
+            const icons = {
+                'pdf': 'fa-file-pdf',
+                'doc': 'fa-file-word',
+                'docx': 'fa-file-word',
+                'ppt': 'fa-file-powerpoint',
+                'txt': 'fa-file-alt',
+                'zip': 'fa-file-archive',
+                'rar': 'fa-file-archive'
+            };
+            return icons[type] || 'fa-file';
+        }
+
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+            } catch (e) {
+                return "Recent";
+            }
         }
 
         function setupEventListeners() {
@@ -3481,16 +2789,6 @@ Please approve this subscription.
             document.getElementById('adminBtn').addEventListener('click', function(e) {
                 e.preventDefault();
                 showSection('admin');
-            });
-            
-            // Auto-focus admin password when admin section is shown
-            document.getElementById('adminSection').addEventListener('click', function() {
-                setTimeout(() => {
-                    const adminPassInput = document.getElementById('adminPassword');
-                    if (adminPassInput && document.getElementById('adminLoginBox').style.display !== 'none') {
-                        adminPassInput.focus();
-                    }
-                }, 100);
             });
         }
 
