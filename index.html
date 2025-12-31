@@ -671,11 +671,6 @@
                 <button class="btn btn-primary" style="width: 100%;" onclick="uploadDocument()">
                     <i class="fas fa-upload"></i> Upload Document
                 </button>
-                
-                <div id="uploadPreview" style="margin-top: 30px; padding: 20px; background: var(--light); border-radius: var(--radius); display: none;">
-                    <h4 style="margin-bottom: 15px;">Upload Preview</h4>
-                    <div id="previewContent"></div>
-                </div>
             </div>
             
             <!-- Recent Uploads -->
@@ -706,27 +701,15 @@
         });
 
         function initSystem() {
-            // Initialize localStorage with default data
-            const defaultData = {
-                documents: [],
-                users: [],
-                pending: [],
-                activity: [],
-                settings: {
-                    subscriptionPrice: 67,
-                    subscriptionDays: 180
-                }
-            };
-
-            // Set default data if not exists
+            // Initialize localStorage with default data if not exists
             if (!localStorage.getItem('revisionvault_documents')) {
-                localStorage.setItem('revisionvault_documents', JSON.stringify(defaultData.documents));
+                localStorage.setItem('revisionvault_documents', JSON.stringify([]));
             }
             if (!localStorage.getItem('revisionvault_users')) {
-                localStorage.setItem('revisionvault_users', JSON.stringify(defaultData.users));
+                localStorage.setItem('revisionvault_users', JSON.stringify([]));
             }
             if (!localStorage.getItem('revisionvault_pending')) {
-                localStorage.setItem('revisionvault_pending', JSON.stringify(defaultData.pending));
+                localStorage.setItem('revisionvault_pending', JSON.stringify([]));
             }
 
             // Load demo documents if empty
@@ -892,7 +875,7 @@
             container.innerHTML = html;
         }
 
-        // ==================== DOCUMENT UPLOAD - FIXED ====================
+        // ==================== DOCUMENT UPLOAD ====================
         function uploadDocument() {
             console.log('📤 Upload button clicked!');
             
@@ -928,15 +911,8 @@
                 return;
             }
             
-            // Check if link is valid URL
-            if (!isValidURL(link)) {
-                showNotification('Please enter a valid URL for the document', 'error');
-                document.getElementById('uploadLink').focus();
-                return;
-            }
-            
             // Create document object
-            const document = {
+            const newDoc = {
                 id: 'doc_' + Date.now(),
                 title: title,
                 university: university,
@@ -952,38 +928,28 @@
                 uploadedBy: 'admin'
             };
             
-            console.log('📄 Creating document:', document);
+            console.log('📄 Creating document:', newDoc);
             
             // Save to localStorage
             let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
-            documents.unshift(document); // Add to beginning
+            documents.unshift(newDoc);
             localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
             
             // Update arrays
-            allDocuments.unshift(document);
-            filteredDocuments.unshift(document);
+            allDocuments.unshift(newDoc);
+            filteredDocuments.unshift(newDoc);
             
             // Update UI
             loadDocuments();
             updateRecentUploads();
             clearUploadForm();
             
-            showNotification('✅ Document uploaded successfully! Available in Study Materials.', 'success');
-            console.log('✅ Document uploaded successfully:', document);
+            showNotification('✅ Document uploaded successfully!', 'success');
             
-            // Switch to documents tab to see the uploaded document
+            // Switch to documents tab
             setTimeout(() => {
                 switchTab('documents');
-            }, 1500);
-        }
-
-        function isValidURL(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (_) {
-                return false;
-            }
+            }, 1000);
         }
 
         function getFileFormat(link) {
@@ -991,7 +957,6 @@
             if (link.includes('.doc')) return 'DOC';
             if (link.includes('.ppt')) return 'PPT';
             if (link.includes('.xls')) return 'Excel';
-            if (link.includes('.jpg') || link.includes('.jpeg') || link.includes('.png')) return 'Image';
             return 'File';
         }
 
@@ -999,10 +964,7 @@
             document.getElementById('uploadTitle').value = '';
             document.getElementById('uploadUniversity').value = '';
             document.getElementById('uploadSubject').value = '';
-            document.getElementById('uploadType').value = 'Past Paper';
             document.getElementById('uploadLink').value = '';
-            document.getElementById('uploadAccess').value = 'premium';
-            document.getElementById('uploadPreview').style.display = 'none';
         }
 
         function updateRecentUploads() {
@@ -1026,14 +988,6 @@
                         <div style="font-size: 12px; color: var(--gray); margin-top: 5px;">
                             ${doc.university} • ${doc.subject} • ${doc.access === 'premium' ? '🔒 Premium' : '🔓 Free'}
                         </div>
-                        <div style="margin-top: 10px;">
-                            <button class="btn" onclick="viewDocument('${doc.id}')" style="background: var(--primary); padding: 8px 16px; font-size: 14px;">
-                                <i class="fas fa-eye"></i> Test View
-                            </button>
-                            <button class="btn" onclick="testDocumentLink('${doc.link}')" style="background: var(--info); padding: 8px 16px; font-size: 14px; margin-left: 10px;">
-                                <i class="fas fa-link"></i> Test Link
-                            </button>
-                        </div>
                     </div>
                 `;
             });
@@ -1041,12 +995,7 @@
             container.innerHTML = html;
         }
 
-        function testDocumentLink(link) {
-            window.open(link, '_blank');
-            showNotification('Opening document link in new tab...', 'info');
-        }
-
-        // ==================== DOCUMENT VIEWER - FIXED ====================
+        // ==================== DOCUMENT VIEWER ====================
         function viewDocument(docId) {
             console.log('👁️ Viewing document ID:', docId);
             
@@ -1088,31 +1037,42 @@
             if (link.includes('drive.google.com')) {
                 if (link.includes('/view')) {
                     return link.replace('/view', '/preview');
-                } else if (link.includes('/file/d/')) {
-                    const match = link.match(/\/file\/d\/([^\/]+)/);
-                    if (match && match[1]) {
-                        return `https://drive.google.com/file/d/${match[1]}/preview`;
-                    }
                 } else if (link.includes('/preview')) {
-                    return link; // Already in preview format
+                    return link;
+                } else if (link.includes('/file/d/')) {
+                    const fileId = extractFileId(link);
+                    if (fileId) {
+                        return `https://drive.google.com/file/d/${fileId}/preview`;
+                    }
                 }
             }
             
-            // For Google Docs links
+            // For Google Docs
             if (link.includes('docs.google.com/document')) {
-                const match = link.match(/\/document\/d\/([^\/]+)/);
-                if (match && match[1]) {
-                    return `https://docs.google.com/document/d/${match[1]}/preview`;
+                const fileId = extractFileId(link);
+                if (fileId) {
+                    return `https://docs.google.com/document/d/${fileId}/preview`;
                 }
             }
             
-            // For direct PDF links
-            if (link.includes('.pdf')) {
-                return link;
-            }
-            
-            // For other links, try to embed
             return link;
+        }
+
+        function extractFileId(url) {
+            const patterns = [
+                /\/file\/d\/([^\/]+)/,
+                /\/d\/([^\/]+)/,
+                /id=([^&]+)/,
+                /\/document\/d\/([^\/]+)/
+            ];
+            
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match && match[1]) {
+                    return match[1];
+                }
+            }
+            return null;
         }
 
         function closeDocumentViewer() {
@@ -1162,24 +1122,17 @@
         function getDownloadLink(link) {
             // Convert Google Drive link to direct download
             if (link.includes('drive.google.com')) {
-                if (link.includes('/file/d/')) {
-                    const match = link.match(/\/file\/d\/([^\/]+)/);
-                    if (match && match[1]) {
-                        return `https://drive.google.com/uc?export=download&id=${match[1]}`;
-                    }
-                } else if (link.includes('/preview')) {
-                    const match = link.match(/\/d\/([^\/]+)/);
-                    if (match && match[1]) {
-                        return `https://drive.google.com/uc?export=download&id=${match[1]}`;
-                    }
+                const fileId = extractFileId(link);
+                if (fileId) {
+                    return `https://drive.google.com/uc?export=download&id=${fileId}`;
                 }
             }
             
             // For Google Docs
             if (link.includes('docs.google.com/document')) {
-                const match = link.match(/\/document\/d\/([^\/]+)/);
-                if (match && match[1]) {
-                    return `https://docs.google.com/document/d/${match[1]}/export?format=pdf`;
+                const fileId = extractFileId(link);
+                if (fileId) {
+                    return `https://docs.google.com/document/d/${fileId}/export?format=pdf`;
                 }
             }
             
@@ -1193,13 +1146,6 @@
                 if (index !== -1) {
                     documents[index] = doc;
                     localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
-                    
-                    // Update in-memory arrays
-                    const allIndex = allDocuments.findIndex(d => d.id === doc.id);
-                    if (allIndex !== -1) allDocuments[allIndex] = doc;
-                    
-                    const filteredIndex = filteredDocuments.findIndex(d => d.id === doc.id);
-                    if (filteredIndex !== -1) filteredDocuments[filteredIndex] = doc;
                 }
             } catch (error) {
                 console.error('Error updating document:', error);
@@ -1281,7 +1227,7 @@
             document.getElementById('txnCode').value = '';
             document.getElementById('userUniversity').value = '';
             
-            // Auto-approve for demo (in real system, admin would verify)
+            // Auto-approve for demo
             setTimeout(() => {
                 verifyPayment(pendingPayment.id);
             }, 2000);
@@ -1295,7 +1241,7 @@
             
             // Create user account
             const expiryDate = new Date();
-            expiryDate.setDate(expiryDate.getDate() + 180); // 180 days
+            expiryDate.setDate(expiryDate.getDate() + 180);
             
             const user = {
                 id: Date.now().toString(),
@@ -1413,7 +1359,6 @@
                 
                 showNotification('✅ Admin login successful! You can now upload documents.', 'success');
                 
-                // Clear password
                 document.getElementById('adminPassword').value = '';
             } else {
                 showNotification('❌ Invalid admin password', 'error');
@@ -1462,7 +1407,6 @@
             const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
             const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
             
-            // Count active users
             const now = new Date();
             const activeUsers = users.filter(user => new Date(user.expiry) > now);
             
@@ -1474,7 +1418,6 @@
             const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
             const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
             
-            // Count active users
             const now = new Date();
             const activeUsers = users.filter(user => new Date(user.expiry) > now);
             
@@ -1506,10 +1449,17 @@
             // Find and activate the clicked tab button
             const tabButtons = document.querySelectorAll('.tab');
             tabButtons.forEach(tab => {
-                if (tab.textContent.includes(tabName === 'student' ? 'Student Portal' : 
-                                            tabName === 'documents' ? 'Study Materials' :
-                                            tabName === 'admin' ? 'Admin Panel' : 'Upload Materials')) {
-                    tab.classList.add('active');
+                const span = tab.querySelector('span');
+                if (span) {
+                    if (span.textContent === 'Student Portal' && tabName === 'student') {
+                        tab.classList.add('active');
+                    } else if (span.textContent === 'Study Materials' && tabName === 'documents') {
+                        tab.classList.add('active');
+                    } else if (span.textContent === 'Admin Panel' && tabName === 'admin') {
+                        tab.classList.add('active');
+                    } else if (span.textContent === 'Upload Materials' && tabName === 'upload') {
+                        tab.classList.add('active');
+                    }
                 }
             });
             
@@ -1558,7 +1508,6 @@
             
             container.appendChild(notification);
             
-            // Remove after 5 seconds
             setTimeout(() => {
                 notification.remove();
             }, 5000);
@@ -1571,7 +1520,6 @@
                 showNotification('Admin access granted', 'success');
                 switchTab('admin');
                 
-                // Auto focus on password field
                 setTimeout(() => {
                     document.getElementById('adminPassword').focus();
                 }, 500);
@@ -1580,7 +1528,7 @@
             }
         }
 
-        // ==================== YOUR EGERTON UNIVERSITY DOCUMENTS ====================
+        // ==================== EGERTON UNIVERSITY DOCUMENTS ====================
         function loadDemoDocuments() {
             const egertonDocuments = [
                 // Your 12 Google Drive documents
@@ -1754,60 +1702,10 @@
                 }
             ];
             
-            // Original demo documents from other universities
-            const originalDocs = [
-                {
-                    id: 'doc_1',
-                    title: 'Mathematics 101 - Calculus Past Papers',
-                    university: 'Egerton University',
-                    subject: 'Mathematics',
-                    type: 'Past Paper',
-                    year: '2023',
-                    link: 'https://drive.google.com/file/d/1wLMVU9JXzW8Kx3h7Vg5Y6tR2eN4pQ5s/preview',
-                    access: 'free',
-                    views: 1245,
-                    downloads: 456,
-                    date: new Date(Date.now() - 86400000).toISOString(),
-                    format: 'PDF'
-                },
-                {
-                    id: 'doc_2',
-                    title: 'Computer Science Data Structures Notes',
-                    university: 'University of Nairobi',
-                    subject: 'Computer Science',
-                    type: 'Lecture Notes',
-                    year: '2024',
-                    link: 'https://drive.google.com/file/d/1ABC123DEF456/preview',
-                    access: 'premium',
-                    views: 856,
-                    downloads: 234,
-                    date: new Date(Date.now() - 172800000).toISOString(),
-                    format: 'PDF'
-                },
-                {
-                    id: 'doc_3',
-                    title: 'Physics Laboratory Manual',
-                    university: 'Kenyatta University',
-                    subject: 'Physics',
-                    type: 'Lab Manual',
-                    year: '2023',
-                    link: 'https://drive.google.com/file/d/1XYZ789ABC123/preview',
-                    access: 'free',
-                    views: 567,
-                    downloads: 123,
-                    date: new Date(Date.now() - 259200000).toISOString(),
-                    format: 'PDF'
-                }
-            ];
+            // Save to localStorage
+            localStorage.setItem('revisionvault_documents', JSON.stringify(egertonDocuments));
             
-            // Combine all documents
-            const demoDocs = [...originalDocs, ...egertonDocuments];
-            
-            localStorage.setItem('revisionvault_documents', JSON.stringify(demoDocs));
-            allDocuments = demoDocs;
-            filteredDocuments = [...demoDocs];
-            
-            showNotification('✅ 15 documents loaded successfully (12 Egerton University + 3 others)', 'success');
+            showNotification('✅ 12 Egerton University documents loaded successfully!', 'success');
         }
 
         // Initialize on load
@@ -1816,7 +1714,7 @@
             loadDocuments();
             checkUserSession();
             checkAdminSession();
-            showNotification('RevisionVault Pro Ready! 15 Documents Available', 'success');
+            showNotification('RevisionVault Pro Ready! 12 Documents Available', 'success');
         };
     </script>
 </body>
