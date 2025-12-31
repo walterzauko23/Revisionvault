@@ -349,6 +349,11 @@
             color: white;
         }
 
+        .action-btn.renew {
+            background: var(--secondary);
+            color: white;
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -466,6 +471,56 @@
             gap: 5px;
         }
 
+        .subscription-status {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .subscription-status.active {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #a7f3d0;
+        }
+
+        .subscription-status.expired {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 2px solid #fecaca;
+        }
+
+        .subscription-status.warning {
+            background: #fffbeb;
+            color: #92400e;
+            border: 2px solid #fde68a;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--secondary));
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .expired-modal {
+            background: white;
+            border-radius: var(--radius);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
             .header { padding: 25px; }
             .tabs { padding: 0; overflow-x: auto; }
@@ -502,6 +557,29 @@
         </div>
     </div>
 
+    <!-- Subscription Expired Modal -->
+    <div class="modal-overlay" id="expiredModal">
+        <div class="expired-modal">
+            <div style="font-size: 60px; color: var(--danger); margin-bottom: 20px;">
+                <i class="fas fa-calendar-times"></i>
+            </div>
+            <h3 style="font-size: 24px; font-weight: 700; color: var(--dark); margin-bottom: 15px;">
+                Subscription Expired
+            </h3>
+            <p style="color: var(--gray); margin-bottom: 25px;">
+                Your 5-month subscription has ended. Please renew your subscription to continue accessing materials.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <button class="btn btn-primary" onclick="showRenewalForm()">
+                    <i class="fas fa-sync-alt"></i> Renew Subscription
+                </button>
+                <button class="btn btn-secondary" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin Secret Button -->
     <div style="position: fixed; top: 15px; right: 15px; z-index: 9999;">
         <button onclick="showAdminSecretAccess()" style="background: var(--primary); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer;">
@@ -520,7 +598,7 @@
                     <p>Premium University Study Materials</p>
                 </div>
             </div>
-            <p style="margin-top: 15px; opacity: 0.9;">Pay First • Admin Approval Required • Full Document Access</p>
+            <p style="margin-top: 15px; opacity: 0.9;">Ksh 67 for 5 Months • Admin Approval Required • Full Document Access</p>
         </div>
 
         <div class="tabs">
@@ -546,10 +624,13 @@
         <div id="student" class="tab-content active">
             <div style="text-align: center; margin-bottom: 60px; padding: 50px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 24px;">
                 <h2 style="font-size: 42px; font-weight: 800; color: var(--primary); margin-bottom: 20px;">Access Premium University Materials</h2>
-                <p style="font-size: 20px; color: var(--gray); margin-bottom: 40px;">Complete Process: Pay → Submit Details → Admin Approval → Access</p>
+                <p style="font-size: 20px; color: var(--gray); margin-bottom: 40px;">Complete Process: Pay → Submit Details → Admin Approval → Access for 5 Months</p>
                 <div style="display: inline-flex; align-items: baseline; gap: 10px; margin: 30px 0; padding: 25px 40px; background: white; border-radius: 20px;">
                     <span style="font-size: 56px; font-weight: 900; color: var(--primary);">Ksh 67</span>
-                    <span style="font-size: 20px; color: var(--gray);">/semester access</span>
+                    <span style="font-size: 20px; color: var(--gray);">for 5 months access</span>
+                </div>
+                <div style="margin-top: 20px; color: var(--gray);">
+                    <i class="fas fa-calendar-alt"></i> 5-month subscription • <i class="fas fa-sync-alt"></i> Renewal required after expiry
                 </div>
             </div>
 
@@ -567,7 +648,7 @@
                         <i class="fas fa-users"></i>
                     </div>
                     <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="approvedUsersCount">0</div>
-                    <div style="color: var(--gray);">Approved Students</div>
+                    <div style="color: var(--gray);">Active Subscriptions</div>
                 </div>
                 <div class="stat-card">
                     <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--warning); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
@@ -595,7 +676,7 @@
                     <i class="fas fa-sign-in-alt"></i> Login to Access Materials
                 </button>
                 <div style="text-align: center; padding: 15px; background: var(--light); border-radius: var(--radius);">
-                    <p style="color: var(--gray); margin-bottom: 10px;">Not approved yet? Submit payment details</p>
+                    <p style="color: var(--gray); margin-bottom: 10px;">Not subscribed yet? Pay Ksh 67 for 5 months access</p>
                     <button class="btn btn-primary" onclick="showPaymentForm()">
                         <i class="fas fa-money-bill-wave"></i> Submit Payment Details
                     </button>
@@ -605,8 +686,19 @@
             <!-- Payment Form -->
             <div class="form-container" id="paymentForm" style="display: none;">
                 <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
-                    <i class="fas fa-money-bill-wave"></i> Submit Payment Details
+                    <i class="fas fa-money-bill-wave"></i> Subscribe for 5 Months
                 </h3>
+                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 20px; border-radius: var(--radius); margin-bottom: 30px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 40px; color: var(--primary);">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--primary); margin-bottom: 5px;">5-Month Subscription</h4>
+                            <p style="color: var(--gray);">Pay Ksh 67 for full access to all materials</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 12px; font-weight: 600;">Full Name</label>
                     <input type="text" id="userName" class="form-control" placeholder="Enter your full name" required>
@@ -618,7 +710,7 @@
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 12px; font-weight: 600;">M-Pesa Transaction Code</label>
                     <input type="text" id="txnCode" class="form-control" placeholder="Enter your transaction code" required>
-                    <small style="color: var(--gray); margin-top: 5px; display: block;">From your Ksh 67 payment</small>
+                    <small style="color: var(--gray); margin-top: 5px; display: block;">From your Ksh 67 payment (5-month subscription)</small>
                 </div>
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 12px; font-weight: 600;">Select University</label>
@@ -649,6 +741,7 @@
                         <div style="font-size: 32px; font-weight: 800; margin: 20px 0; font-family: monospace;">0765 098 865</div>
                         <div style="font-size: 18px;">
                             <strong>Amount:</strong> Ksh 67<br>
+                            <strong>Duration:</strong> 5 Months<br>
                             <strong>Reference:</strong> REVISIONVAULT
                         </div>
                     </div>
@@ -666,14 +759,14 @@
                     </div>
                     <h4 style="font-size: 22px; margin-bottom: 20px; color: var(--dark);">Contact Admin via WhatsApp</h4>
                     <p style="color: var(--gray); margin-bottom: 30px; font-size: 16px;">
-                        Your payment details have been submitted. Contact admin via WhatsApp with your transaction code for approval.
+                        Your 5-month subscription details have been submitted. Contact admin via WhatsApp with your transaction code for approval.
                     </p>
                     <a id="whatsappLink" class="whatsapp-button" target="_blank">
                         <i class="fab fa-whatsapp"></i>
                         <span>Message Admin on WhatsApp</span>
                     </a>
                     <p style="color: var(--gray); margin-top: 20px; font-size: 14px;">
-                        After admin approves, you can login with your phone and transaction code.
+                        After admin approves, you'll have 5 months of access. Login with your phone and transaction code.
                     </p>
                 </div>
                 <button class="btn btn-secondary" style="width: 100%; margin-top: 30px;" onclick="showLoginForm()">
@@ -691,13 +784,19 @@
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </div>
+                
+                <div id="subscriptionStatus"></div>
+                
                 <div id="userDashboardContent"></div>
                 <div style="margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap;">
                     <button class="btn btn-success" onclick="switchTab('documents')">
                         <i class="fas fa-file-alt"></i> Access Study Materials
                     </button>
                     <button class="btn btn-info" onclick="viewAccountDetails()">
-                        <i class="fas fa-receipt"></i> View Account Details
+                        <i class="fas fa-receipt"></i> View Subscription Details
+                    </button>
+                    <button class="btn btn-warning" onclick="showRenewalForm()" id="renewBtn" style="display: none;">
+                        <i class="fas fa-sync-alt"></i> Renew Subscription
                     </button>
                 </div>
             </div>
@@ -710,7 +809,7 @@
                     <h3 style="font-size: 28px; font-weight: 700; color: var(--primary);">
                         <i class="fas fa-file-alt"></i> University Study Materials
                     </h3>
-                    <p style="color: var(--gray); margin-top: 10px;">Premium content unlocked after admin approval</p>
+                    <p style="color: var(--gray); margin-top: 10px;">Premium content unlocked with 5-month subscription</p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 20px;">
                     <div style="background: var(--primary); color: white; padding: 12px 24px; border-radius: 50px; font-weight: 600;">
@@ -718,7 +817,7 @@
                         <span id="docCountBadge">0 materials</span>
                     </div>
                     <div id="accessStatus" style="color: var(--success); font-size: 14px; font-weight: 500; display: none;">
-                        <i class="fas fa-unlock"></i> Full Access Granted
+                        <i class="fas fa-unlock"></i> 5-Month Access Active
                     </div>
                 </div>
             </div>
@@ -770,16 +869,16 @@
                 <h4 style="color: var(--primary); margin-bottom: 15px;">
                     <i class="fas fa-unlock"></i> All Materials Unlocked!
                 </h4>
-                <p style="color: var(--gray);">You have full access to all study materials. Click on any document to view.</p>
+                <p style="color: var(--gray);">You have full access to all study materials for 5 months. Click on any document to view.</p>
             </div>
 
             <div id="documentsLockedMessage" style="text-align: center; padding: 40px; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-radius: var(--radius); margin-bottom: 30px;">
                 <h4 style="color: var(--warning); margin-bottom: 15px;">
                     <i class="fas fa-lock"></i> Materials Locked
                 </h4>
-                <p style="color: var(--gray); margin-bottom: 20px;">Please login with approved account to access study materials.</p>
+                <p style="color: var(--gray); margin-bottom: 20px;">Subscribe with Ksh 67 for 5 months access to study materials.</p>
                 <button class="btn btn-primary" onclick="switchTab('student')">
-                    <i class="fas fa-sign-in-alt"></i> Login / Get Approved
+                    <i class="fas fa-sign-in-alt"></i> Subscribe / Login
                 </button>
             </div>
 
@@ -834,29 +933,30 @@
                         <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                             <i class="fas fa-users"></i>
                         </div>
-                        <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="adminApprovedUsers">0</div>
-                        <div style="color: var(--gray);">Approved Users</div>
+                        <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="adminActiveUsers">0</div>
+                        <div style="color: var(--gray);">Active Subscriptions</div>
                     </div>
                     <div class="stat-card">
-                        <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--warning); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
+                        <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--danger); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                             <i class="fas fa-user-clock"></i>
                         </div>
-                        <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="adminPendingUsers">0</div>
-                        <div style="color: var(--gray);">Pending Approvals</div>
+                        <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="adminExpiredUsers">0</div>
+                        <div style="color: var(--gray);">Expired Subscriptions</div>
                     </div>
                 </div>
 
                 <!-- Admin Tabs -->
                 <div class="tab-switcher">
                     <button class="tab-btn active" onclick="switchAdminTab('pending')">Pending Approvals</button>
-                    <button class="tab-btn" onclick="switchAdminTab('users')">Approved Users</button>
+                    <button class="tab-btn" onclick="switchAdminTab('users')">Active Users</button>
+                    <button class="tab-btn" onclick="switchAdminTab('expired')">Expired Users</button>
                     <button class="tab-btn" onclick="switchAdminTab('documents')">Manage Documents</button>
                 </div>
 
                 <!-- Pending Approvals -->
                 <div id="pendingApprovals" class="admin-tab-content">
                     <h3 style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 20px;">
-                        <i class="fas fa-user-clock"></i> Pending User Approvals
+                        <i class="fas fa-user-clock"></i> Pending Subscription Approvals
                     </h3>
                     <div class="admin-table-container" id="pendingUsersTable">
                         <!-- Will be populated by JS -->
@@ -866,9 +966,20 @@
                 <!-- Approved Users -->
                 <div id="approvedUsers" class="admin-tab-content" style="display: none;">
                     <h3 style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 20px;">
-                        <i class="fas fa-users"></i> Approved Users
+                        <i class="fas fa-users"></i> Active Subscriptions (5-Month Access)
                     </h3>
                     <div class="admin-table-container" id="approvedUsersTable">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Expired Users -->
+                <div id="expiredUsers" class="admin-tab-content" style="display: none;">
+                    <h3 style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 20px;">
+                        <i class="fas fa-user-times"></i> Expired Subscriptions
+                    </h3>
+                    <p style="color: var(--gray); margin-bottom: 20px;">Users whose 5-month subscription has ended. They need to renew.</p>
+                    <div class="admin-table-container" id="expiredUsersTable">
                         <!-- Will be populated by JS -->
                     </div>
                 </div>
@@ -969,6 +1080,36 @@
             }
         }
 
+        // ==================== SUBSCRIPTION MANAGEMENT ====================
+        function getSubscriptionEndDate(startDate) {
+            // Add 5 months (approximately 150 days) to the start date
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 5);
+            return endDate.toISOString();
+        }
+
+        function calculateDaysRemaining(expiryDate) {
+            const expiry = new Date(expiryDate);
+            const now = new Date();
+            const diffTime = expiry - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        function checkSubscriptionStatus(user) {
+            if (!user || !user.expiry) return 'expired';
+            
+            const daysRemaining = calculateDaysRemaining(user.expiry);
+            
+            if (daysRemaining <= 0) {
+                return 'expired';
+            } else if (daysRemaining <= 7) {
+                return 'expiring_soon';
+            } else {
+                return 'active';
+            }
+        }
+
         // ==================== DOCUMENT MANAGEMENT ====================
         function loadDocuments() {
             try {
@@ -994,7 +1135,7 @@
 
         function displayDocuments() {
             const container = document.getElementById('documentsList');
-            const isAccessible = currentUser || isAdmin;
+            const isAccessible = (currentUser && checkSubscriptionStatus(currentUser) === 'active') || isAdmin;
             
             // Show/hide access messages
             if (isAccessible) {
@@ -1036,7 +1177,7 @@
             
             card.innerHTML = `
                 ${!isAccessible ? `<div class="premium-badge" style="position: absolute; top: 20px; right: 20px;">
-                    <i class="fas fa-crown"></i> PREMIUM
+                    <i class="fas fa-crown"></i> 5-MONTH SUBSCRIPTION
                 </div>` : ''}
                 
                 <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #e0f2fe; color: #0369a1; border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 20px;">
@@ -1065,7 +1206,7 @@
                                 <i class="fas fa-eye"></i> View
                             </button>` :
                             `<button class="btn" onclick="showLoginPrompt()" style="background: var(--warning); padding: 10px 20px; font-size: 14px;">
-                                <i class="fas fa-lock"></i> Locked
+                                <i class="fas fa-lock"></i> Subscribe to View
                             </button>`
                         }
                     </div>
@@ -1077,9 +1218,15 @@
 
         // ==================== DOCUMENT VIEWER ====================
         function viewDocument(docId) {
-            if (!currentUser && !isAdmin) {
-                showNotification('🔒 Please login to access documents', 'error');
-                switchTab('student');
+            const status = currentUser ? checkSubscriptionStatus(currentUser) : 'expired';
+            
+            if (status !== 'active' && !isAdmin) {
+                if (status === 'expired') {
+                    document.getElementById('expiredModal').style.display = 'flex';
+                } else {
+                    showNotification('🔒 Please subscribe or renew subscription to access documents', 'error');
+                    switchTab('student');
+                }
                 return;
             }
             
@@ -1211,13 +1358,16 @@
                 return;
             }
             
-            // Check if user already approved
+            // Check if user already approved (but may be expired)
             const approvedUsers = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
             const existingApproved = approvedUsers.find(u => u.phone === phone);
             if (existingApproved) {
-                showNotification('This phone number is already approved. Please login instead.', 'info');
-                showLoginForm();
-                return;
+                const status = checkSubscriptionStatus(existingApproved);
+                if (status === 'active' || status === 'expiring_soon') {
+                    showNotification('This phone number already has an active subscription. Please login instead.', 'info');
+                    showLoginForm();
+                    return;
+                }
             }
             
             const pendingUser = {
@@ -1228,7 +1378,8 @@
                 university: university,
                 status: 'pending',
                 date: new Date().toISOString(),
-                amount: 67
+                amount: 67,
+                subscriptionType: '5_months'
             };
             
             pendingUsers.push(pendingUser);
@@ -1239,13 +1390,13 @@
             document.getElementById('whatsappSection').style.display = 'block';
             
             // Create WhatsApp link
-            const whatsappMessage = `Hello Admin, I have submitted payment for RevisionVault Pro. Please approve my account.\n\nName: ${name}\nPhone: ${phone}\nTransaction Code: ${txnCode}\nUniversity: ${university}`;
+            const whatsappMessage = `Hello Admin, I have submitted payment for RevisionVault Pro 5-month subscription. Please approve my account.\n\nName: ${name}\nPhone: ${phone}\nTransaction Code: ${txnCode}\nUniversity: ${university}\nAmount: Ksh 67\nSubscription: 5 Months`;
             const encodedMessage = encodeURIComponent(whatsappMessage);
             const whatsappLink = `https://wa.me/254765098865?text=${encodedMessage}`;
             
             document.getElementById('whatsappLink').href = whatsappLink;
             
-            showNotification('✅ Payment details submitted! Please contact admin via WhatsApp.', 'success');
+            showNotification('✅ 5-month subscription details submitted! Please contact admin via WhatsApp.', 'success');
             updateStats();
             
             // Clear form
@@ -1272,11 +1423,10 @@
                 return;
             }
             
-            const expiry = new Date(user.expiry);
-            const now = new Date();
+            const status = checkSubscriptionStatus(user);
             
-            if (expiry < now) {
-                showNotification('Your access has expired. Please contact admin for renewal.', 'error');
+            if (status === 'expired') {
+                document.getElementById('expiredModal').style.display = 'flex';
                 return;
             }
             
@@ -1286,7 +1436,7 @@
             showUserDashboard();
             updateStats();
             loadDocuments(); // Refresh to show unlocked documents
-            showNotification(`✅ Welcome back, ${user.name}!`, 'success');
+            showNotification(`✅ Welcome back, ${user.name}! Subscription active for ${calculateDaysRemaining(user.expiry)} days`, 'success');
             
             document.getElementById('loginPhone').value = '';
             document.getElementById('loginTxnCode').value = '';
@@ -1300,14 +1450,65 @@
             
             if (!currentUser) return;
             
-            const expiry = new Date(currentUser.expiry);
-            const now = new Date();
-            const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            const status = checkSubscriptionStatus(currentUser);
+            const daysRemaining = calculateDaysRemaining(currentUser.expiry);
+            const expiryDate = new Date(currentUser.expiry);
+            const startDate = new Date(currentUser.approvalDate || currentUser.date);
+            
+            // Update subscription status display
+            let statusHtml = '';
+            let renewBtnDisplay = 'none';
+            
+            if (status === 'active') {
+                statusHtml = `
+                    <div class="subscription-status active">
+                        <i class="fas fa-check-circle"></i> Subscription Active
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${Math.min(100, (daysRemaining / 150) * 100)}%"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 14px;">
+                            <span>${daysRemaining} days remaining</span>
+                            <span>Expires: ${expiryDate.toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (status === 'expiring_soon') {
+                statusHtml = `
+                    <div class="subscription-status warning">
+                        <i class="fas fa-exclamation-circle"></i> Subscription Expiring Soon
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${(daysRemaining / 150) * 100}%"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 14px;">
+                            <span>${daysRemaining} days remaining</span>
+                            <span>Expires: ${expiryDate.toLocaleDateString()}</span>
+                        </div>
+                        <button class="btn btn-warning" onclick="showRenewalForm()" style="margin-top: 15px;">
+                            <i class="fas fa-sync-alt"></i> Renew Now
+                        </button>
+                    </div>
+                `;
+                renewBtnDisplay = 'block';
+            } else if (status === 'expired') {
+                statusHtml = `
+                    <div class="subscription-status expired">
+                        <i class="fas fa-times-circle"></i> Subscription Expired
+                        <p style="margin: 10px 0;">Your 5-month subscription ended on ${expiryDate.toLocaleDateString()}</p>
+                        <button class="btn btn-primary" onclick="showRenewalForm()">
+                            <i class="fas fa-sync-alt"></i> Renew Subscription
+                        </button>
+                    </div>
+                `;
+                renewBtnDisplay = 'block';
+            }
+            
+            document.getElementById('subscriptionStatus').innerHTML = statusHtml;
+            document.getElementById('renewBtn').style.display = renewBtnDisplay;
             
             document.getElementById('userDashboardContent').innerHTML = `
                 <div style="background: #d1fae5; color: #065f46; padding: 25px; border-radius: var(--radius); border: 2px solid #a7f3d0; margin-bottom: 20px;">
                     <h4 style="margin-bottom: 20px; color: #065f46;">
-                        <i class="fas fa-user-check"></i> Account Approved
+                        <i class="fas fa-user-check"></i> Account Details
                     </h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
                         <div>
@@ -1319,8 +1520,8 @@
                             <div style="font-size: 18px; font-weight: 600;">${currentUser.university}</div>
                         </div>
                         <div>
-                            <div style="font-size: 12px; color: #065f46;">DAYS REMAINING</div>
-                            <div style="font-size: 32px; font-weight: 800;">${daysLeft}</div>
+                            <div style="font-size: 12px; color: #065f46;">SUBSCRIPTION START</div>
+                            <div style="font-size: 14px; font-weight: 600;">${startDate.toLocaleDateString()}</div>
                         </div>
                     </div>
                 </div>
@@ -1338,12 +1539,27 @@
                             <div style="font-size: 12px; color: var(--gray);">Downloads</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="font-size: 32px; font-weight: 800; color: var(--warning);">${daysLeft}</div>
+                            <div style="font-size: 32px; font-weight: 800; color: ${status === 'active' ? 'var(--success)' : 'var(--warning)'};">${daysRemaining > 0 ? daysRemaining : 0}</div>
                             <div style="font-size: 12px; color: var(--gray);">Days Remaining</div>
                         </div>
                     </div>
                 </div>
             `;
+        }
+
+        function showRenewalForm() {
+            if (currentUser) {
+                // Pre-fill the form with user details
+                document.getElementById('userName').value = currentUser.name;
+                document.getElementById('userPhone').value = currentUser.phone;
+                document.getElementById('userUniversity').value = currentUser.university;
+            }
+            
+            switchTab('student');
+            showPaymentForm();
+            document.getElementById('expiredModal').style.display = 'none';
+            
+            showNotification('Please submit new payment details for renewal (Ksh 67 for another 5 months)', 'info');
         }
 
         function logout() {
@@ -1352,6 +1568,7 @@
             showLoginForm();
             updateStats();
             loadDocuments();
+            document.getElementById('expiredModal').style.display = 'none';
             showNotification('Logged out successfully', 'info');
         }
 
@@ -1359,24 +1576,43 @@
             const savedUser = localStorage.getItem('revisionvault_current_user');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
-                showUserDashboard();
+                const status = checkSubscriptionStatus(currentUser);
+                
+                if (status === 'expired') {
+                    document.getElementById('expiredModal').style.display = 'flex';
+                } else {
+                    showUserDashboard();
+                }
             }
         }
 
         function viewAccountDetails() {
             if (!currentUser) return;
             
-            const expiry = new Date(currentUser.expiry);
+            const status = checkSubscriptionStatus(currentUser);
+            const daysRemaining = calculateDaysRemaining(currentUser.expiry);
+            const expiryDate = new Date(currentUser.expiry);
+            const startDate = new Date(currentUser.approvalDate || currentUser.date);
             
-            alert(`📋 Account Details\n\n` +
+            let statusText = '';
+            if (status === 'active') {
+                statusText = `Active (${daysRemaining} days remaining)`;
+            } else if (status === 'expiring_soon') {
+                statusText = `Expiring Soon (${daysRemaining} days remaining)`;
+            } else {
+                statusText = 'Expired';
+            }
+            
+            alert(`📋 Subscription Details\n\n` +
                   `Name: ${currentUser.name}\n` +
                   `Phone: ${currentUser.phone}\n` +
                   `University: ${currentUser.university}\n` +
                   `Transaction Code: ${currentUser.txnCode}\n` +
+                  `Subscription Type: 5 Months\n` +
                   `Amount Paid: Ksh 67\n` +
-                  `Approval Date: ${new Date(currentUser.approvalDate).toLocaleDateString()}\n` +
-                  `Expiry Date: ${expiry.toLocaleDateString()}\n` +
-                  `Status: Active ✅\n\n` +
+                  `Start Date: ${startDate.toLocaleDateString()}\n` +
+                  `Expiry Date: ${expiryDate.toLocaleDateString()}\n` +
+                  `Status: ${statusText}\n\n` +
                   `Documents Viewed: ${currentUser.views || 0}\n` +
                   `Documents Downloaded: ${currentUser.downloads || 0}\n\n` +
                   `Thank you for using RevisionVault Pro!`);
@@ -1420,6 +1656,7 @@
         function loadAdminData() {
             loadPendingUsers();
             loadApprovedUsers();
+            loadExpiredUsers();
             loadDocumentsForAdmin();
         }
 
@@ -1445,6 +1682,7 @@
                             <th>Phone</th>
                             <th>Transaction Code</th>
                             <th>University</th>
+                            <th>Subscription</th>
                             <th>Date</th>
                             <th>Actions</th>
                         </tr>
@@ -1459,6 +1697,7 @@
                         <td>${user.phone}</td>
                         <td><code>${user.txnCode}</code></td>
                         <td>${user.university}</td>
+                        <td><span class="premium-badge">5 Months</span></td>
                         <td>${new Date(user.date).toLocaleDateString()}</td>
                         <td>
                             <div class="action-buttons">
@@ -1480,13 +1719,14 @@
 
         function loadApprovedUsers() {
             const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            const activeUsers = users.filter(user => checkSubscriptionStatus(user) === 'active' || checkSubscriptionStatus(user) === 'expiring_soon');
             const container = document.getElementById('approvedUsersTable');
             
-            if (users.length === 0) {
+            if (activeUsers.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: var(--gray);">
                         <i class="fas fa-users" style="font-size: 60px; margin-bottom: 20px;"></i>
-                        <h4>No approved users yet</h4>
+                        <h4>No active subscriptions</h4>
                     </div>
                 `;
                 return;
@@ -1500,6 +1740,7 @@
                             <th>Phone</th>
                             <th>University</th>
                             <th>Expiry Date</th>
+                            <th>Days Left</th>
                             <th>Views</th>
                             <th>Downloads</th>
                             <th>Actions</th>
@@ -1508,19 +1749,82 @@
                     <tbody>
             `;
             
-            users.forEach(user => {
+            activeUsers.forEach(user => {
                 const expiry = new Date(user.expiry);
-                const now = new Date();
-                const isExpired = expiry < now;
+                const daysRemaining = calculateDaysRemaining(user.expiry);
+                const status = checkSubscriptionStatus(user);
                 
                 html += `
                     <tr>
                         <td>${user.name}</td>
                         <td>${user.phone}</td>
                         <td>${user.university}</td>
-                        <td style="color: ${isExpired ? 'var(--danger)' : 'var(--success)'};">
+                        <td style="color: ${status === 'expiring_soon' ? 'var(--warning)' : 'var(--success)'};">
                             ${expiry.toLocaleDateString()}
-                            ${isExpired ? ' (Expired)' : ''}
+                            ${status === 'expiring_soon' ? ' ⚠️' : ''}
+                        </td>
+                        <td>${daysRemaining}</td>
+                        <td>${user.views || 0}</td>
+                        <td>${user.downloads || 0}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn delete" onclick="deleteUser('${user.id}')">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                                <button class="action-btn renew" onclick="extendSubscription('${user.id}')">
+                                    <i class="fas fa-calendar-plus"></i> Extend
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function loadExpiredUsers() {
+            const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            const expiredUsers = users.filter(user => checkSubscriptionStatus(user) === 'expired');
+            const container = document.getElementById('expiredUsersTable');
+            
+            if (expiredUsers.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-user-times" style="font-size: 60px; margin-bottom: 20px;"></i>
+                        <h4>No expired subscriptions</h4>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>University</th>
+                            <th>Expired On</th>
+                            <th>Views</th>
+                            <th>Downloads</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            expiredUsers.forEach(user => {
+                const expiry = new Date(user.expiry);
+                
+                html += `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.university}</td>
+                        <td style="color: var(--danger);">
+                            ${expiry.toLocaleDateString()} (Expired)
                         </td>
                         <td>${user.views || 0}</td>
                         <td>${user.downloads || 0}</td>
@@ -1529,8 +1833,8 @@
                                 <button class="action-btn delete" onclick="deleteUser('${user.id}')">
                                     <i class="fas fa-trash"></i> Remove
                                 </button>
-                                <button class="action-btn edit" onclick="extendAccess('${user.id}')">
-                                    <i class="fas fa-calendar-plus"></i> Extend
+                                <button class="action-btn renew" onclick="renewUserSubscription('${user.id}')">
+                                    <i class="fas fa-sync-alt"></i> Renew
                                 </button>
                             </div>
                         </td>
@@ -1605,35 +1909,55 @@
             
             const pendingUser = pendingUsers[pendingUserIndex];
             
-            // Create approved user
-            const approvedUser = {
-                ...pendingUser,
-                id: 'user_' + Date.now(),
-                status: 'approved',
-                approvalDate: new Date().toISOString(),
-                expiry: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(), // 180 days
-                views: 0,
-                downloads: 0
-            };
+            // Check if user already exists (for renewal)
+            const existingUserIndex = users.findIndex(u => u.phone === pendingUser.phone);
             
-            users.push(approvedUser);
+            if (existingUserIndex !== -1) {
+                // Update existing user (renewal)
+                const now = new Date();
+                users[existingUserIndex].txnCode = pendingUser.txnCode;
+                users[existingUserIndex].approvalDate = now.toISOString();
+                users[existingUserIndex].expiry = getSubscriptionEndDate(now.toISOString());
+                users[existingUserIndex].status = 'approved';
+                users[existingUserIndex].subscriptionType = '5_months';
+                users[existingUserIndex].amount = 67;
+                
+                showNotification(`✅ Subscription renewed for ${pendingUser.name}!`, 'success');
+            } else {
+                // Create new approved user
+                const now = new Date();
+                const approvedUser = {
+                    ...pendingUser,
+                    id: 'user_' + Date.now(),
+                    status: 'approved',
+                    approvalDate: now.toISOString(),
+                    expiry: getSubscriptionEndDate(now.toISOString()),
+                    views: 0,
+                    downloads: 0,
+                    subscriptionType: '5_months',
+                    amount: 67
+                };
+                
+                users.push(approvedUser);
+                showNotification(`✅ User ${pendingUser.name} approved for 5 months!`, 'success');
+            }
+            
             pendingUsers.splice(pendingUserIndex, 1);
             
             localStorage.setItem('revisionvault_pending', JSON.stringify(pendingUsers));
             localStorage.setItem('revisionvault_users', JSON.stringify(users));
             
-            showNotification(`✅ User ${pendingUser.name} approved! They can now login.`, 'success');
             loadAdminData();
             updateStats();
         }
 
         function rejectUser(userId) {
-            if (confirm('Are you sure you want to reject this user?')) {
+            if (confirm('Are you sure you want to reject this subscription request?')) {
                 let pendingUsers = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
                 pendingUsers = pendingUsers.filter(u => u.id !== userId);
                 
                 localStorage.setItem('revisionvault_pending', JSON.stringify(pendingUsers));
-                showNotification('User rejected', 'info');
+                showNotification('Subscription request rejected', 'info');
                 loadAdminData();
                 updateStats();
             }
@@ -1651,19 +1975,41 @@
             }
         }
 
-        function extendAccess(userId) {
+        function extendSubscription(userId) {
             const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
             const userIndex = users.findIndex(u => u.id === userId);
             
             if (userIndex !== -1) {
                 const user = users[userIndex];
-                const newExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Add 30 days
-                user.expiry = newExpiry.toISOString();
+                const newExpiry = getSubscriptionEndDate(new Date().toISOString());
+                user.expiry = newExpiry;
+                user.approvalDate = new Date().toISOString();
                 users[userIndex] = user;
                 
                 localStorage.setItem('revisionvault_users', JSON.stringify(users));
-                showNotification(`✅ Access extended for ${user.name}`, 'success');
+                showNotification(`✅ 5-month subscription extended for ${user.name}`, 'success');
                 loadApprovedUsers();
+                loadExpiredUsers();
+            }
+        }
+
+        function renewUserSubscription(userId) {
+            const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            const userIndex = users.findIndex(u => u.id === userId);
+            
+            if (userIndex !== -1) {
+                const user = users[userIndex];
+                const newExpiry = getSubscriptionEndDate(new Date().toISOString());
+                user.expiry = newExpiry;
+                user.approvalDate = new Date().toISOString();
+                user.status = 'approved';
+                users[userIndex] = user;
+                
+                localStorage.setItem('revisionvault_users', JSON.stringify(users));
+                showNotification(`✅ 5-month subscription renewed for ${user.name}`, 'success');
+                loadApprovedUsers();
+                loadExpiredUsers();
+                updateStats();
             }
         }
 
@@ -1688,8 +2034,17 @@
                 btn.classList.remove('active');
             });
             
-            document.getElementById(tabName === 'pending' ? 'pendingApprovals' : 
-                                   tabName === 'users' ? 'approvedUsers' : 'manageDocuments').style.display = 'block';
+            let targetId = '';
+            switch(tabName) {
+                case 'pending': targetId = 'pendingApprovals'; break;
+                case 'users': targetId = 'approvedUsers'; break;
+                case 'expired': targetId = 'expiredUsers'; break;
+                case 'documents': targetId = 'manageDocuments'; break;
+            }
+            
+            if (targetId) {
+                document.getElementById(targetId).style.display = 'block';
+            }
             
             event.target.classList.add('active');
         }
@@ -1816,16 +2171,29 @@
             const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
             const pendingUsers = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
             
+            // Count active and expired users
+            let activeUsers = 0;
+            let expiredUsers = 0;
+            
+            users.forEach(user => {
+                const status = checkSubscriptionStatus(user);
+                if (status === 'active' || status === 'expiring_soon') {
+                    activeUsers++;
+                } else if (status === 'expired') {
+                    expiredUsers++;
+                }
+            });
+            
             // Update student stats
             document.getElementById('totalDocsCount').textContent = documents.length;
-            document.getElementById('approvedUsersCount').textContent = users.length;
+            document.getElementById('approvedUsersCount').textContent = activeUsers;
             document.getElementById('pendingApprovalsCount').textContent = pendingUsers.length;
             
             // Update admin stats if visible
             if (document.getElementById('adminTotalDocs')) {
                 document.getElementById('adminTotalDocs').textContent = documents.length;
-                document.getElementById('adminApprovedUsers').textContent = users.length;
-                document.getElementById('adminPendingUsers').textContent = pendingUsers.length;
+                document.getElementById('adminActiveUsers').textContent = activeUsers;
+                document.getElementById('adminExpiredUsers').textContent = expiredUsers;
             }
         }
 
@@ -1926,7 +2294,7 @@
         }
 
         function showLoginPrompt() {
-            showNotification('🔒 Please login or get approved to access study materials', 'warning');
+            showNotification('🔒 Subscribe with Ksh 67 for 5 months access to study materials', 'warning');
             switchTab('student');
         }
 
