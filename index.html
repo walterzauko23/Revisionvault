@@ -338,7 +338,7 @@
     <div class="document-viewer-container" id="documentViewer">
         <div style="background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
             <h3 id="viewerTitle">Document Viewer</h3>
-            <button onclick="closeDocumentViewer()" style="background: none; border: none; color: white; font-size: 28px; cursor: pointer;">×</button>
+            <button onclick="closeDocumentViewer()" style="background: none; border: none; color: white; font-size: 28px; cursor: pointer; padding: 5px 15px; border-radius: 5px;">×</button>
         </div>
         <div class="viewer-content">
             <iframe id="viewerFrame" class="viewer-iframe"></iframe>
@@ -702,6 +702,7 @@
             initSystem();
             loadInitialData();
             checkUserSession();
+            checkAdminSession();
         });
 
         function initSystem() {
@@ -893,7 +894,7 @@
 
         // ==================== DOCUMENT UPLOAD - FIXED ====================
         function uploadDocument() {
-            console.log('Upload button clicked!');
+            console.log('📤 Upload button clicked!');
             
             const title = document.getElementById('uploadTitle').value.trim();
             const university = document.getElementById('uploadUniversity').value;
@@ -928,17 +929,20 @@
             }
             
             // Check if link is valid URL
-            try {
-                new URL(link);
-            } catch (e) {
+            if (!isValidURL(link)) {
                 showNotification('Please enter a valid URL for the document', 'error');
                 document.getElementById('uploadLink').focus();
                 return;
             }
             
+            // Check if it's a Google Drive link
+            if (!link.includes('drive.google.com') || (!link.includes('/view') && !link.includes('/preview'))) {
+                showNotification('Please use Google Drive link ending with /view or /preview', 'warning');
+            }
+            
             // Create document object
             const document = {
-                id: Date.now().toString(),
+                id: 'doc_' + Date.now(),
                 title: title,
                 university: university,
                 subject: subject,
@@ -953,7 +957,7 @@
                 uploadedBy: 'admin'
             };
             
-            console.log('Creating document:', document);
+            console.log('📄 Creating document:', document);
             
             // Save to localStorage
             let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
@@ -969,8 +973,22 @@
             updateRecentUploads();
             clearUploadForm();
             
-            showNotification('Document uploaded successfully! ✅', 'success');
-            console.log('Document uploaded successfully:', document);
+            showNotification('✅ Document uploaded successfully! Available in Study Materials.', 'success');
+            console.log('✅ Document uploaded successfully:', document);
+            
+            // Switch to documents tab to see the uploaded document
+            setTimeout(() => {
+                switchTab('documents');
+            }, 1500);
+        }
+
+        function isValidURL(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
         }
 
         function getFileFormat(link) {
@@ -986,7 +1004,9 @@
             document.getElementById('uploadTitle').value = '';
             document.getElementById('uploadUniversity').value = '';
             document.getElementById('uploadSubject').value = '';
+            document.getElementById('uploadType').value = 'Past Paper';
             document.getElementById('uploadLink').value = '';
+            document.getElementById('uploadAccess').value = 'premium';
             document.getElementById('uploadPreview').style.display = 'none';
         }
 
@@ -1033,7 +1053,7 @@
 
         // ==================== DOCUMENT VIEWER - FIXED ====================
         function viewDocument(docId) {
-            console.log('Viewing document ID:', docId);
+            console.log('👁️ Viewing document ID:', docId);
             
             const doc = allDocuments.find(d => d.id === docId);
             if (!doc) {
@@ -1043,7 +1063,7 @@
             
             // Check access
             if (doc.access === 'premium' && !currentUser && !isAdmin) {
-                showNotification('This document requires a subscription. Please subscribe to view.', 'error');
+                showNotification('🔒 This document requires a subscription. Please subscribe to view.', 'error');
                 switchTab('student');
                 return;
             }
@@ -1062,10 +1082,10 @@
             // Load document
             const iframe = document.getElementById('viewerFrame');
             const viewerLink = getViewerLink(doc.link);
+            console.log('🌐 Loading document with link:', viewerLink);
             iframe.src = viewerLink;
             
-            showNotification('Document opened successfully! 📄', 'success');
-            console.log('Document opened:', doc.title, 'Link:', viewerLink);
+            showNotification('📄 Document opened successfully!', 'success');
         }
 
         function getViewerLink(link) {
@@ -1074,17 +1094,33 @@
                 if (link.includes('/view')) {
                     return link.replace('/view', '/preview');
                 } else if (link.includes('/file/d/')) {
-                    const fileId = link.split('/file/d/')[1].split('/')[0];
-                    return `https://drive.google.com/file/d/${fileId}/preview`;
+                    const match = link.match(/\/file\/d\/([^\/]+)/);
+                    if (match && match[1]) {
+                        return `https://drive.google.com/file/d/${match[1]}/preview`;
+                    }
+                } else if (link.includes('/preview')) {
+                    return link; // Already in preview format
                 }
             }
+            
+            // For direct PDF links
+            if (link.includes('.pdf')) {
+                return link;
+            }
+            
+            // For other links, try to embed
             return link;
         }
 
         function closeDocumentViewer() {
-            document.getElementById('documentViewer').style.display = 'none';
-            document.getElementById('viewerFrame').src = '';
+            const viewer = document.getElementById('documentViewer');
+            const iframe = document.getElementById('viewerFrame');
+            
+            viewer.style.display = 'none';
+            iframe.src = '';
             currentDocument = null;
+            
+            console.log('❌ Document viewer closed');
             showNotification('Document viewer closed', 'info');
         }
 
@@ -1094,7 +1130,7 @@
                 return;
             }
             
-            console.log('Downloading document:', currentDocument.title);
+            console.log('📥 Downloading document:', currentDocument.title);
             
             // Update download count
             currentDocument.downloads = (currentDocument.downloads || 0) + 1;
@@ -1102,24 +1138,59 @@
             
             // Create download link
             const link = document.createElement('a');
-            link.href = currentDocument.link;
-            link.download = currentDocument.title + '.' + getFileFormat(currentDocument.link).toLowerCase();
-            link.target = '_blank';
             
-            // Trigger download
+            // Get direct download link
+            const downloadLink = getDownloadLink(currentDocument.link);
+            
+            link.href = downloadLink;
+            link.target = '_blank';
+            link.download = currentDocument.title.replace(/[^a-z0-9]/gi, '_') + '.' + getFileFormat(currentDocument.link).toLowerCase();
+            
+            // Add to page, click, and remove
             document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
             
-            showNotification('Download started for: ' + currentDocument.title, 'success');
+            showNotification(`📥 Download started: ${currentDocument.title}`, 'success');
+        }
+
+        function getDownloadLink(link) {
+            // Convert Google Drive link to direct download
+            if (link.includes('drive.google.com')) {
+                if (link.includes('/file/d/')) {
+                    const match = link.match(/\/file\/d\/([^\/]+)/);
+                    if (match && match[1]) {
+                        return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+                    }
+                } else if (link.includes('/preview')) {
+                    const match = link.match(/\/d\/([^\/]+)/);
+                    if (match && match[1]) {
+                        return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+                    }
+                }
+            }
+            return link;
         }
 
         function updateDocumentInStorage(doc) {
-            let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
-            const index = documents.findIndex(d => d.id === doc.id);
-            if (index !== -1) {
-                documents[index] = doc;
-                localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
+            try {
+                let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+                const index = documents.findIndex(d => d.id === doc.id);
+                if (index !== -1) {
+                    documents[index] = doc;
+                    localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
+                    
+                    // Update in-memory arrays
+                    const allIndex = allDocuments.findIndex(d => d.id === doc.id);
+                    if (allIndex !== -1) allDocuments[allIndex] = doc;
+                    
+                    const filteredIndex = filteredDocuments.findIndex(d => d.id === doc.id);
+                    if (filteredIndex !== -1) filteredDocuments[filteredIndex] = doc;
+                }
+            } catch (error) {
+                console.error('Error updating document:', error);
             }
         }
 
@@ -1419,7 +1490,16 @@
             
             // Activate selected tab
             document.getElementById(tabName).classList.add('active');
-            event.currentTarget.classList.add('active');
+            
+            // Find and activate the clicked tab button
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(tab => {
+                if (tab.textContent.includes(tabName === 'student' ? 'Student Portal' : 
+                                            tabName === 'documents' ? 'Study Materials' :
+                                            tabName === 'admin' ? 'Admin Panel' : 'Upload Materials')) {
+                    tab.classList.add('active');
+                }
+            });
             
             // Load specific content
             switch(tabName) {
@@ -1492,7 +1572,7 @@
         function loadDemoDocuments() {
             const demoDocs = [
                 {
-                    id: '1',
+                    id: 'doc_1',
                     title: 'Mathematics 101 - Calculus Past Papers',
                     university: 'Egerton University',
                     subject: 'Mathematics',
@@ -1502,10 +1582,11 @@
                     access: 'free',
                     views: 1245,
                     downloads: 456,
-                    date: new Date(Date.now() - 86400000).toISOString()
+                    date: new Date(Date.now() - 86400000).toISOString(),
+                    format: 'PDF'
                 },
                 {
-                    id: '2',
+                    id: 'doc_2',
                     title: 'Computer Science Data Structures Notes',
                     university: 'University of Nairobi',
                     subject: 'Computer Science',
@@ -1515,10 +1596,11 @@
                     access: 'premium',
                     views: 856,
                     downloads: 234,
-                    date: new Date(Date.now() - 172800000).toISOString()
+                    date: new Date(Date.now() - 172800000).toISOString(),
+                    format: 'PDF'
                 },
                 {
-                    id: '3',
+                    id: 'doc_3',
                     title: 'Physics Laboratory Manual',
                     university: 'Kenyatta University',
                     subject: 'Physics',
@@ -1528,7 +1610,8 @@
                     access: 'free',
                     views: 567,
                     downloads: 123,
-                    date: new Date(Date.now() - 259200000).toISOString()
+                    date: new Date(Date.now() - 259200000).toISOString(),
+                    format: 'PDF'
                 }
             ];
             
@@ -1544,6 +1627,7 @@
             initSystem();
             loadDocuments();
             checkUserSession();
+            checkAdminSession();
             showNotification('RevisionVault Pro Ready! 🚀', 'success');
         };
     </script>
