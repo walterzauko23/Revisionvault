@@ -521,6 +521,13 @@
             text-align: center;
         }
 
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
         @media (max-width: 768px) {
             .header { padding: 25px; }
             .tabs { padding: 0; overflow-x: auto; }
@@ -834,26 +841,6 @@
                     <option value="Moi University">Moi University</option>
                     <option value="Technical University of Kenya">Technical University of Kenya</option>
                 </select>
-                
-                <select id="subjectFilter" class="filter-select" onchange="filterDocuments()">
-                    <option value="">All Subjects</option>
-                    <option value="Biology">Biology</option>
-                    <option value="Chemistry">Chemistry</option>
-                    <option value="Physics">Physics</option>
-                    <option value="Mathematics">Mathematics</option>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Engineering">Engineering</option>
-                    <option value="Medicine">Medicine</option>
-                    <option value="Business">Business</option>
-                </select>
-                
-                <select id="yearFilter" class="filter-select" onchange="filterDocuments()">
-                    <option value="">All Years</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                </select>
             </div>
 
             <!-- Search -->
@@ -874,11 +861,11 @@
 
             <div id="documentsLockedMessage" style="text-align: center; padding: 40px; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-radius: var(--radius); margin-bottom: 30px;">
                 <h4 style="color: var(--warning); margin-bottom: 15px;">
-                    <i class="fas fa-lock"></i> Materials Locked
+                    <i class="fas fa-lock"></i> All Documents Locked
                 </h4>
                 <p style="color: var(--gray); margin-bottom: 20px;">Subscribe with Ksh 67 for 5 months access to study materials.</p>
                 <button class="btn btn-primary" onclick="switchTab('student')">
-                    <i class="fas fa-sign-in-alt"></i> Subscribe / Login
+                    <i class="fas fa-sign-in-alt"></i> Subscribe to Get Access
                 </button>
             </div>
 
@@ -903,7 +890,7 @@
                     </h3>
                     <div class="form-group">
                         <label style="display: block; margin-bottom: 12px; font-weight: 600;">Admin Password</label>
-                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password">
+                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password" required>
                         <small style="color: var(--gray); margin-top: 5px; display: block;">Password: walter.zauko23</small>
                     </div>
                     <button class="btn btn-primary" style="width: 100%;" onclick="adminLogin()">
@@ -913,11 +900,16 @@
             </div>
 
             <div id="adminDashboard" style="display: none;">
-                <div style="text-align: center; padding: 40px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 24px; margin-bottom: 40px;">
-                    <h3 style="font-size: 32px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
-                        <i class="fas fa-tachometer-alt"></i> Admin Dashboard
-                    </h3>
-                    <p style="color: var(--gray);">Manage Subscriptions & Documents</p>
+                <div class="admin-header">
+                    <div>
+                        <h3 style="font-size: 32px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                        </h3>
+                        <p style="color: var(--gray);">Manage Subscriptions & Documents</p>
+                    </div>
+                    <button class="btn btn-danger" onclick="adminLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout Admin
+                    </button>
                 </div>
                 
                 <!-- Admin Stats -->
@@ -1024,12 +1016,11 @@
                 </div>
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 12px; font-weight: 600;">Year *</label>
-                    <select id="uploadYear" class="form-control" required>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                    </select>
+                    <input type="text" id="uploadYear" class="form-control" placeholder="e.g., 2024, 2023" required>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Date *</label>
+                    <input type="date" id="uploadDate" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Link *</label>
@@ -1187,7 +1178,7 @@
             
             card.innerHTML = `
                 ${!hasAccess ? `<div class="premium-badge" style="position: absolute; top: 20px; right: 20px;">
-                    <i class="fas fa-crown"></i> 5-MONTH SUBSCRIPTION
+                    <i class="fas fa-crown"></i> SUBSCRIBE TO ACCESS
                 </div>` : ''}
                 
                 <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #e0f2fe; color: #0369a1; border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 20px;">
@@ -1202,6 +1193,7 @@
                 <div style="font-size: 14px; color: var(--gray); margin-bottom: 15px;">
                     <i class="fas fa-book"></i> ${doc.subject || 'General'} • 
                     <i class="fas fa-calendar"></i> ${doc.year || 'N/A'}
+                    ${doc.date ? ` • <i class="fas fa-clock"></i> ${new Date(doc.date).toLocaleDateString()}` : ''}
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
@@ -1215,7 +1207,7 @@
                             `<button class="btn" onclick="viewDocument('${doc.id}')" style="background: var(--primary); padding: 10px 20px; font-size: 14px;">
                                 <i class="fas fa-eye"></i> View
                             </button>` :
-                            `<button class="btn" onclick="showLoginPrompt()" style="background: var(--warning); padding: 10px 20px; font-size: 14px;">
+                            `<button class="btn" onclick="showSubscribePrompt()" style="background: var(--warning); padding: 10px 20px; font-size: 14px;">
                                 <i class="fas fa-lock"></i> Subscribe to View
                             </button>`
                         }
@@ -1661,6 +1653,17 @@
             }
         }
 
+        function adminLogout() {
+            isAdmin = false;
+            localStorage.removeItem('revisionvault_admin_session');
+            
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('uploadTab').style.display = 'none';
+            
+            showNotification('Admin logged out successfully', 'info');
+        }
+
         function checkAdminSession() {
             if (localStorage.getItem('revisionvault_admin_session') === 'true') {
                 isAdmin = true;
@@ -1887,6 +1890,7 @@
                             <th>University</th>
                             <th>Subject</th>
                             <th>Year</th>
+                            <th>Date</th>
                             <th>Views</th>
                             <th>Downloads</th>
                             <th>Actions</th>
@@ -1902,6 +1906,7 @@
                         <td>${doc.university}</td>
                         <td>${doc.subject || 'N/A'}</td>
                         <td>${doc.year || 'N/A'}</td>
+                        <td>${doc.date ? new Date(doc.date).toLocaleDateString() : 'N/A'}</td>
                         <td>${doc.views || 0}</td>
                         <td>${doc.downloads || 0}</td>
                         <td>
@@ -2073,10 +2078,11 @@
             const title = document.getElementById('uploadTitle').value.trim();
             const university = document.getElementById('uploadUniversity').value;
             const subject = document.getElementById('uploadSubject').value.trim();
-            const year = document.getElementById('uploadYear').value;
+            const year = document.getElementById('uploadYear').value.trim();
+            const date = document.getElementById('uploadDate').value;
             const link = document.getElementById('uploadLink').value.trim();
             
-            if (!title || !university || !subject || !year || !link) {
+            if (!title || !university || !subject || !year || !date || !link) {
                 showNotification('Please fill all required fields', 'error');
                 return;
             }
@@ -2088,8 +2094,9 @@
                 subject: subject,
                 type: 'Study Material',
                 year: year,
+                date: date,
                 link: link,
-                date: new Date().toISOString(),
+                uploadDate: new Date().toISOString(),
                 views: 0,
                 downloads: 0,
                 format: 'PDF'
@@ -2107,6 +2114,8 @@
             // Clear form
             document.getElementById('uploadTitle').value = '';
             document.getElementById('uploadSubject').value = '';
+            document.getElementById('uploadYear').value = '';
+            document.getElementById('uploadDate').value = '';
             document.getElementById('uploadLink').value = '';
             
             showNotification('✅ Document uploaded successfully!', 'success');
@@ -2120,8 +2129,6 @@
         function searchDocuments() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const university = document.getElementById('universityFilter').value;
-            const subject = document.getElementById('subjectFilter').value;
-            const year = document.getElementById('yearFilter').value;
             
             filteredDocuments = allDocuments.filter(doc => {
                 const matchesSearch = !query || 
@@ -2130,10 +2137,8 @@
                     doc.university.toLowerCase().includes(query);
                 
                 const matchesUniversity = !university || doc.university === university;
-                const matchesSubject = !subject || (doc.subject && doc.subject.toLowerCase().includes(subject.toLowerCase()));
-                const matchesYear = !year || doc.year === year;
                 
-                return matchesSearch && matchesUniversity && matchesSubject && matchesYear;
+                return matchesSearch && matchesUniversity;
             });
             
             displayDocuments();
@@ -2260,11 +2265,12 @@
                     subject: 'Biology',
                     type: 'Lecture Notes',
                     year: '2024',
+                    date: '2024-01-15',
                     link: 'https://drive.google.com/file/d/1uSBqGCfeWPr-upLjKOu-cCkwQUVW7GOU/preview',
                     description: 'Complete biology lecture notes for first year students',
                     views: 0,
                     downloads: 0,
-                    date: new Date().toISOString(),
+                    uploadDate: new Date().toISOString(),
                     format: 'PDF'
                 },
                 {
@@ -2274,11 +2280,12 @@
                     subject: 'Chemistry',
                     type: 'Study Guide',
                     year: '2023',
+                    date: '2023-11-20',
                     link: 'https://drive.google.com/file/d/1LZ5P_t9qRlxZq2AyAI8JoG-bZAdS6G_c/preview',
                     description: 'Essential chemistry concepts and practice problems',
                     views: 0,
                     downloads: 0,
-                    date: new Date().toISOString(),
+                    uploadDate: new Date().toISOString(),
                     format: 'PDF'
                 }
             ];
@@ -2312,7 +2319,7 @@
             }
         }
 
-        function showLoginPrompt() {
+        function showSubscribePrompt() {
             showNotification('🔒 Subscribe with Ksh 67 for 5 months access to study materials', 'warning');
             switchTab('student');
         }
