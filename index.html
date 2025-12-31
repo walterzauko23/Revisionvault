@@ -436,7 +436,21 @@
             <button onclick="closeDocumentViewer()" style="background: none; border: none; color: white; font-size: 28px; cursor: pointer;">×</button>
         </div>
         <div style="flex: 1; display: flex; justify-content: center; align-items: center; background: #000;">
-            <iframe id="viewerFrame" class="viewer-iframe"></iframe>
+            <div id="viewerContent" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
+                <iframe id="viewerFrame" class="viewer-iframe" style="display: none;"></iframe>
+                <div id="viewerError" style="text-align: center; padding: 40px; display: none;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 60px; color: var(--warning); margin-bottom: 20px;"></i>
+                    <h3 style="margin-bottom: 15px;">Document Loading Failed</h3>
+                    <p style="margin-bottom: 20px;">The document could not be loaded. Please check the link and try again.</p>
+                    <button class="btn btn-primary" onclick="tryAlternativeViewer()">
+                        <i class="fas fa-sync-alt"></i> Try Alternative Viewer
+                    </button>
+                </div>
+                <div id="viewerLoading" style="text-align: center;">
+                    <div class="loading-spinner" style="width: 50px; height: 50px; margin-bottom: 20px;"></div>
+                    <p>Loading document...</p>
+                </div>
+            </div>
         </div>
         <div style="background: var(--primary); padding: 15px; display: flex; gap: 15px; justify-content: center;">
             <button class="btn" onclick="downloadCurrentDocument()" style="background: var(--success);">
@@ -510,7 +524,7 @@
         <div id="student" class="tab-content active">
             <div style="text-align: center; margin-bottom: 60px; padding: 50px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 24px;">
                 <h2 style="font-size: 42px; font-weight: 800; color: var(--primary); margin-bottom: 20px;">Access Premium University Revision Materials</h2>
-                <p style="font-size: 20px; color: var(--gray); margin-bottom: 40px;">12 Egerton University Zoology Documents • Premium Quality • Instant Access</p>
+                <p style="font-size: 20px; color: var(--gray); margin-bottom: 40px;">Premium University Documents • Instant Access</p>
                 <div style="display: inline-flex; align-items: baseline; gap: 10px; margin: 30px 0; padding: 25px 40px; background: white; border-radius: 20px;">
                     <span style="font-size: 56px; font-weight: 900; color: var(--primary);">Ksh 67</span>
                     <span style="font-size: 20px; color: var(--gray);">/semester access</span>
@@ -830,7 +844,17 @@
                 </div>
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Link *</label>
-                    <input type="text" id="uploadLink" class="form-control" placeholder="https://drive.google.com/file/d/.../view" required>
+                    <input type="text" id="uploadLink" class="form-control" placeholder="https://drive.google.com/file/d/FILE_ID/view" required>
+                    <small style="color: var(--gray); margin-top: 5px; display: block;">
+                        <strong>Important:</strong> Use Google Drive links. Make sure the file is set to "Anyone with the link can view"
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Alternative Viewer (Optional)</label>
+                    <input type="text" id="uploadAltLink" class="form-control" placeholder="https://docs.google.com/viewer?url=YOUR_LINK">
+                    <small style="color: var(--gray); margin-top: 5px; display: block;">
+                        Use Google Docs viewer if direct link fails: https://docs.google.com/viewer?url=YOUR_LINK
+                    </small>
                 </div>
                 <button class="btn btn-primary" style="width: 100%;" onclick="uploadDocument()">
                     <i class="fas fa-upload"></i> Upload Document
@@ -866,7 +890,7 @@
         function initSystem() {
             if (!localStorage.getItem('revisionvault_documents')) {
                 localStorage.setItem('revisionvault_documents', JSON.stringify([]));
-                loadEgertonDocuments();
+                loadSampleDocuments();
             }
             if (!localStorage.getItem('revisionvault_users')) {
                 localStorage.setItem('revisionvault_users', JSON.stringify([]));
@@ -1267,53 +1291,123 @@
             document.getElementById('viewerTitle').textContent = doc.title;
             document.getElementById('documentViewer').style.display = 'flex';
             
+            document.getElementById('viewerLoading').style.display = 'block';
+            document.getElementById('viewerError').style.display = 'none';
+            document.getElementById('viewerFrame').style.display = 'none';
+            
             const iframe = document.getElementById('viewerFrame');
+            
+            // Try primary link first
             const viewerLink = getViewerLink(doc.link);
             iframe.src = viewerLink;
             
-            showNotification('📄 Document opened successfully!', 'success');
-            logActivity('document_viewed', `Document viewed: ${doc.title}`);
+            iframe.onload = function() {
+                document.getElementById('viewerLoading').style.display = 'none';
+                document.getElementById('viewerFrame').style.display = 'block';
+                showNotification('📄 Document opened successfully!', 'success');
+                logActivity('document_viewed', `Document viewed: ${doc.title}`);
+            };
+            
+            iframe.onerror = function() {
+                // If primary link fails, try alternative viewer
+                setTimeout(function() {
+                    if (doc.altLink) {
+                        iframe.src = doc.altLink;
+                    } else {
+                        showDocumentError();
+                    }
+                }, 2000);
+            };
+            
+            // Set timeout in case iframe doesn't load at all
+            setTimeout(function() {
+                if (iframe.contentWindow && iframe.contentWindow.length > 0) {
+                    // Document loaded
+                    document.getElementById('viewerLoading').style.display = 'none';
+                    document.getElementById('viewerFrame').style.display = 'block';
+                } else {
+                    showDocumentError();
+                }
+            }, 5000);
+        }
+
+        function showDocumentError() {
+            document.getElementById('viewerLoading').style.display = 'none';
+            document.getElementById('viewerError').style.display = 'block';
+            showNotification('⚠️ Document could not be loaded. Try downloading instead.', 'warning');
+        }
+
+        function tryAlternativeViewer() {
+            if (!currentDocument) return;
+            
+            const iframe = document.getElementById('viewerFrame');
+            document.getElementById('viewerLoading').style.display = 'block';
+            document.getElementById('viewerError').style.display = 'none';
+            
+            // Use Google Docs viewer as alternative
+            const encodedUrl = encodeURIComponent(currentDocument.link);
+            iframe.src = `https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`;
+            
+            iframe.onload = function() {
+                document.getElementById('viewerLoading').style.display = 'none';
+                document.getElementById('viewerFrame').style.display = 'block';
+                showNotification('Using alternative viewer', 'info');
+            };
         }
 
         function getViewerLink(link) {
-            if (link.includes('drive.google.com')) {
-                if (link.includes('/view')) {
-                    return link.replace('/view', '/preview');
-                } else if (link.includes('/preview')) {
-                    return link;
-                } else if (link.includes('/file/d/')) {
-                    const fileId = extractFileId(link);
-                    if (fileId) {
-                        return `https://drive.google.com/file/d/${fileId}/preview`;
-                    }
+            if (!link) return '';
+            
+            // If it's already a preview link, return as is
+            if (link.includes('/preview')) {
+                return link;
+            }
+            
+            // Convert Google Drive view link to preview
+            if (link.includes('drive.google.com/file/d/')) {
+                const fileId = extractFileId(link);
+                if (fileId) {
+                    return `https://drive.google.com/file/d/${fileId}/preview`;
                 }
             }
             
-            if (link.includes('docs.google.com/document')) {
+            // Convert Google Docs link to preview
+            if (link.includes('docs.google.com/document/d/')) {
                 const fileId = extractFileId(link);
                 if (fileId) {
                     return `https://docs.google.com/document/d/${fileId}/preview`;
                 }
             }
             
-            return link;
+            // For other links, try to use Google Docs viewer
+            return `https://docs.google.com/viewer?url=${encodeURIComponent(link)}&embedded=true`;
         }
 
         function extractFileId(url) {
-            const patterns = [
-                /\/file\/d\/([^\/]+)/,
-                /\/d\/([^\/]+)/,
-                /id=([^&]+)/,
-                /\/document\/d\/([^\/]+)/
-            ];
-            
-            for (const pattern of patterns) {
-                const match = url.match(pattern);
-                if (match && match[1]) {
-                    return match[1];
+            try {
+                // Pattern 1: /file/d/{fileId}/view
+                const filePattern1 = /\/file\/d\/([^\/]+)/;
+                // Pattern 2: /d/{fileId}/
+                const filePattern2 = /\/d\/([^\/]+)/;
+                // Pattern 3: id={fileId}
+                const filePattern3 = /[?&]id=([^&]+)/;
+                // Pattern 4: /document/d/{fileId}/
+                const docPattern = /\/document\/d\/([^\/]+)/;
+                
+                const patterns = [filePattern1, filePattern2, filePattern3, docPattern];
+                
+                for (const pattern of patterns) {
+                    const match = url.match(pattern);
+                    if (match && match[1]) {
+                        return match[1];
+                    }
                 }
+                
+                return null;
+            } catch (e) {
+                console.error('Error extracting file ID:', e);
+                return null;
             }
-            return null;
         }
 
         function closeDocumentViewer() {
@@ -1357,20 +1451,23 @@
         }
 
         function getDownloadLink(link) {
-            if (link.includes('drive.google.com')) {
+            // Convert Google Drive link to direct download
+            if (link.includes('drive.google.com/file/d/')) {
                 const fileId = extractFileId(link);
                 if (fileId) {
                     return `https://drive.google.com/uc?export=download&id=${fileId}`;
                 }
             }
             
-            if (link.includes('docs.google.com/document')) {
+            // For Google Docs
+            if (link.includes('docs.google.com/document/d/')) {
                 const fileId = extractFileId(link);
                 if (fileId) {
                     return `https://docs.google.com/document/d/${fileId}/export?format=pdf`;
                 }
             }
             
+            // Return original link as fallback
             return link;
         }
 
@@ -1410,6 +1507,7 @@
             const university = document.getElementById('uploadUniversity').value;
             const subject = document.getElementById('uploadSubject').value.trim();
             const link = document.getElementById('uploadLink').value.trim();
+            const altLink = document.getElementById('uploadAltLink').value.trim();
             
             if (!title) {
                 showNotification('Please enter document title', 'error');
@@ -1439,12 +1537,14 @@
                 type: 'Document',
                 year: new Date().getFullYear().toString(),
                 link: link,
+                altLink: altLink || '',
                 access: 'premium',
                 description: '',
                 date: new Date().toISOString(),
                 views: 0,
                 downloads: 0,
-                format: 'PDF'
+                format: 'PDF',
+                uploadedBy: isAdmin ? 'admin' : (currentUser ? currentUser.displayPhone : 'anonymous')
             };
             
             let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
@@ -1455,9 +1555,12 @@
             filteredDocuments.unshift(newDoc);
             
             loadDocuments();
+            
+            // Clear form
             document.getElementById('uploadTitle').value = '';
             document.getElementById('uploadSubject').value = '';
             document.getElementById('uploadLink').value = '';
+            document.getElementById('uploadAltLink').value = '';
             
             showNotification('✅ Document uploaded successfully!', 'success');
             logActivity('document_uploaded', `Document uploaded: ${title}`);
@@ -1941,57 +2044,42 @@
             }
         }
 
-        function loadEgertonDocuments() {
-            const egertonDocuments = [
+        function loadSampleDocuments() {
+            const sampleDocuments = [
                 {
-                    id: 'doc_egerton_1',
-                    title: 'Animal Physiology Lecture Notes',
+                    id: 'doc_sample_1',
+                    title: 'Introduction to Biology',
                     university: 'Egerton University',
-                    subject: 'Zoology',
+                    subject: 'Biology',
                     type: 'Lecture Notes',
                     year: '2024',
                     link: 'https://drive.google.com/file/d/1uSBqGCfeWPr-upLjKOu-cCkwQUVW7GOU/preview',
                     access: 'premium',
-                    description: 'Complete animal physiology lecture notes covering all major systems',
+                    description: 'Basic biology concepts and principles',
                     views: 320,
                     downloads: 150,
                     date: new Date().toISOString(),
                     format: 'PDF'
                 },
                 {
-                    id: 'doc_egerton_2',
-                    title: 'Comparative Anatomy Study Guide',
-                    university: 'Egerton University',
-                    subject: 'Zoology',
+                    id: 'doc_sample_2',
+                    title: 'Chemistry Fundamentals',
+                    university: 'University of Nairobi',
+                    subject: 'Chemistry',
                     type: 'Study Guide',
                     year: '2023',
                     link: 'https://drive.google.com/file/d/1LZ5P_t9qRlxZq2AyAI8JoG-bZAdS6G_c/preview',
-                    access: 'premium',
-                    description: 'Comprehensive study guide for comparative anatomy',
+                    access: 'free',
+                    description: 'Essential chemistry concepts for beginners',
                     views: 210,
                     downloads: 89,
-                    date: new Date().toISOString(),
-                    format: 'PDF'
-                },
-                {
-                    id: 'doc_egerton_3',
-                    title: 'Zoology Lab Practical Manual',
-                    university: 'Egerton University',
-                    subject: 'Zoology',
-                    type: 'Lab Manual',
-                    year: '2023',
-                    link: 'https://drive.google.com/file/d/1mJdvpS8b53BwgDAwUUmlGCdOpEMSPLpC/preview',
-                    access: 'free',
-                    description: 'Complete laboratory manual for zoology practical sessions',
-                    views: 450,
-                    downloads: 200,
                     date: new Date().toISOString(),
                     format: 'PDF'
                 }
             ];
             
-            localStorage.setItem('revisionvault_documents', JSON.stringify(egertonDocuments));
-            showNotification('✅ Egerton University documents loaded!', 'success');
+            localStorage.setItem('revisionvault_documents', JSON.stringify(sampleDocuments));
+            showNotification('✅ Sample documents loaded!', 'success');
         }
 
         function viewUserSubscription() {
