@@ -1098,6 +1098,14 @@
                 }
             }
             
+            // For Google Docs links
+            if (link.includes('docs.google.com/document')) {
+                const match = link.match(/\/document\/d\/([^\/]+)/);
+                if (match && match[1]) {
+                    return `https://docs.google.com/document/d/${match[1]}/preview`;
+                }
+            }
+            
             // For direct PDF links
             if (link.includes('.pdf')) {
                 return link;
@@ -1166,6 +1174,15 @@
                     }
                 }
             }
+            
+            // For Google Docs
+            if (link.includes('docs.google.com/document')) {
+                const match = link.match(/\/document\/d\/([^\/]+)/);
+                if (match && match[1]) {
+                    return `https://docs.google.com/document/d/${match[1]}/export?format=pdf`;
+                }
+            }
+            
             return link;
         }
 
@@ -1563,9 +1580,182 @@
             }
         }
 
-        // ==================== DEMO DATA - INCLUDING EGERTON UNIVERSITY DOCUMENT ====================
+        // ==================== YOUR EGERTON UNIVERSITY DOCUMENTS ====================
         function loadDemoDocuments() {
-            const demoDocs = [
+            const egertonDocuments = [
+                // Your 12 Google Drive documents
+                {
+                    id: 'doc_egerton_1',
+                    title: 'Animal Physiology Lecture Notes',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Lecture Notes',
+                    year: '2024',
+                    link: 'https://drive.google.com/file/d/1uSBqGCfeWPr-upLjKOu-cCkwQUVW7GOU/view?usp=drivesdk',
+                    access: 'free',
+                    views: 320,
+                    downloads: 150,
+                    date: new Date(Date.now() - 432000000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_egerton_2',
+                    title: 'Comparative Anatomy Study Guide',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Revision Guide',
+                    year: '2023',
+                    link: 'https://drive.google.com/file/d/1LZ5P_t9qRlxZq2AyAI8JoG-bZAdS6G_c/view?usp=drivesdk',
+                    access: 'premium',
+                    views: 210,
+                    downloads: 89,
+                    date: new Date(Date.now() - 345600000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_egerton_3',
+                    title: 'Zoology Lab Practical Manual',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Lab Manual',
+                    year: '2023',
+                    link: 'https://drive.google.com/file/d/1mJdvpS8b53BwgDAwUUmlGCdOpEMSPLpC/view?usp=drivesdk',
+                    access: 'free',
+                    views: 450,
+                    downloads: 200,
+                    date: new Date(Date.now() - 518400000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_egerton_4',
+                    title: 'Animal Behavior Notes',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Lecture Notes',
+                    year: '2024',
+                    link: 'https://drive.google.com/file/d/1MxYZpCMFoxTLI6ZR0w9rBBAWeZ1h_bg_/view?usp=drivesdk',
+                    access: 'free',
+                    views: 180,
+                    downloads: 75,
+                    date: new Date(Date.now() - 604800000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_egerton_5',
+                    title: 'Zoology Term Paper Guide',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Study Guide',
+                    year: '2024',
+                    link: 'https://docs.google.com/document/d/1MfDE0_6MEHMGphyuHURxWMRzjLwgircD/edit?usp=drivesdk&ouid=116263653769968642750&rtpof=true&sd=true',
+                    access: 'premium',
+                    views: 120,
+                    downloads: 45,
+                    date: new Date(Date.now() - 691200000).toISOString(),
+                    format: 'DOC'
+                },
+                {
+                    id: 'doc_egerton_6',
+                    title: 'Entomology Field Guide',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Field Guide',
+                    year: '2023',
+                    link: 'https://drive.google.com/file/d/1IP58TYkUMn7sku56FPLbX7P3k0DQ3Ban/view?usp=drivesdk',
+                    access: 'free',
+                    views: 290,
+                    downloads: 130,
+                    date: new Date(Date.now() - 777600000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_egerton_7',
+                    title: 'Ichthyology Study Materials',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Study Materials',
+                    year: '2024',
+                    link: 'https://drive.google.com/file/d/1wFm3cb1YRR9yD9f5noK4tg0HeD0K0jtg/view?usp=drivesdk',
+                    access: 'premium',
+                    views: 95,
+                    downloads: 40,
+                    date: new Date(Date.now() - 864000000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_egerton_8',
+                    title: 'Zoology Research Methods',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Research Guide',
+                    year: '2024',
+                    link: 'https://docs.google.com/document/d/17CG_rb_ecvnkLfjTzNC31u55pBR_RW70/edit?usp=drivesdk&ouid=116263653769968642750&rtpof=true&sd=true',
+                    access: 'free',
+                    views: 160,
+                    downloads: 65,
+                    date: new Date(Date.now() - 950400000).toISOString(),
+                    format: 'DOC'
+                },
+                {
+                    id: 'doc_egerton_9',
+                    title: 'Animal Taxonomy Classification',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Classification Guide',
+                    year: '2023',
+                    link: 'https://drive.google.com/file/d/102toSTJ9WewkGSiBKx3IxWlbPoeKrGCU/view?usp=drivesdk',
+                    access: 'premium',
+                    views: 220,
+                    downloads: 95,
+                    date: new Date(Date.now() - 1036800000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_egerton_10',
+                    title: 'Wildlife Conservation Notes',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Lecture Notes',
+                    year: '2024',
+                    link: 'https://drive.google.com/file/d/1vSG6ErlBddO-dXBVu8Ice1ut297SiI5d/view?usp=drivesdk',
+                    access: 'free',
+                    views: 175,
+                    downloads: 80,
+                    date: new Date(Date.now() - 1123200000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_egerton_11',
+                    title: 'Parasitology Study Guide',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Study Guide',
+                    year: '2023',
+                    link: 'https://drive.google.com/file/d/1nZfdRK6TTVLvR05-E70WPLBN51_m6G7C/view?usp=drivesdk',
+                    access: 'premium',
+                    views: 140,
+                    downloads: 60,
+                    date: new Date(Date.now() - 1209600000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_egerton_12',
+                    title: 'Ecology and Environment Notes',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Lecture Notes',
+                    year: '2024',
+                    link: 'https://drive.google.com/file/d/1Rd_mPqrUik3mh9LX6GQEgD5XOjDfw1gB/view?usp=drivesdk',
+                    access: 'free',
+                    views: 195,
+                    downloads: 85,
+                    date: new Date(Date.now() - 1296000000).toISOString(),
+                    format: 'PDF'
+                }
+            ];
+            
+            // Original demo documents from other universities
+            const originalDocs = [
                 {
                     id: 'doc_1',
                     title: 'Mathematics 101 - Calculus Past Papers',
@@ -1607,90 +1797,17 @@
                     downloads: 123,
                     date: new Date(Date.now() - 259200000).toISOString(),
                     format: 'PDF'
-                },
-                // EGERTON UNIVERSITY DOCUMENT FROM YOUR FOLDER
-                {
-                    id: 'doc_4',
-                    title: 'Zool210 - Introduction to Zoology Notes',
-                    university: 'Egerton University',
-                    subject: 'Zoology',
-                    type: 'Lecture Notes',
-                    year: '2024',
-                    link: 'https://drive.google.com/file/d/1abc123xyz/preview',
-                    access: 'free',
-                    views: 320,
-                    downloads: 150,
-                    date: new Date(Date.now() - 432000000).toISOString(),
-                    format: 'PDF'
-                },
-                {
-                    id: 'doc_5',
-                    title: 'Animal Physiology - Egerton Revision Guide',
-                    university: 'Egerton University',
-                    subject: 'Zoology',
-                    type: 'Revision Guide',
-                    year: '2023',
-                    link: 'https://drive.google.com/file/d/1def456ghi/preview',
-                    access: 'premium',
-                    views: 210,
-                    downloads: 89,
-                    date: new Date(Date.now() - 345600000).toISOString(),
-                    format: 'PDF'
-                },
-                {
-                    id: 'doc_6',
-                    title: 'Comparative Anatomy Past Papers 2022',
-                    university: 'Egerton University',
-                    subject: 'Zoology',
-                    type: 'Past Paper',
-                    year: '2022',
-                    link: 'https://drive.google.com/file/d/1jkl789mno/preview',
-                    access: 'free',
-                    views: 450,
-                    downloads: 200,
-                    date: new Date(Date.now() - 518400000).toISOString(),
-                    format: 'PDF'
                 }
             ];
+            
+            // Combine all documents
+            const demoDocs = [...originalDocs, ...egertonDocuments];
             
             localStorage.setItem('revisionvault_documents', JSON.stringify(demoDocs));
             allDocuments = demoDocs;
             filteredDocuments = [...demoDocs];
             
-            showNotification('Demo documents loaded successfully', 'success');
-        }
-
-        // Function to add Egerton University document from your Google Drive folder
-        function addEgertonZoologyDocument() {
-            // This is an example - you'll need to replace with actual file links from your folder
-            const egertonDoc = {
-                id: 'doc_egerton_zoology_' + Date.now(),
-                title: 'Zool210 Complete Study Materials',
-                university: 'Egerton University',
-                subject: 'Zoology',
-                type: 'Study Materials',
-                year: '2024',
-                link: 'https://drive.google.com/drive/folders/18SKghIX7PmbkrzPHcK-e6H7Uhv5_qNBQ',
-                access: 'free',
-                views: 0,
-                downloads: 0,
-                date: new Date().toISOString(),
-                format: 'Folder',
-                note: 'This is a folder link. Users can access all materials in the folder.'
-            };
-            
-            // Save to localStorage
-            let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
-            documents.unshift(egertonDoc);
-            localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
-            
-            // Update arrays
-            allDocuments.unshift(egertonDoc);
-            filteredDocuments.unshift(egertonDoc);
-            
-            // Update UI
-            loadDocuments();
-            showNotification('✅ Egerton University Zoology document added!', 'success');
+            showNotification('✅ 15 documents loaded successfully (12 Egerton University + 3 others)', 'success');
         }
 
         // Initialize on load
@@ -1699,12 +1816,7 @@
             loadDocuments();
             checkUserSession();
             checkAdminSession();
-            showNotification('RevisionVault Pro Ready! 🚀', 'success');
-            
-            // Auto-add Egerton document on first load
-            setTimeout(() => {
-                addEgertonZoologyDocument();
-            }, 2000);
+            showNotification('RevisionVault Pro Ready! 15 Documents Available', 'success');
         };
     </script>
 </body>
