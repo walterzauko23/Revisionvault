@@ -393,10 +393,6 @@
                 <i class="fas fa-cloud-upload-alt"></i>
                 <span>Upload Materials</span>
             </div>
-            <div class="tab" onclick="switchTab('stats')">
-                <i class="fas fa-chart-line"></i>
-                <span>Statistics</span>
-            </div>
         </div>
 
         <!-- Student Portal Tab -->
@@ -428,14 +424,6 @@
                     <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="activeStudentsCount">0</div>
                     <div style="color: var(--gray);">Active Students</div>
                 </div>
-                
-                <div class="stat-card">
-                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--warning); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
-                        <i class="fas fa-university"></i>
-                    </div>
-                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;">8</div>
-                    <div style="color: var(--gray);">Universities</div>
-                </div>
             </div>
 
             <!-- Subscription Form -->
@@ -446,7 +434,7 @@
                 
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 12px; font-weight: 600;">Your Phone Number</label>
-                    <input type="tel" id="userPhone" class="form-control" placeholder="07XXXXXXXX" pattern="[0-9]{10}" maxlength="10" required>
+                    <input type="tel" id="userPhone" class="form-control" placeholder="07XXXXXXXX" maxlength="10" required>
                 </div>
                 
                 <div class="form-group">
@@ -533,9 +521,6 @@
                 <button class="btn" onclick="loadDocuments()" style="background: var(--primary);">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
-                <button class="btn" onclick="clearFilters()" style="background: var(--secondary);">
-                    <i class="fas fa-times"></i> Clear Filters
-                </button>
             </div>
 
             <!-- Search Bar -->
@@ -607,14 +592,6 @@
                         <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="totalStudents">0</div>
                         <div style="color: var(--gray);">Active Students</div>
                     </div>
-                    
-                    <div class="stat-card">
-                        <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--warning); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="pendingApprovalsCount">0</div>
-                        <div style="color: var(--gray);">Pending Verifications</div>
-                    </div>
                 </div>
 
                 <!-- Quick Actions -->
@@ -628,22 +605,10 @@
                             <i class="fas fa-check-double"></i> Auto-Verify All
                         </button>
                         
-                        <button class="btn btn-warning" onclick="backupSystem()">
-                            <i class="fas fa-database"></i> Backup System
-                        </button>
-                        
                         <button class="btn btn-danger" onclick="adminLogout()">
                             <i class="fas fa-sign-out-alt"></i> Logout Admin
                         </button>
                     </div>
-                </div>
-
-                <!-- Pending Verifications -->
-                <div class="form-container">
-                    <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
-                        <i class="fas fa-user-check"></i> Pending Verifications
-                    </h3>
-                    <div id="pendingApprovalsList"></div>
                 </div>
             </div>
         </div>
@@ -719,62 +684,6 @@
                     <i class="fas fa-history"></i> Recent Uploads
                 </h3>
                 <div id="recentUploads"></div>
-            </div>
-        </div>
-
-        <!-- Statistics Tab -->
-        <div id="stats" class="tab-content">
-            <div style="text-align: center; margin-bottom: 60px; padding: 50px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 24px;">
-                <h2 style="font-size: 42px; font-weight: 800; color: var(--primary); margin-bottom: 20px;">System Statistics & Analytics</h2>
-                <p style="font-size: 20px; color: var(--gray);">Real-time insights into system performance</p>
-            </div>
-            
-            <!-- Stats Overview -->
-            <div class="admin-dashboard">
-                <div class="stat-card">
-                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--info); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="dailyViews">0</div>
-                    <div style="color: var(--gray);">Today's Views</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="newUsersToday">0</div>
-                    <div style="color: var(--gray);">New Users Today</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--warning); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
-                        <i class="fas fa-download"></i>
-                    </div>
-                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="totalDownloads">0</div>
-                    <div style="color: var(--gray);">Total Downloads</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div style="text-align: center; padding: 40px; color: var(--gray); border-top: 2px solid var(--border); background: var(--light);">
-            <p style="font-size: 18px; font-weight: 600; color: var(--dark); margin-bottom: 10px;">
-                RevisionVault Pro System v4.0
-            </p>
-            <p style="color: var(--gray); margin-bottom: 5px;">
-                Owner: Walter Zauko • Advanced Protection Active
-            </p>
-            <p style="color: var(--gray); font-size: 14px;">
-                Screenshot protection enabled • All documents are viewable with zoom functionality
-            </p>
-            <div style="margin-top: 20px;">
-                <a href="https://wa.me/254765098865" style="color: var(--primary); text-decoration: none; margin: 0 10px;">
-                    <i class="fab fa-whatsapp"></i> WhatsApp Support
-                </a>
-                <a href="tel:0765098865" style="color: var(--primary); text-decoration: none; margin: 0 10px;">
-                    <i class="fas fa-phone"></i> Call: 0765 098 865
-                </a>
             </div>
         </div>
     </div>
@@ -982,22 +891,10 @@
             container.innerHTML = html;
         }
 
-        function clearFilters() {
-            document.getElementById('searchInput').value = '';
-            filteredDocuments = [...allDocuments];
-            displayDocuments();
-            
-            // Reset university filter
-            document.querySelectorAll('#universityFilters .university-chip').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.textContent === 'All Universities') {
-                    btn.classList.add('active');
-                }
-            });
-        }
-
-        // ==================== DOCUMENT UPLOAD ====================
+        // ==================== DOCUMENT UPLOAD - FIXED ====================
         function uploadDocument() {
+            console.log('Upload button clicked!');
+            
             const title = document.getElementById('uploadTitle').value.trim();
             const university = document.getElementById('uploadUniversity').value;
             const subject = document.getElementById('uploadSubject').value.trim();
@@ -1005,13 +902,37 @@
             const link = document.getElementById('uploadLink').value.trim();
             const access = document.getElementById('uploadAccess').value;
             
-            if (!title || !university || !subject || !link) {
-                showNotification('Please fill in all required fields', 'error');
+            // Validation
+            if (!title) {
+                showNotification('Please enter document title', 'error');
+                document.getElementById('uploadTitle').focus();
                 return;
             }
             
-            if (!link.includes('http')) {
-                showNotification('Please enter a valid URL', 'error');
+            if (!university) {
+                showNotification('Please select university', 'error');
+                document.getElementById('uploadUniversity').focus();
+                return;
+            }
+            
+            if (!subject) {
+                showNotification('Please enter subject/course', 'error');
+                document.getElementById('uploadSubject').focus();
+                return;
+            }
+            
+            if (!link) {
+                showNotification('Please enter document link', 'error');
+                document.getElementById('uploadLink').focus();
+                return;
+            }
+            
+            // Check if link is valid URL
+            try {
+                new URL(link);
+            } catch (e) {
+                showNotification('Please enter a valid URL for the document', 'error');
+                document.getElementById('uploadLink').focus();
                 return;
             }
             
@@ -1028,21 +949,37 @@
                 date: new Date().toISOString(),
                 views: 0,
                 downloads: 0,
-                format: 'PDF',
+                format: getFileFormat(link),
                 uploadedBy: 'admin'
             };
             
+            console.log('Creating document:', document);
+            
             // Save to localStorage
             let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
-            documents.unshift(document);
+            documents.unshift(document); // Add to beginning
             localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
+            
+            // Update arrays
+            allDocuments.unshift(document);
+            filteredDocuments.unshift(document);
             
             // Update UI
             loadDocuments();
             updateRecentUploads();
             clearUploadForm();
             
-            showNotification('Document uploaded successfully!', 'success');
+            showNotification('Document uploaded successfully! ✅', 'success');
+            console.log('Document uploaded successfully:', document);
+        }
+
+        function getFileFormat(link) {
+            if (link.includes('.pdf')) return 'PDF';
+            if (link.includes('.doc')) return 'DOC';
+            if (link.includes('.ppt')) return 'PPT';
+            if (link.includes('.xls')) return 'Excel';
+            if (link.includes('.jpg') || link.includes('.jpeg') || link.includes('.png')) return 'Image';
+            return 'File';
         }
 
         function clearUploadForm() {
@@ -1072,7 +1009,15 @@
                             <span style="font-size: 12px; color: var(--gray);">${new Date(doc.date).toLocaleDateString()}</span>
                         </div>
                         <div style="font-size: 12px; color: var(--gray); margin-top: 5px;">
-                            ${doc.university} • ${doc.subject}
+                            ${doc.university} • ${doc.subject} • ${doc.access === 'premium' ? '🔒 Premium' : '🔓 Free'}
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <button class="btn" onclick="viewDocument('${doc.id}')" style="background: var(--primary); padding: 8px 16px; font-size: 14px;">
+                                <i class="fas fa-eye"></i> Test View
+                            </button>
+                            <button class="btn" onclick="testDocumentLink('${doc.link}')" style="background: var(--info); padding: 8px 16px; font-size: 14px; margin-left: 10px;">
+                                <i class="fas fa-link"></i> Test Link
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1081,8 +1026,15 @@
             container.innerHTML = html;
         }
 
-        // ==================== DOCUMENT VIEWER ====================
+        function testDocumentLink(link) {
+            window.open(link, '_blank');
+            showNotification('Opening document link in new tab...', 'info');
+        }
+
+        // ==================== DOCUMENT VIEWER - FIXED ====================
         function viewDocument(docId) {
+            console.log('Viewing document ID:', docId);
+            
             const doc = allDocuments.find(d => d.id === docId);
             if (!doc) {
                 showNotification('Document not found', 'error');
@@ -1091,7 +1043,7 @@
             
             // Check access
             if (doc.access === 'premium' && !currentUser && !isAdmin) {
-                showNotification('This document requires a subscription', 'error');
+                showNotification('This document requires a subscription. Please subscribe to view.', 'error');
                 switchTab('student');
                 return;
             }
@@ -1112,7 +1064,8 @@
             const viewerLink = getViewerLink(doc.link);
             iframe.src = viewerLink;
             
-            showNotification('Document opened successfully', 'success');
+            showNotification('Document opened successfully! 📄', 'success');
+            console.log('Document opened:', doc.title, 'Link:', viewerLink);
         }
 
         function getViewerLink(link) {
@@ -1132,25 +1085,33 @@
             document.getElementById('documentViewer').style.display = 'none';
             document.getElementById('viewerFrame').src = '';
             currentDocument = null;
+            showNotification('Document viewer closed', 'info');
         }
 
         function downloadCurrentDocument() {
-            if (!currentDocument) return;
+            if (!currentDocument) {
+                showNotification('No document to download', 'error');
+                return;
+            }
+            
+            console.log('Downloading document:', currentDocument.title);
             
             // Update download count
             currentDocument.downloads = (currentDocument.downloads || 0) + 1;
             updateDocumentInStorage(currentDocument);
             
-            // Trigger download
+            // Create download link
             const link = document.createElement('a');
             link.href = currentDocument.link;
-            link.download = currentDocument.title;
+            link.download = currentDocument.title + '.' + getFileFormat(currentDocument.link).toLowerCase();
             link.target = '_blank';
+            
+            // Trigger download
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            showNotification('Download started', 'success');
+            showNotification('Download started for: ' + currentDocument.title, 'success');
         }
 
         function updateDocumentInStorage(doc) {
@@ -1166,20 +1127,21 @@
             const doc = allDocuments.find(d => d.id === docId);
             if (!doc) return;
             
-            alert(`Document Information:\n\n` +
+            alert(`📄 Document Information:\n\n` +
                   `Title: ${doc.title}\n` +
                   `University: ${doc.university}\n` +
                   `Subject: ${doc.subject}\n` +
                   `Type: ${doc.type}\n` +
                   `Year: ${doc.year}\n` +
+                  `Access: ${doc.access === 'premium' ? '🔒 Premium (Subscribers Only)' : '🔓 Free (Public)'}\n` +
                   `Views: ${doc.views || 0}\n` +
                   `Downloads: ${doc.downloads || 0}\n` +
                   `Uploaded: ${new Date(doc.date).toLocaleDateString()}\n` +
-                  `Access: ${doc.access === 'premium' ? 'Premium (Subscribers Only)' : 'Free'}`);
+                  `Format: ${doc.format || 'PDF'}`);
         }
 
         function showSubscribeMessage() {
-            showNotification('Please subscribe to access premium documents', 'warning');
+            showNotification('🔒 This document requires a subscription. Please subscribe to access premium documents.', 'warning');
             switchTab('student');
         }
 
@@ -1192,19 +1154,22 @@
             // Basic validation
             if (!phone || phone.length !== 10 || !phone.startsWith('07')) {
                 showNotification('Please enter a valid 10-digit phone number starting with 07', 'error');
+                document.getElementById('userPhone').focus();
                 return;
             }
             
             if (!txnCode) {
                 showNotification('Please enter transaction code', 'error');
+                document.getElementById('txnCode').focus();
                 return;
             }
             
             if (!university) {
                 showNotification('Please select university', 'error');
+                document.getElementById('userUniversity').focus();
                 return;
             }
-            
+
             // Format phone
             const formattedPhone = '254' + phone.substring(1);
             
@@ -1226,7 +1191,7 @@
             localStorage.setItem('revisionvault_pending', JSON.stringify(pendingPayments));
             
             // Show success message
-            showNotification('Payment submitted for verification. Access will be granted within minutes.', 'success');
+            showNotification('Payment submitted for verification. Access will be granted within minutes. ✅', 'success');
             
             // Clear form
             document.getElementById('userPhone').value = '';
@@ -1279,7 +1244,7 @@
             showUserDashboard();
             updateStats();
             
-            showNotification('Payment verified! You now have access.', 'success');
+            showNotification('🎉 Payment verified! You now have access to all premium documents.', 'success');
         }
 
         function checkUserSession() {
@@ -1360,15 +1325,15 @@
                 document.getElementById('adminDashboard').style.display = 'block';
                 document.getElementById('uploadTab').style.display = 'flex';
                 
-                loadPendingApprovals();
                 updateAdminStats();
+                updateRecentUploads();
                 
-                showNotification('Admin login successful!', 'success');
+                showNotification('✅ Admin login successful! You can now upload documents.', 'success');
                 
                 // Clear password
                 document.getElementById('adminPassword').value = '';
             } else {
-                showNotification('Invalid admin password', 'error');
+                showNotification('❌ Invalid admin password', 'error');
                 document.getElementById('adminPassword').value = '';
                 document.getElementById('adminPassword').focus();
             }
@@ -1380,7 +1345,6 @@
                 document.getElementById('adminLogin').style.display = 'none';
                 document.getElementById('adminDashboard').style.display = 'block';
                 document.getElementById('uploadTab').style.display = 'flex';
-                loadPendingApprovals();
                 updateAdminStats();
             }
         }
@@ -1394,64 +1358,6 @@
             document.getElementById('uploadTab').style.display = 'none';
             
             showNotification('Admin logged out', 'info');
-        }
-
-        function loadPendingApprovals() {
-            const container = document.getElementById('pendingApprovalsList');
-            const pending = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
-            
-            if (pending.length === 0) {
-                container.innerHTML = '<p style="color: var(--gray); text-align: center; padding: 20px;">No pending verifications</p>';
-                document.getElementById('pendingApprovalsCount').textContent = '0';
-                return;
-            }
-            
-            document.getElementById('pendingApprovalsCount').textContent = pending.length;
-            
-            let html = '';
-            pending.forEach(payment => {
-                html += `
-                    <div style="background: #fef3c7; padding: 25px; border-radius: 16px; border: 2px solid #fde68a; margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <div style="font-weight: 600; color: var(--dark);">${payment.displayPhone}</div>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn" onclick="verifyPayment('${payment.id}')" style="background: var(--success); padding: 8px 16px;">
-                                    <i class="fas fa-check"></i> Verify
-                                </button>
-                                <button class="btn" onclick="rejectPayment('${payment.id}')" style="background: var(--danger); padding: 8px 16px;">
-                                    <i class="fas fa-times"></i> Reject
-                                </button>
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <div>
-                                <div style="font-size: 12px; color: #92400e;">TRANSACTION CODE</div>
-                                <div style="font-size: 16px; font-weight: 600;">${payment.txnCode}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 12px; color: #92400e;">UNIVERSITY</div>
-                                <div style="font-size: 16px; font-weight: 600;">${payment.university}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 12px; color: #92400e;">AMOUNT</div>
-                                <div style="font-size: 16px; font-weight: 600;">Ksh ${payment.amount}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function rejectPayment(paymentId) {
-            let pendingPayments = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
-            pendingPayments = pendingPayments.filter(p => p.id !== paymentId);
-            localStorage.setItem('revisionvault_pending', JSON.stringify(pendingPayments));
-            
-            loadPendingApprovals();
-            updateAdminStats();
-            showNotification('Payment rejected', 'warning');
         }
 
         function autoApproveAll() {
@@ -1469,31 +1375,9 @@
             showNotification('All payments approved successfully', 'success');
         }
 
-        function backupSystem() {
-            const data = {
-                documents: JSON.parse(localStorage.getItem('revisionvault_documents') || '[]'),
-                users: JSON.parse(localStorage.getItem('revisionvault_users') || '[]'),
-                pending: JSON.parse(localStorage.getItem('revisionvault_pending') || '[]'),
-                timestamp: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `revisionvault-backup-${new Date().getTime()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('System backup downloaded', 'success');
-        }
-
         function updateAdminStats() {
             const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
             const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
-            const pending = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
             
             // Count active users
             const now = new Date();
@@ -1501,7 +1385,6 @@
             
             document.getElementById('totalDocuments').textContent = documents.length;
             document.getElementById('totalStudents').textContent = activeUsers.length;
-            document.getElementById('pendingApprovalsCount').textContent = pending.length;
         }
 
         function updatePublicStats() {
@@ -1521,15 +1404,6 @@
             if (isAdmin) {
                 updateAdminStats();
             }
-            
-            // Update statistics tab
-            const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
-            const today = new Date().toDateString();
-            const todayViews = documents.reduce((sum, doc) => sum + (doc.views || 0), 0);
-            
-            document.getElementById('dailyViews').textContent = todayViews;
-            document.getElementById('newUsersToday').textContent = '0';
-            document.getElementById('totalDownloads').textContent = documents.reduce((sum, doc) => sum + (doc.downloads || 0), 0);
         }
 
         // ==================== UTILITY FUNCTIONS ====================
@@ -1554,7 +1428,7 @@
                     break;
                 case 'upload':
                     if (!isAdmin) {
-                        showNotification('Admin access required', 'error');
+                        showNotification('Admin access required for uploads', 'error');
                         switchTab('student');
                     } else {
                         updateRecentUploads();
@@ -1562,9 +1436,6 @@
                     break;
                 case 'admin':
                     checkAdminSession();
-                    break;
-                case 'stats':
-                    updateStats();
                     break;
             }
         }
@@ -1607,6 +1478,11 @@
                 document.getElementById('adminPassword').value = 'walter.zauko23';
                 showNotification('Admin access granted', 'success');
                 switchTab('admin');
+                
+                // Auto focus on password field
+                setTimeout(() => {
+                    document.getElementById('adminPassword').focus();
+                }, 500);
             } else if (secret) {
                 showNotification('Invalid secret code', 'error');
             }
@@ -1622,7 +1498,7 @@
                     subject: 'Mathematics',
                     type: 'Past Paper',
                     year: '2023',
-                    link: 'https://drive.google.com/file/d/1ABC123DEF456/preview',
+                    link: 'https://drive.google.com/file/d/1wLMVU9JXzW8Kx3h7Vg5Y6tR2eN4pQ5s/preview',
                     access: 'free',
                     views: 1245,
                     downloads: 456,
@@ -1635,7 +1511,7 @@
                     subject: 'Computer Science',
                     type: 'Lecture Notes',
                     year: '2024',
-                    link: 'https://drive.google.com/file/d/2XYZ789ABC123/preview',
+                    link: 'https://drive.google.com/file/d/1ABC123DEF456/preview',
                     access: 'premium',
                     views: 856,
                     downloads: 234,
@@ -1648,24 +1524,11 @@
                     subject: 'Physics',
                     type: 'Lab Manual',
                     year: '2023',
-                    link: 'https://drive.google.com/file/d/3DEF456GHI789/preview',
+                    link: 'https://drive.google.com/file/d/1XYZ789ABC123/preview',
                     access: 'free',
                     views: 567,
                     downloads: 123,
                     date: new Date(Date.now() - 259200000).toISOString()
-                },
-                {
-                    id: '4',
-                    title: 'Chemistry Organic Reactions Guide',
-                    university: 'Masinde Muliro University',
-                    subject: 'Chemistry',
-                    type: 'Revision Guide',
-                    year: '2024',
-                    link: 'https://drive.google.com/file/d/4JKL123MNO456/preview',
-                    access: 'premium',
-                    views: 432,
-                    downloads: 98,
-                    date: new Date(Date.now() - 345600000).toISOString()
                 }
             ];
             
@@ -1681,7 +1544,7 @@
             initSystem();
             loadDocuments();
             checkUserSession();
-            showNotification('RevisionVault Pro Ready!', 'success');
+            showNotification('RevisionVault Pro Ready! 🚀', 'success');
         };
     </script>
 </body>
