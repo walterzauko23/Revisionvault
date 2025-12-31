@@ -935,11 +935,6 @@
                 return;
             }
             
-            // Check if it's a Google Drive link
-            if (!link.includes('drive.google.com') || (!link.includes('/view') && !link.includes('/preview'))) {
-                showNotification('Please use Google Drive link ending with /view or /preview', 'warning');
-            }
-            
             // Create document object
             const document = {
                 id: 'doc_' + Date.now(),
@@ -1568,7 +1563,7 @@
             }
         }
 
-        // ==================== DEMO DATA ====================
+        // ==================== DEMO DATA - INCLUDING EGERTON UNIVERSITY DOCUMENT ====================
         function loadDemoDocuments() {
             const demoDocs = [
                 {
@@ -1612,6 +1607,49 @@
                     downloads: 123,
                     date: new Date(Date.now() - 259200000).toISOString(),
                     format: 'PDF'
+                },
+                // EGERTON UNIVERSITY DOCUMENT FROM YOUR FOLDER
+                {
+                    id: 'doc_4',
+                    title: 'Zool210 - Introduction to Zoology Notes',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Lecture Notes',
+                    year: '2024',
+                    link: 'https://drive.google.com/file/d/1abc123xyz/preview',
+                    access: 'free',
+                    views: 320,
+                    downloads: 150,
+                    date: new Date(Date.now() - 432000000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_5',
+                    title: 'Animal Physiology - Egerton Revision Guide',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Revision Guide',
+                    year: '2023',
+                    link: 'https://drive.google.com/file/d/1def456ghi/preview',
+                    access: 'premium',
+                    views: 210,
+                    downloads: 89,
+                    date: new Date(Date.now() - 345600000).toISOString(),
+                    format: 'PDF'
+                },
+                {
+                    id: 'doc_6',
+                    title: 'Comparative Anatomy Past Papers 2022',
+                    university: 'Egerton University',
+                    subject: 'Zoology',
+                    type: 'Past Paper',
+                    year: '2022',
+                    link: 'https://drive.google.com/file/d/1jkl789mno/preview',
+                    access: 'free',
+                    views: 450,
+                    downloads: 200,
+                    date: new Date(Date.now() - 518400000).toISOString(),
+                    format: 'PDF'
                 }
             ];
             
@@ -1622,6 +1660,39 @@
             showNotification('Demo documents loaded successfully', 'success');
         }
 
+        // Function to add Egerton University document from your Google Drive folder
+        function addEgertonZoologyDocument() {
+            // This is an example - you'll need to replace with actual file links from your folder
+            const egertonDoc = {
+                id: 'doc_egerton_zoology_' + Date.now(),
+                title: 'Zool210 Complete Study Materials',
+                university: 'Egerton University',
+                subject: 'Zoology',
+                type: 'Study Materials',
+                year: '2024',
+                link: 'https://drive.google.com/drive/folders/18SKghIX7PmbkrzPHcK-e6H7Uhv5_qNBQ',
+                access: 'free',
+                views: 0,
+                downloads: 0,
+                date: new Date().toISOString(),
+                format: 'Folder',
+                note: 'This is a folder link. Users can access all materials in the folder.'
+            };
+            
+            // Save to localStorage
+            let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            documents.unshift(egertonDoc);
+            localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
+            
+            // Update arrays
+            allDocuments.unshift(egertonDoc);
+            filteredDocuments.unshift(egertonDoc);
+            
+            // Update UI
+            loadDocuments();
+            showNotification('✅ Egerton University Zoology document added!', 'success');
+        }
+
         // Initialize on load
         window.onload = function() {
             initSystem();
@@ -1629,6 +1700,11 @@
             checkUserSession();
             checkAdminSession();
             showNotification('RevisionVault Pro Ready! 🚀', 'success');
+            
+            // Auto-add Egerton document on first load
+            setTimeout(() => {
+                addEgertonZoologyDocument();
+            }, 2000);
         };
     </script>
 </body>
