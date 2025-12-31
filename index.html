@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RevisionVault Pro - Advanced University Study System</title>
     <style>
-        /* ==================== GLOBAL STYLES ==================== */
         :root {
             --primary: #1a2980;
             --secondary: #26d0ce;
@@ -35,10 +34,8 @@
             padding: 20px;
             color: #1f2937;
             line-height: 1.6;
-            font-size: 16px;
         }
 
-        /* ==================== CONTAINER ==================== */
         .container {
             max-width: 1600px;
             margin: 0 auto;
@@ -48,66 +45,14 @@
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
         }
 
-        /* ==================== HEADER ==================== */
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             padding: 40px 50px;
             text-align: center;
             position: relative;
-            overflow: hidden;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .logo-icon {
-            width: 70px;
-            height: 70px;
-            background: white;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .logo-icon i {
-            font-size: 36px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .logo-text h1 {
-            font-size: 42px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 5px;
-        }
-
-        .logo-text p {
-            font-size: 18px;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-        .tagline {
-            font-size: 18px;
-            margin-top: 15px;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-
-        /* ==================== TABS ==================== */
         .tabs {
             display: flex;
             background: var(--light);
@@ -125,26 +70,15 @@
             color: var(--gray);
             border-bottom: 4px solid transparent;
             transition: all 0.3s ease;
-            font-size: 17px;
             display: flex;
             align-items: center;
             gap: 12px;
-            white-space: nowrap;
-        }
-
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.8);
-            color: var(--primary);
         }
 
         .tab.active {
             color: var(--primary);
             border-bottom-color: var(--primary);
             background: white;
-        }
-
-        .tab.hidden {
-            display: none;
         }
 
         .tab-content {
@@ -154,87 +88,28 @@
 
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.5s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ==================== BUTTONS ==================== */
         .btn {
             padding: 16px 32px;
             border-radius: var(--radius);
             border: none;
             font-weight: 600;
-            font-size: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
             text-decoration: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:hover::after {
-            width: 300px;
-            height: 300px;
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-        }
-
-        .btn-block {
-            width: 100%;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            box-shadow: var(--shadow);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(26, 41, 128, 0.25);
-        }
-
-        .btn-secondary {
-            background: var(--light);
-            color: var(--dark);
-            border: 2px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: #f1f5f9;
-            border-color: var(--gray);
         }
 
         .btn-success {
             background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
-            color: white;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
             color: white;
         }
 
@@ -243,188 +118,21 @@
             color: white;
         }
 
-        .btn-info {
-            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
             color: white;
         }
 
-        .btn-small {
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* ==================== STUDENT PORTAL ==================== */
-        .hero-section {
-            text-align: center;
-            margin-bottom: 60px;
-            padding: 50px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-radius: 24px;
-            border: 2px solid #bae6fd;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 200px;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%233b82f6' opacity='0.1' d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'/%3E%3C/svg%3E");
-        }
-
-        .hero-title {
-            font-size: 42px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .hero-subtitle {
-            font-size: 20px;
-            color: var(--gray);
-            margin-bottom: 40px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .price-tag {
-            display: inline-flex;
-            align-items: baseline;
-            gap: 10px;
-            margin: 30px 0;
-            padding: 25px 40px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .price {
-            font-size: 56px;
-            font-weight: 900;
-            color: var(--primary);
-            line-height: 1;
-        }
-
-        .period {
-            font-size: 20px;
-            color: var(--gray);
-            font-weight: 500;
-        }
-
-        .steps-container {
-            background: white;
-            padding: 40px;
-            border-radius: 24px;
-            margin-bottom: 40px;
-            border: 2px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-
-        .section-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .section-title i {
-            color: var(--secondary);
-        }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
-
-        .step-card {
-            background: var(--light);
-            padding: 30px;
-            border-radius: 20px;
-            border-left: 6px solid var(--primary);
-            transition: transform 0.3s ease;
-        }
-
-        .step-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .step-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            background: var(--primary);
-            color: white;
-            border-radius: 12px;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .step-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 15px;
-        }
-
-        .step-description {
-            color: var(--gray);
-            line-height: 1.6;
-        }
-
-        .mpesa-box {
-            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
-            color: white;
-            padding: 35px;
-            border-radius: 20px;
-            text-align: center;
-            margin: 40px 0;
-            box-shadow: var(--shadow);
-        }
-
-        .mpesa-number {
-            font-size: 42px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            direction: ltr;
-        }
-
-        /* ==================== FORMS ==================== */
         .form-container {
             background: white;
             padding: 40px;
             border-radius: 24px;
             border: 2px solid var(--border);
             margin-bottom: 40px;
-            box-shadow: var(--shadow);
         }
 
         .form-group {
             margin-bottom: 30px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 16px;
         }
 
         .form-control {
@@ -434,107 +142,11 @@
             border-radius: var(--radius);
             font-size: 16px;
             transition: all 0.3s ease;
-            background: white;
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26, 41, 128, 0.1);
-        }
-
-        .form-control::placeholder {
-            color: #9ca3af;
-        }
-
-        /* ==================== SEARCH SYSTEM ==================== */
-        .search-container {
-            position: relative;
-            margin-bottom: 40px;
-        }
-
-        .search-input {
-            padding: 20px 60px 20px 30px;
-            font-size: 18px;
-            border: 2px solid var(--border);
-            border-radius: 50px;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(26, 41, 128, 0.1);
-        }
-
-        .search-button {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--gray);
-            font-size: 22px;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .search-button:hover {
-            color: var(--primary);
-        }
-
-        /* ==================== UNIVERSITY SYSTEM ==================== */
-        .university-filter {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-
-        .university-chip {
-            padding: 16px 32px;
-            background: var(--light);
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--dark);
-        }
-
-        .university-chip i {
-            font-size: 20px;
-        }
-
-        .university-chip:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-
-        .university-chip.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            box-shadow: var(--shadow);
-        }
-
-        .university-chip.active:hover {
-            background: #15245e;
-        }
-
-        /* ==================== DOCUMENTS GRID ==================== */
-        .documents-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            gap: 20px;
         }
 
         .documents-grid {
@@ -551,8 +163,6 @@
             border: 2px solid var(--border);
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow);
         }
 
         .document-card:hover {
@@ -561,129 +171,6 @@
             box-shadow: var(--shadow-lg);
         }
 
-        .document-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 8px 16px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .document-university {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: #e0f2fe;
-            color: #0369a1;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .document-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-
-        .document-meta {
-            display: flex;
-            gap: 20px;
-            margin: 20px 0;
-            font-size: 14px;
-            color: var(--gray);
-        }
-
-        .document-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .document-description {
-            color: var(--gray);
-            line-height: 1.6;
-            margin: 20px 0;
-            font-size: 15px;
-        }
-
-        .document-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .document-tag {
-            padding: 6px 12px;
-            background: #f3f4f6;
-            color: var(--dark);
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .document-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-
-        /* ==================== STATUS MESSAGES ==================== */
-        .status-message {
-            padding: 20px;
-            border-radius: var(--radius);
-            margin: 20px 0;
-            text-align: center;
-            font-weight: 500;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .status-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 2px solid #a7f3d0;
-        }
-
-        .status-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 2px solid #fecaca;
-        }
-
-        .status-warning {
-            background: #fef3c7;
-            color: #92400e;
-            border: 2px solid #fde68a;
-        }
-
-        .status-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 2px solid #bfdbfe;
-        }
-
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-            border: 2px solid #fde68a;
-        }
-
-        /* ==================== ADMIN PANEL ==================== */
         .admin-dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -698,345 +185,8 @@
             border: 2px solid var(--border);
             text-align: center;
             transition: transform 0.3s ease;
-            box-shadow: var(--shadow);
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 32px;
-        }
-
-        .stat-icon.documents {
-            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
-            color: white;
-        }
-
-        .stat-icon.students {
-            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-            color: white;
-        }
-
-        .stat-icon.pending {
-            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            color: white;
-        }
-
-        .stat-icon.revenue {
-            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
-            color: white;
-        }
-
-        .stat-value {
-            font-size: 42px;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 10px;
-            line-height: 1;
-        }
-
-        .stat-label {
-            color: var(--gray);
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .admin-section {
-            background: white;
-            padding: 40px;
-            border-radius: 24px;
-            border: 2px solid var(--border);
-            margin-bottom: 40px;
-            box-shadow: var(--shadow);
-        }
-
-        /* ==================== USERS TABLE ==================== */
-        .users-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 20px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid var(--border);
-        }
-
-        .users-table th {
-            background: var(--light);
-            padding: 20px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--dark);
-            border-bottom: 2px solid var(--border);
-            font-size: 15px;
-        }
-
-        .users-table td {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            color: var(--gray);
-        }
-
-        .users-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .users-table tr:hover {
-            background: var(--light);
-        }
-
-        .user-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .status-active {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-expired {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        /* ==================== PENDING APPROVALS ==================== */
-        .approval-card {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            border: 2px solid #fef3c7;
-            margin-bottom: 20px;
-            background: #fef3c7;
-        }
-
-        .approval-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .approval-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .info-label {
-            font-size: 12px;
-            color: #92400e;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .info-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        /* ==================== AUTO-SYNC INDICATOR ==================== */
-        .auto-sync-indicator {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 1000;
-            box-shadow: var(--shadow-lg);
-            animation: slideInUp 0.5s ease;
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ==================== MODAL ==================== */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 2000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #1a1a1a;
-            border-radius: 20px;
-            width: 95%;
-            height: 90%;
-            overflow: hidden;
-            border: 3px solid var(--primary);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-header {
-            padding: 25px 30px;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s ease;
-        }
-
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-body {
-            height: calc(100% - 80px);
-            padding: 0;
-            position: relative;
-            background: #000;
-        }
-
-        /* ==================== DOCUMENT VIEWER ==================== */
-        .document-viewer-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 9999;
-            display: none;
-            flex-direction: column;
-        }
-
-        .viewer-header {
-            background: var(--primary);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10000;
-        }
-
-        .viewer-content {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .viewer-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
-        }
-
-        .viewer-controls {
-            background: var(--primary);
-            padding: 15px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            align-items: center;
-        }
-
-        /* ==================== SCREENSHOT PROTECTION ==================== */
-        .screenshot-protection {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 2147483647;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .screenshot-protection i {
-            font-size: 72px;
-            margin-bottom: 20px;
-            color: var(--danger);
-        }
-
-        /* ==================== LOADING OVERLAY ==================== */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -1059,7 +209,6 @@
             border-top: 6px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
         }
 
         @keyframes spin {
@@ -1067,7 +216,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ==================== NOTIFICATIONS ==================== */
         .notification {
             position: fixed;
             top: 20px;
@@ -1081,8 +229,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: var(--shadow-lg);
-            max-width: 400px;
         }
 
         .notification.success {
@@ -1102,133 +248,87 @@
         }
 
         @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* ==================== FOOTER ==================== */
-        .footer {
-            text-align: center;
-            padding: 40px;
-            color: var(--gray);
-            border-top: 2px solid var(--border);
-            background: var(--light);
+        .search-container {
+            position: relative;
+            margin-bottom: 40px;
         }
 
-        .footer-links {
+        .search-input {
+            padding: 20px 60px 20px 30px;
+            font-size: 18px;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            width: 100%;
+        }
+
+        .university-filter {
             display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 30px 0;
+            gap: 15px;
+            margin-bottom: 40px;
             flex-wrap: wrap;
         }
 
-        .footer-link {
-            color: var(--gray);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
+        .university-chip {
+            padding: 16px 32px;
+            background: var(--light);
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .university-chip.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .document-viewer-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+        }
+
+        .viewer-content {
+            flex: 1;
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 8px;
+            background: #000;
         }
 
-        .footer-link:hover {
-            color: var(--primary);
-        }
-
-        .copyright {
-            margin-top: 20px;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        /* ==================== LOADING SPINNER ==================== */
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 40px auto;
-        }
-
-        /* ==================== RESPONSIVE DESIGN ==================== */
-        @media (max-width: 1200px) {
-            .hero-title { font-size: 36px; }
-            .logo-text h1 { font-size: 36px; }
-            .price { font-size: 48px; }
-        }
-
-        @media (max-width: 992px) {
-            .header { padding: 30px; }
-            .tabs { padding: 0 30px; }
-            .tab-content { padding: 30px; }
-            .tab { padding: 20px 25px; font-size: 16px; }
-            .hero-title { font-size: 32px; }
-            .hero-section { padding: 30px; }
-            .steps-grid { grid-template-columns: 1fr; }
+        .viewer-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
         }
 
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            .container { border-radius: 20px; }
             .header { padding: 25px; }
-            .logo { flex-direction: column; gap: 15px; }
-            .logo-text { text-align: center; }
-            .logo-text h1 { font-size: 32px; }
-            .tabs { overflow-x: auto; flex-wrap: nowrap; }
-            .tab { padding: 18px 20px; font-size: 15px; }
+            .tabs { padding: 0; overflow-x: auto; }
+            .tab { padding: 18px 20px; }
             .tab-content { padding: 25px; }
-            .hero-title { font-size: 28px; }
-            .hero-subtitle { font-size: 18px; }
-            .price { font-size: 42px; }
-            .form-container { padding: 25px; }
             .documents-grid { grid-template-columns: 1fr; }
-            .admin-dashboard { grid-template-columns: 1fr; }
-            .modal-content { width: 100%; height: 100%; border-radius: 0; }
-            .mpesa-number { font-size: 32px; }
-            .viewer-controls { flex-wrap: wrap; gap: 10px; }
-        }
-
-        @media (max-width: 480px) {
-            .hero-title { font-size: 24px; }
-            .price { font-size: 36px; }
-            .btn { padding: 14px 24px; font-size: 15px; }
-            .section-title { font-size: 22px; }
-            .search-input { padding: 16px 50px 16px 20px; font-size: 16px; }
-            .university-chip { padding: 14px 24px; font-size: 14px; }
-            .document-card { padding: 20px; }
-            .stat-card { padding: 20px; }
-            .stat-value { font-size: 36px; }
-            .footer-links { flex-direction: column; gap: 15px; }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- PDF.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
 </head>
 <body>
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
-        <div id="loadingText" style="font-size: 18px; margin-top: 20px;">Loading...</div>
-    </div>
-
-    <!-- Screenshot Protection Overlay -->
-    <div class="screenshot-protection" id="screenshotProtection">
-        <i class="fas fa-shield-alt"></i>
-        <h2>SCREENSHOT PROTECTION ACTIVE</h2>
-        <p>Document content is protected against screenshots</p>
-        <p style="font-size: 16px; margin-top: 20px; opacity: 0.8;">This screen will disappear in 3 seconds</p>
+        <div id="loadingText" style="margin-top: 20px;">Loading...</div>
     </div>
 
     <!-- Notification Container -->
@@ -1236,69 +336,43 @@
 
     <!-- Document Viewer -->
     <div class="document-viewer-container" id="documentViewer">
-        <div class="viewer-header">
-            <div class="modal-title">
-                <i class="fas fa-file-pdf"></i>
-                <span id="viewerTitle">Document Viewer</span>
-            </div>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <span id="viewerPageInfo" style="font-size: 14px;">Page 1 of 1</span>
-                <button class="modal-close" onclick="closeDocumentViewer()">×</button>
-            </div>
+        <div style="background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="viewerTitle">Document Viewer</h3>
+            <button onclick="closeDocumentViewer()" style="background: none; border: none; color: white; font-size: 28px; cursor: pointer;">×</button>
         </div>
         <div class="viewer-content">
             <iframe id="viewerFrame" class="viewer-iframe"></iframe>
-            <div id="viewerLoading" class="spinner" style="position: absolute; display: none;"></div>
         </div>
-        <div class="viewer-controls">
-            <button class="btn btn-small btn-secondary" onclick="zoomOut()">
-                <i class="fas fa-search-minus"></i> Zoom Out
-            </button>
-            <span id="zoomLevel" style="color: white; font-weight: 600; min-width: 60px; text-align: center;">100%</span>
-            <button class="btn btn-small btn-secondary" onclick="zoomIn()">
-                <i class="fas fa-search-plus"></i> Zoom In
-            </button>
-            <button class="btn btn-small btn-success" onclick="downloadCurrentDocument()">
+        <div style="background: var(--primary); padding: 15px; display: flex; gap: 15px; justify-content: center;">
+            <button class="btn" onclick="downloadCurrentDocument()" style="background: var(--success);">
                 <i class="fas fa-download"></i> Download
             </button>
-            <button class="btn btn-small btn-info" onclick="printDocument()">
-                <i class="fas fa-print"></i> Print
+            <button class="btn" onclick="closeDocumentViewer()" style="background: var(--danger);">
+                <i class="fas fa-times"></i> Close
             </button>
         </div>
     </div>
 
     <!-- Admin Secret Access -->
-    <div class="admin-secret-access" style="position: fixed; top: 15px; right: 15px; z-index: 9999;">
-        <button onclick="showAdminSecretAccess()" style="background: var(--primary); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; box-shadow: var(--shadow);">
+    <div style="position: fixed; top: 15px; right: 15px; z-index: 9999;">
+        <button onclick="showAdminSecretAccess()" style="background: var(--primary); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer;">
             <i class="fas fa-shield-alt"></i>
         </button>
-    </div>
-
-    <!-- Auto-Sync Indicator -->
-    <div id="autoSyncIndicator" class="auto-sync-indicator" style="display: none;">
-        <i class="fas fa-sync-alt fa-spin"></i>
-        <span>Syncing new documents...</span>
-    </div>
-
-    <!-- Session Timer -->
-    <div id="sessionTimer" style="display: none; position: fixed; bottom: 15px; left: 15px; background: var(--warning); color: white; padding: 10px 20px; border-radius: 50px; font-size: 14px; font-weight: 600; z-index: 999; box-shadow: var(--shadow);">
-        <i class="fas fa-clock"></i>
-        <span id="timerText">Session: 0 mins</span>
     </div>
 
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-graduation-cap"></i>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 15px;">
+                <div style="width: 70px; height: 70px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-graduation-cap" style="font-size: 36px; color: var(--primary);"></i>
                 </div>
-                <div class="logo-text">
-                    <h1>RevisionVault Pro</h1>
+                <div>
+                    <h1 style="font-size: 42px; font-weight: 800; margin-bottom: 5px;">RevisionVault Pro</h1>
                     <p>Premium University Study Materials System</p>
                 </div>
             </div>
-            <p class="tagline">Smart document viewing • Screenshot protection • Instant access • Ksh 67/semester</p>
+            <p style="margin-top: 15px; opacity: 0.9;">Smart document viewing • Screenshot protection • Instant access • Ksh 67/semester</p>
         </div>
 
         <!-- Tabs -->
@@ -1315,7 +389,7 @@
                 <i class="fas fa-user-shield"></i>
                 <span>Admin Panel</span>
             </div>
-            <div class="tab hidden" onclick="switchTab('upload')" id="uploadTab">
+            <div class="tab" onclick="switchTab('upload')" id="uploadTab" style="display: none;">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <span>Upload Materials</span>
             </div>
@@ -1325,202 +399,96 @@
             </div>
         </div>
 
-        <!-- Tab Contents -->
-        
         <!-- Student Portal Tab -->
         <div id="student" class="tab-content active">
-            <div class="hero-section">
-                <h2 class="hero-title">Access Premium University Revision Materials</h2>
-                <p class="hero-subtitle">Thousands of past papers, notes, and study guides from Kenyan universities. Instant access after payment verification.</p>
+            <div style="text-align: center; margin-bottom: 60px; padding: 50px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 24px;">
+                <h2 style="font-size: 42px; font-weight: 800; color: var(--primary); margin-bottom: 20px;">Access Premium University Revision Materials</h2>
+                <p style="font-size: 20px; color: var(--gray); margin-bottom: 40px;">Thousands of past papers, notes, and study guides from Kenyan universities</p>
                 
-                <div class="price-tag">
-                    <span class="price">Ksh 67</span>
-                    <span class="period">/semester access</span>
-                </div>
-                
-                <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap;">
-                    <a href="https://t.me/RevisionVaultDocuments" class="btn btn-info" target="_blank">
-                        <i class="fab fa-telegram"></i> Telegram Channel
-                    </a>
-                    <a href="https://wa.me/254765098865" class="btn btn-success" target="_blank">
-                        <i class="fab fa-whatsapp"></i> Contact Support
-                    </a>
-                    <button class="btn btn-warning" onclick="showDemoAccess()">
-                        <i class="fas fa-gift"></i> Try Free Demo
-                    </button>
+                <div style="display: inline-flex; align-items: baseline; gap: 10px; margin: 30px 0; padding: 25px 40px; background: white; border-radius: 20px;">
+                    <span style="font-size: 56px; font-weight: 900; color: var(--primary);">Ksh 67</span>
+                    <span style="font-size: 20px; color: var(--gray);">/semester access</span>
                 </div>
             </div>
 
             <!-- Quick Stats -->
             <div class="admin-dashboard" style="margin-bottom: 40px;">
                 <div class="stat-card">
-                    <div class="stat-icon documents">
+                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--info); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                         <i class="fas fa-book-open"></i>
                     </div>
-                    <div class="stat-value" id="publicDocCount">0</div>
-                    <div class="stat-label">Available Documents</div>
+                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="publicDocCount">0</div>
+                    <div style="color: var(--gray);">Available Documents</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon students">
+                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                         <i class="fas fa-users"></i>
                     </div>
-                    <div class="stat-value" id="activeStudentsCount">0</div>
-                    <div class="stat-label">Active Students</div>
+                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="activeStudentsCount">0</div>
+                    <div style="color: var(--gray);">Active Students</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon pending">
+                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--warning); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                         <i class="fas fa-university"></i>
                     </div>
-                    <div class="stat-value" id="universityCount">8</div>
-                    <div class="stat-label">Universities</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon revenue">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-value" id="ratingValue">4.8</div>
-                    <div class="stat-label">User Rating</div>
-                </div>
-            </div>
-
-            <!-- Status Message -->
-            <div id="statusMessage" class="status-message" style="display: none;"></div>
-
-            <!-- How to Subscribe -->
-            <div class="steps-container">
-                <h3 class="section-title">
-                    <i class="fas fa-mobile-alt"></i>
-                    How to Subscribe in 3 Easy Steps
-                </h3>
-                
-                <div class="steps-grid">
-                    <div class="step-card">
-                        <div class="step-number">1</div>
-                        <h4 class="step-title">Send Ksh 67 via M-Pesa</h4>
-                        <p class="step-description">Go to M-Pesa menu → Send Money → Enter 0765 098 865</p>
-                    </div>
-                    
-                    <div class="step-card">
-                        <div class="step-number">2</div>
-                        <h4 class="step-title">Enter Transaction Details</h4>
-                        <p class="step-description">Submit your phone number and M-Pesa transaction code below</p>
-                    </div>
-                    
-                    <div class="step-card">
-                        <div class="step-number">3</div>
-                        <h4 class="step-title">Get Instant Access</h4>
-                        <p class="step-description">Receive immediate access to all university study materials</p>
-                    </div>
-                </div>
-                
-                <div class="mpesa-box">
-                    <div style="font-size: 20px; margin-bottom: 10px;">
-                        <i class="fas fa-money-bill-wave"></i> Send Ksh 67 to:
-                    </div>
-                    <div class="mpesa-number">0765 098 865</div>
-                    <div style="font-size: 18px; margin: 15px 0;">
-                        <strong>Reference:</strong> REVISIONVAULT
-                    </div>
-                    <p style="opacity: 0.9; font-size: 16px;">(M-Pesa or Airtel Money)</p>
+                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;">8</div>
+                    <div style="color: var(--gray);">Universities</div>
                 </div>
             </div>
 
             <!-- Subscription Form -->
             <div class="form-container" id="subscriptionForm">
-                <h3 class="section-title">
-                    <i class="fas fa-rocket"></i>
-                    Submit Payment for Verification
+                <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
+                    <i class="fas fa-rocket"></i> Submit Payment for Verification
                 </h3>
                 
                 <div class="form-group">
-                    <label class="form-label">Your Phone Number (10 digits starting with 07)</label>
-                    <input type="tel" id="userPhone" class="form-control" 
-                           placeholder="07XXXXXXXX" pattern="[0-9]{10}" 
-                           maxlength="10" required
-                           oninput="formatPhoneNumber(this)">
-                    <small style="color: var(--gray); margin-top: 5px; display: block;">
-                        Format: 07XXXXXXXX (10 digits)
-                    </small>
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Your Phone Number</label>
+                    <input type="tel" id="userPhone" class="form-control" placeholder="07XXXXXXXX" pattern="[0-9]{10}" maxlength="10" required>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">M-Pesa Transaction Code</label>
-                    <input type="text" id="txnCode" class="form-control" 
-                           placeholder="ABC123XYZ" maxlength="10" required
-                           style="text-transform: uppercase;">
-                    <small style="color: var(--gray); margin-top: 5px; display: block;">
-                        From your M-Pesa confirmation message
-                    </small>
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">M-Pesa Transaction Code</label>
+                    <input type="text" id="txnCode" class="form-control" placeholder="ABC123XYZ" maxlength="10" required>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Select Your University</label>
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Select Your University</label>
                     <select id="userUniversity" class="form-control" required>
                         <option value="">Choose your university</option>
                         <option value="Egerton University">Egerton University</option>
-                        <option value="University of Nairobi">University of Nairobi (UON)</option>
-                        <option value="Kenyatta University">Kenyatta University (KU)</option>
-                        <option value="Masinde Muliro University">Masinde Muliro University (MMUST)</option>
-                        <option value="JKUAT">Jomo Kenyatta University (JKUAT)</option>
+                        <option value="University of Nairobi">University of Nairobi</option>
+                        <option value="Kenyatta University">Kenyatta University</option>
+                        <option value="Masinde Muliro University">Masinde Muliro University</option>
+                        <option value="JKUAT">JKUAT</option>
                         <option value="Moi University">Moi University</option>
                         <option value="Technical University of Kenya">Technical University of Kenya</option>
-                        <option value="Other">Other University</option>
                     </select>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Course/Program (Optional)</label>
-                    <input type="text" id="userCourse" class="form-control" 
-                           placeholder="e.g., Bachelor of Science Computer Science">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Year of Study (Optional)</label>
-                    <select id="userYear" class="form-control">
-                        <option value="">Select year</option>
-                        <option value="Year 1">Year 1</option>
-                        <option value="Year 2">Year 2</option>
-                        <option value="Year 3">Year 3</option>
-                        <option value="Year 4">Year 4</option>
-                        <option value="Year 5">Year 5</option>
-                        <option value="Postgraduate">Postgraduate</option>
-                    </select>
-                </div>
-                
-                <button class="btn btn-primary btn-block" onclick="submitPayment()">
+                <button class="btn btn-primary" style="width: 100%;" onclick="submitPayment()">
                     <i class="fas fa-paper-plane"></i> Submit for Verification
                 </button>
                 
-                <div style="margin-top: 25px; padding: 15px; background: #f0f9ff; border-radius: var(--radius); border-left: 4px solid var(--info);">
-                    <div style="display: flex; gap: 10px; align-items: flex-start;">
-                        <i class="fas fa-info-circle" style="color: var(--info); margin-top: 3px;"></i>
-                        <div>
-                            <strong style="color: var(--dark);">Verification Process:</strong>
-                            <p style="color: var(--gray); margin-top: 5px; font-size: 14px;">
-                                Your payment will be verified within minutes. Once verified, you'll get immediate access to all study materials for 180 days.
-                            </p>
+                <div style="margin-top: 30px; text-align: center;">
+                    <div style="background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); color: white; padding: 35px; border-radius: 20px;">
+                        <div style="font-size: 20px; margin-bottom: 10px;">
+                            <i class="fas fa-money-bill-wave"></i> Send Ksh 67 to:
+                        </div>
+                        <div style="font-size: 42px; font-weight: 800; margin: 20px 0; font-family: monospace;">0765 098 865</div>
+                        <div style="font-size: 18px;">
+                            <strong>Reference:</strong> REVISIONVAULT
                         </div>
                     </div>
-                </div>
-                
-                <div style="margin-top: 20px; text-align: center;">
-                    <button class="btn btn-secondary" onclick="checkApprovalStatus()">
-                        <i class="fas fa-sync-alt"></i> Check Verification Status
-                    </button>
-                    <button class="btn btn-info" onclick="showFreeDocuments()" style="margin-left: 10px;">
-                        <i class="fas fa-eye"></i> View Free Samples
-                    </button>
                 </div>
             </div>
 
             <!-- User Info (When Logged In) -->
             <div class="form-container" id="userInfo" style="display: none;">
-                <h3 class="section-title">
-                    <i class="fas fa-user-check"></i>
-                    Your Active Subscription
+                <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
+                    <i class="fas fa-user-check"></i> Your Active Subscription
                 </h3>
                 <div id="subscriptionDetails"></div>
                 
@@ -1528,41 +496,19 @@
                     <button class="btn btn-success" onclick="switchTab('documents')">
                         <i class="fas fa-book"></i> Browse Materials
                     </button>
-                    <button class="btn btn-info" onclick="showRecentViews()">
-                        <i class="fas fa-history"></i> View History
-                    </button>
-                    <button class="btn btn-warning" onclick="showSubscriptionDetails()">
-                        <i class="fas fa-receipt"></i> Receipt
-                    </button>
                     <button class="btn btn-secondary" onclick="logout()">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
-                </div>
-            </div>
-
-            <!-- Pending Verification -->
-            <div class="form-container" id="pendingApproval" style="display: none;">
-                <h3 class="section-title">
-                    <i class="fas fa-clock"></i>
-                    Payment Verification in Progress
-                </h3>
-                <div id="pendingDetails"></div>
-                <button class="btn btn-primary btn-block" onclick="checkApprovalStatus()">
-                    <i class="fas fa-sync-alt"></i> Check Status Now
-                </button>
-                <div style="text-align: center; margin-top: 20px;">
-                    <p style="color: var(--gray);">Having issues? <a href="https://wa.me/254765098865" target="_blank" style="color: var(--info); text-decoration: none;">Contact Support on WhatsApp</a></p>
                 </div>
             </div>
         </div>
 
         <!-- Study Materials Tab -->
         <div id="documents" class="tab-content">
-            <div class="documents-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
                 <div>
-                    <h3 class="section-title">
-                        <i class="fas fa-file-pdf"></i>
-                        University Study Materials
+                    <h3 style="font-size: 28px; font-weight: 700; color: var(--primary);">
+                        <i class="fas fa-file-pdf"></i> University Study Materials
                     </h3>
                     <p style="color: var(--gray); margin-top: 10px;">Browse, view, zoom, and download • Screenshot protected</p>
                 </div>
@@ -1581,27 +527,21 @@
 
             <!-- Quick Actions -->
             <div style="display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap;">
-                <button class="btn btn-small btn-info" onclick="filterByUniversity('all')">
+                <button class="btn" onclick="filterByUniversity('all')" style="background: var(--info);">
                     <i class="fas fa-globe"></i> All Universities
                 </button>
-                <button class="btn btn-small btn-success" onclick="sortDocuments('newest')">
-                    <i class="fas fa-sort-amount-down"></i> Newest First
-                </button>
-                <button class="btn btn-small btn-warning" onclick="showMostViewed()">
-                    <i class="fas fa-fire"></i> Most Popular
-                </button>
-                <button class="btn btn-small btn-primary" onclick="loadDocuments()">
+                <button class="btn" onclick="loadDocuments()" style="background: var(--primary);">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
-                <button class="btn btn-small btn-secondary" onclick="toggleScreenshotProtection()" id="protectionToggle">
-                    <i class="fas fa-shield-alt"></i> Protection: ON
+                <button class="btn" onclick="clearFilters()" style="background: var(--secondary);">
+                    <i class="fas fa-times"></i> Clear Filters
                 </button>
             </div>
 
             <!-- Search Bar -->
             <div class="search-container">
                 <input type="text" id="searchInput" class="search-input" placeholder="Search for subjects, courses, or document names..." onkeyup="searchDocuments()">
-                <button class="search-button" onclick="searchDocuments()">
+                <button style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--gray); font-size: 22px; cursor: pointer;" onclick="searchDocuments()">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
@@ -1611,18 +551,10 @@
                 <!-- Universities will be loaded here -->
             </div>
 
-            <!-- Subject Filter -->
-            <div class="university-filter" id="subjectFilters">
-                <!-- Subjects will be loaded here -->
-            </div>
-
             <!-- Documents Grid -->
             <div class="documents-grid" id="documentsList">
                 <!-- Documents will be loaded here -->
             </div>
-
-            <!-- Loading Spinner -->
-            <div id="loadingSpinner" class="spinner" style="display: none;"></div>
 
             <!-- No Documents Message -->
             <div id="noDocuments" style="text-align: center; padding: 60px; color: var(--gray); display: none;">
@@ -1633,17 +565,6 @@
                     <i class="fas fa-sync-alt"></i> Load Documents
                 </button>
             </div>
-
-            <!-- Pagination -->
-            <div id="pagination" style="display: none; text-align: center; margin-top: 40px;">
-                <button class="btn btn-secondary" onclick="prevPage()" id="prevPageBtn">
-                    <i class="fas fa-chevron-left"></i> Previous
-                </button>
-                <span style="margin: 0 20px; font-weight: 600;" id="pageInfo">Page 1 of 1</span>
-                <button class="btn btn-secondary" onclick="nextPage()" id="nextPageBtn">
-                    Next <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
         </div>
 
         <!-- Admin Panel Tab -->
@@ -1651,26 +572,19 @@
             <!-- Admin Login -->
             <div id="adminLogin">
                 <div class="form-container" style="max-width: 500px; margin: 0 auto;">
-                    <h3 class="section-title">
-                        <i class="fas fa-lock"></i>
-                        Admin Authentication
+                    <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
+                        <i class="fas fa-lock"></i> Admin Authentication
                     </h3>
                     
                     <div class="form-group">
-                        <label class="form-label">Admin Password</label>
-                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password" autocomplete="off">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Admin Password</label>
+                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password">
                         <small style="color: var(--gray); margin-top: 5px; display: block;">Default: walter.zauko23</small>
                     </div>
                     
-                    <button class="btn btn-primary btn-block" onclick="adminLogin()">
+                    <button class="btn btn-primary" style="width: 100%;" onclick="adminLogin()">
                         <i class="fas fa-sign-in-alt"></i> Login as Admin
                     </button>
-                    
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn btn-small btn-warning" onclick="resetAdminPassword()">
-                            <i class="fas fa-key"></i> Reset Password
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -1679,43 +593,34 @@
                 <!-- Stats Cards -->
                 <div class="admin-dashboard">
                     <div class="stat-card">
-                        <div class="stat-icon documents">
+                        <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--info); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                             <i class="fas fa-file-pdf"></i>
                         </div>
-                        <div class="stat-value" id="totalDocuments">0</div>
-                        <div class="stat-label">Total Documents</div>
+                        <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="totalDocuments">0</div>
+                        <div style="color: var(--gray);">Total Documents</div>
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon students">
+                        <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                             <i class="fas fa-users"></i>
                         </div>
-                        <div class="stat-value" id="totalStudents">0</div>
-                        <div class="stat-label">Active Students</div>
+                        <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="totalStudents">0</div>
+                        <div style="color: var(--gray);">Active Students</div>
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon pending">
+                        <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--warning); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                             <i class="fas fa-clock"></i>
                         </div>
-                        <div class="stat-value" id="pendingApprovalsCount">0</div>
-                        <div class="stat-label">Pending Verifications</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon revenue">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div class="stat-value" id="revenue">Ksh 0</div>
-                        <div class="stat-label">Total Revenue</div>
+                        <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="pendingApprovalsCount">0</div>
+                        <div style="color: var(--gray);">Pending Verifications</div>
                     </div>
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="admin-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-bolt"></i>
-                        Quick Actions
+                <div class="form-container">
+                    <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
+                        <i class="fas fa-bolt"></i> Quick Actions
                     </h3>
                     
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
@@ -1723,130 +628,40 @@
                             <i class="fas fa-check-double"></i> Auto-Verify All
                         </button>
                         
-                        <button class="btn btn-info" onclick="exportData()">
-                            <i class="fas fa-download"></i> Export Data
-                        </button>
-                        
                         <button class="btn btn-warning" onclick="backupSystem()">
                             <i class="fas fa-database"></i> Backup System
                         </button>
                         
-                        <button class="btn btn-secondary" onclick="adminLogout()">
+                        <button class="btn btn-danger" onclick="adminLogout()">
                             <i class="fas fa-sign-out-alt"></i> Logout Admin
                         </button>
                     </div>
                 </div>
 
                 <!-- Pending Verifications -->
-                <div class="admin-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3 class="section-title">
-                            <i class="fas fa-user-check"></i>
-                            Pending Verifications
-                        </h3>
-                        <button class="btn btn-small btn-success" onclick="approveAllPayments()">
-                            <i class="fas fa-check-circle"></i> Verify All
-                        </button>
-                    </div>
+                <div class="form-container">
+                    <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
+                        <i class="fas fa-user-check"></i> Pending Verifications
+                    </h3>
                     <div id="pendingApprovalsList"></div>
-                </div>
-
-                <!-- Users Management -->
-                <div class="admin-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-users-cog"></i>
-                        Users Management
-                    </h3>
-                    
-                    <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-                        <div style="font-weight: 600; color: var(--dark);">Filter:</div>
-                        <button class="btn btn-small btn-secondary" onclick="filterUsers('all')">All Users</button>
-                        <button class="btn btn-small btn-success" onclick="filterUsers('active')">Active</button>
-                        <button class="btn btn-small btn-warning" onclick="filterUsers('expiring')">Expiring Soon</button>
-                        <button class="btn btn-small btn-danger" onclick="filterUsers('expired')">Expired</button>
-                        <input type="text" id="userSearch" class="form-control" style="flex: 1; max-width: 300px;" placeholder="Search users..." onkeyup="searchUsers()">
-                    </div>
-                    
-                    <div style="overflow-x: auto;">
-                        <table class="users-table">
-                            <thead>
-                                <tr>
-                                    <th>Phone</th>
-                                    <th>University</th>
-                                    <th>Status</th>
-                                    <th>Expiry</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="usersTableBody">
-                                <!-- Users will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- System Settings -->
-                <div class="admin-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-sliders-h"></i>
-                        System Configuration
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Subscription Price (Ksh)</label>
-                        <input type="number" id="subscriptionPrice" class="form-control" value="67">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Subscription Duration (Days)</label>
-                        <input type="number" id="subscriptionDays" class="form-control" value="180">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Auto-Sync Interval (Seconds)</label>
-                        <select id="syncInterval" class="form-control">
-                            <option value="5000">5 seconds</option>
-                            <option value="10000" selected>10 seconds</option>
-                            <option value="30000">30 seconds</option>
-                            <option value="60000">1 minute</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Screenshot Protection</label>
-                        <select id="screenshotProtectionSetting" class="form-control">
-                            <option value="true" selected>Enabled</option>
-                            <option value="false">Disabled</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Admin Password</label>
-                        <input type="password" id="newAdminPassword" class="form-control" placeholder="Enter new password (min 8 chars)">
-                    </div>
-                    
-                    <button class="btn btn-primary btn-block" onclick="saveAdminSettings()">
-                        <i class="fas fa-save"></i> Save All Settings
-                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Upload Materials Tab -->
         <div id="upload" class="tab-content">
-            <div class="admin-section">
-                <h3 class="section-title">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    Upload Study Materials (Admin Only)
+            <div class="form-container">
+                <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload Study Materials (Admin Only)
                 </h3>
                 
                 <div class="form-group">
-                    <label class="form-label">Document Title *</label>
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Title *</label>
                     <input type="text" id="uploadTitle" class="form-control" placeholder="e.g., Computer Science Past Papers 2023" required>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Select University *</label>
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Select University *</label>
                     <select id="uploadUniversity" class="form-control" required>
                         <option value="">Choose university</option>
                         <option value="Egerton University">Egerton University</option>
@@ -1856,79 +671,41 @@
                         <option value="JKUAT">JKUAT</option>
                         <option value="Moi University">Moi University</option>
                         <option value="Technical University of Kenya">Technical University of Kenya</option>
-                        <option value="Other">Other University</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Subject/Course *</label>
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Subject/Course *</label>
                     <input type="text" id="uploadSubject" class="form-control" placeholder="e.g., Mathematics, Computer Science" required>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Document Type</label>
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Type</label>
                     <select id="uploadType" class="form-control">
                         <option value="Past Paper">Past Paper</option>
                         <option value="Lecture Notes">Lecture Notes</option>
                         <option value="Revision Guide">Revision Guide</option>
                         <option value="Lab Manual">Lab Manual</option>
-                        <option value="Tutorial">Tutorial</option>
-                        <option value="Project">Project</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Year</label>
-                    <input type="text" id="uploadYear" class="form-control" placeholder="e.g., 2023" value="2024">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Link *</label>
+                    <input type="text" id="uploadLink" class="form-control" placeholder="https://drive.google.com/file/d/.../view" required>
+                    <small style="color: var(--gray); margin-top: 5px; display: block;">Google Drive link ending with /view or /preview</small>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Document Link *</label>
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <select id="uploadLinkType" class="form-control" style="flex: 1;" onchange="updateLinkPlaceholder()">
-                            <option value="telegram">Telegram Link</option>
-                            <option value="drive">Google Drive Link</option>
-                            <option value="direct">Direct Link</option>
-                            <option value="onedrive">OneDrive Link</option>
-                            <option value="dropbox">Dropbox Link</option>
-                        </select>
-                        <button class="btn btn-small btn-info" onclick="testDocumentLink()">
-                            <i class="fas fa-test"></i> Test
-                        </button>
-                    </div>
-                    <input type="text" id="uploadLink" class="form-control" placeholder="Paste your document link here" required onchange="autoUploadIfValid()">
-                    <small style="color: var(--gray); margin-top: 5px; display: block;" id="linkHelp">
-                        For Google Drive: Use shareable link ending with /view?usp=sharing
-                    </small>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Description (Optional)</label>
-                    <textarea id="uploadDescription" class="form-control" rows="3" placeholder="Brief description of the document..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Tags (Separate with commas)</label>
-                    <input type="text" id="uploadTags" class="form-control" placeholder="e.g., calculus, past-paper, mathematics">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Access Level</label>
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Access Level</label>
                     <select id="uploadAccess" class="form-control">
                         <option value="premium">Premium (Subscribers Only)</option>
                         <option value="free">Free (Public Access)</option>
-                        <option value="demo">Demo (Limited Access)</option>
                     </select>
                 </div>
                 
-                <div style="display: flex; gap: 15px; margin-top: 30px;">
-                    <button class="btn btn-primary" onclick="uploadDocument()" style="flex: 1;">
-                        <i class="fas fa-upload"></i> Upload Document
-                    </button>
-                    <button class="btn btn-secondary" onclick="clearUploadForm()">
-                        <i class="fas fa-times"></i> Clear
-                    </button>
-                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="uploadDocument()">
+                    <i class="fas fa-upload"></i> Upload Document
+                </button>
                 
                 <div id="uploadPreview" style="margin-top: 30px; padding: 20px; background: var(--light); border-radius: var(--radius); display: none;">
                     <h4 style="margin-bottom: 15px;">Upload Preview</h4>
@@ -1937,191 +714,85 @@
             </div>
             
             <!-- Recent Uploads -->
-            <div class="admin-section">
-                <h3 class="section-title">
-                    <i class="fas fa-history"></i>
-                    Recent Uploads
+            <div class="form-container">
+                <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
+                    <i class="fas fa-history"></i> Recent Uploads
                 </h3>
-                <div id="recentUploads" style="max-height: 300px; overflow-y: auto;">
-                    <!-- Recent uploads will appear here -->
-                </div>
+                <div id="recentUploads"></div>
             </div>
         </div>
 
         <!-- Statistics Tab -->
         <div id="stats" class="tab-content">
-            <div class="hero-section">
-                <h2 class="hero-title">System Statistics & Analytics</h2>
-                <p class="hero-subtitle">Real-time insights into system performance and user engagement</p>
+            <div style="text-align: center; margin-bottom: 60px; padding: 50px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 24px;">
+                <h2 style="font-size: 42px; font-weight: 800; color: var(--primary); margin-bottom: 20px;">System Statistics & Analytics</h2>
+                <p style="font-size: 20px; color: var(--gray);">Real-time insights into system performance</p>
             </div>
             
             <!-- Stats Overview -->
             <div class="admin-dashboard">
                 <div class="stat-card">
-                    <div class="stat-icon documents">
+                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--info); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <div class="stat-value" id="dailyViews">0</div>
-                    <div class="stat-label">Today's Views</div>
+                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="dailyViews">0</div>
+                    <div style="color: var(--gray);">Today's Views</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon students">
+                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                         <i class="fas fa-user-plus"></i>
                     </div>
-                    <div class="stat-value" id="newUsersToday">0</div>
-                    <div class="stat-label">New Users Today</div>
+                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="newUsersToday">0</div>
+                    <div style="color: var(--gray);">New Users Today</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon pending">
+                    <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--warning); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
                         <i class="fas fa-download"></i>
                     </div>
-                    <div class="stat-value" id="totalDownloads">0</div>
-                    <div class="stat-label">Total Downloads</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon revenue">
-                        <i class="fas fa-money-check-alt"></i>
-                    </div>
-                    <div class="stat-value" id="todayRevenue">Ksh 0</div>
-                    <div class="stat-label">Today's Revenue</div>
-                </div>
-            </div>
-            
-            <!-- University Distribution -->
-            <div class="admin-section">
-                <h3 class="section-title">
-                    <i class="fas fa-university"></i>
-                    University Distribution
-                </h3>
-                <div id="universityStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                    <!-- University stats will be loaded here -->
-                </div>
-            </div>
-            
-            <!-- Popular Documents -->
-            <div class="admin-section">
-                <h3 class="section-title">
-                    <i class="fas fa-fire"></i>
-                    Most Popular Documents
-                </h3>
-                <div id="popularDocuments" style="max-height: 400px; overflow-y: auto;">
-                    <!-- Popular documents will be loaded here -->
-                </div>
-            </div>
-            
-            <!-- Activity Timeline -->
-            <div class="admin-section">
-                <h3 class="section-title">
-                    <i class="fas fa-history"></i>
-                    Recent Activity Timeline
-                </h3>
-                <div id="activityTimeline" style="max-height: 400px; overflow-y: auto;">
-                    <!-- Activity will be loaded here -->
+                    <div style="font-size: 42px; font-weight: 800; color: var(--dark); margin-bottom: 10px;" id="totalDownloads">0</div>
+                    <div style="color: var(--gray);">Total Downloads</div>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
-        <div class="footer">
-            <div class="footer-links">
-                <a href="https://t.me/RevisionVaultDocuments" class="footer-link" target="_blank">
-                    <i class="fab fa-telegram"></i> Telegram
+        <div style="text-align: center; padding: 40px; color: var(--gray); border-top: 2px solid var(--border); background: var(--light);">
+            <p style="font-size: 18px; font-weight: 600; color: var(--dark); margin-bottom: 10px;">
+                RevisionVault Pro System v4.0
+            </p>
+            <p style="color: var(--gray); margin-bottom: 5px;">
+                Owner: Walter Zauko • Advanced Protection Active
+            </p>
+            <p style="color: var(--gray); font-size: 14px;">
+                Screenshot protection enabled • All documents are viewable with zoom functionality
+            </p>
+            <div style="margin-top: 20px;">
+                <a href="https://wa.me/254765098865" style="color: var(--primary); text-decoration: none; margin: 0 10px;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Support
                 </a>
-                <a href="https://wa.me/254765098865" class="footer-link" target="_blank">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </a>
-                <a href="tel:0765098865" class="footer-link">
+                <a href="tel:0765098865" style="color: var(--primary); text-decoration: none; margin: 0 10px;">
                     <i class="fas fa-phone"></i> Call: 0765 098 865
                 </a>
-                <a href="mailto:support@revisionvault.co.ke" class="footer-link">
-                    <i class="fas fa-envelope"></i> Email Support
-                </a>
-            </div>
-            
-            <div style="margin: 30px 0; height: 2px; background: var(--border);"></div>
-            
-            <div>
-                <p style="font-size: 18px; font-weight: 600; color: var(--dark); margin-bottom: 10px;">
-                    RevisionVault Pro System v4.0
-                </p>
-                <p style="color: var(--gray); margin-bottom: 5px;">
-                    Owner: Walter Zauko • Advanced Protection Active
-                </p>
-                <p style="color: var(--gray); font-size: 14px;">
-                    Screenshot protection enabled • All documents are viewable with zoom functionality
-                </p>
-            </div>
-            
-            <div class="copyright">
-                © 2024 RevisionVault Pro. All rights reserved.
             </div>
         </div>
     </div>
 
     <script>
-        // ==================== GLOBAL CONFIGURATION ====================
-        const CONFIG = {
-            adminPassword: 'walter.zauko23',
-            subscriptionPrice: 67,
-            subscriptionDays: 180,
-            universities: [
-                { id: 'egerton', name: 'Egerton University', color: '#1e40af', icon: 'fas fa-graduation-cap' },
-                { id: 'uon', name: 'University of Nairobi', color: '#dc2626', icon: 'fas fa-university' },
-                { id: 'ku', name: 'Kenyatta University', color: '#059669', icon: 'fas fa-book' },
-                { id: 'jkuat', name: 'JKUAT', color: '#7c3aed', icon: 'fas fa-flask' },
-                { id: 'mmust', name: 'Masinde Muliro University', color: '#ea580c', icon: 'fas fa-microscope' },
-                { id: 'moi', name: 'Moi University', color: '#0d9488', icon: 'fas fa-briefcase' },
-                { id: 'tuk', name: 'Technical University of Kenya', color: '#be185d', icon: 'fas fa-cogs' },
-                { id: 'other', name: 'Other University', color: '#6b7280', icon: 'fas fa-school' }
-            ],
-            mpesaNumber: '0765098865',
-            whatsappNumber: '254765098865'
-        };
-
         // ==================== GLOBAL STATE ====================
         let allDocuments = [];
         let filteredDocuments = [];
         let currentUser = null;
         let isAdmin = false;
-        let autoSyncTimer = null;
-        let currentPage = 1;
-        let documentsPerPage = 12;
-        let zoomLevel = 1;
-        let screenshotProtectionEnabled = true;
-        let currentUniversityFilter = 'all';
-        let currentSubjectFilter = 'all';
         let currentDocument = null;
-        let autoUploadEnabled = false;
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 RevisionVault Pro System Initialized');
-            
-            // Initialize system
             initSystem();
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            // Setup screenshot protection
-            setupScreenshotProtection();
-            
-            // Check user session
-            checkUserSession();
-            
-            // Check admin session
-            checkAdminSession();
-            
-            // Load initial data
             loadInitialData();
-            
-            // Show welcome
-            setTimeout(() => {
-                showNotification('Welcome to RevisionVault Pro!', 'success');
-            }, 1000);
+            checkUserSession();
         });
 
         function initSystem() {
@@ -2133,128 +804,735 @@
                 activity: [],
                 settings: {
                     subscriptionPrice: 67,
-                    subscriptionDays: 180,
-                    screenshotProtection: true,
-                    autoSync: true
+                    subscriptionDays: 180
                 }
             };
 
-            Object.keys(defaultData).forEach(key => {
-                if (!localStorage.getItem(`revisionvault_${key}`)) {
-                    localStorage.setItem(`revisionvault_${key}`, JSON.stringify(defaultData[key]));
-                }
-            });
+            // Set default data if not exists
+            if (!localStorage.getItem('revisionvault_documents')) {
+                localStorage.setItem('revisionvault_documents', JSON.stringify(defaultData.documents));
+            }
+            if (!localStorage.getItem('revisionvault_users')) {
+                localStorage.setItem('revisionvault_users', JSON.stringify(defaultData.users));
+            }
+            if (!localStorage.getItem('revisionvault_pending')) {
+                localStorage.setItem('revisionvault_pending', JSON.stringify(defaultData.pending));
+            }
 
-            // Load demo data if no documents
-            if (JSON.parse(localStorage.getItem('revisionvault_documents')).length === 0) {
+            // Load demo documents if empty
+            const documents = JSON.parse(localStorage.getItem('revisionvault_documents'));
+            if (documents.length === 0) {
                 loadDemoDocuments();
             }
         }
 
         function loadInitialData() {
             showLoading('Loading system...');
-            
             setTimeout(() => {
-                // Load documents
                 loadDocuments();
-                
-                // Update stats
                 updateStats();
-                
-                // Update recent uploads
-                updateRecentUploads();
-                
-                // Hide loading
                 hideLoading();
+                showNotification('System loaded successfully!', 'success');
+            }, 1000);
+        }
+
+        // ==================== DOCUMENT MANAGEMENT ====================
+        function loadDocuments() {
+            try {
+                const documents = JSON.parse(localStorage.getItem('revisionvault_documents')) || [];
+                allDocuments = documents;
+                filteredDocuments = [...documents];
                 
-                // Add initial activity
-                addActivity('System initialized', 'system');
-            }, 1500);
+                updateDocumentCount();
+                generateUniversityFilters();
+                displayDocuments();
+                updatePublicStats();
+                
+                document.getElementById('lastSync').textContent = `Last sync: ${new Date().toLocaleTimeString()}`;
+                
+                if (documents.length === 0) {
+                    document.getElementById('noDocuments').style.display = 'block';
+                } else {
+                    document.getElementById('noDocuments').style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Error loading documents:', error);
+                showNotification('Error loading documents', 'error');
+            }
         }
 
-        function setupEventListeners() {
-            // Phone number formatting - FIXED
-            document.getElementById('userPhone').addEventListener('input', function(e) {
-                formatPhoneNumber(e.target);
-            });
+        function updateDocumentCount() {
+            const count = allDocuments.length;
+            document.getElementById('docCountBadge').textContent = `${count} documents`;
+            document.getElementById('publicDocCount').textContent = count;
+            if (document.getElementById('totalDocuments')) {
+                document.getElementById('totalDocuments').textContent = count;
+            }
+        }
 
-            // Transaction code uppercase
-            document.getElementById('txnCode').addEventListener('input', function(e) {
-                e.target.value = e.target.value.toUpperCase();
+        function generateUniversityFilters() {
+            const container = document.getElementById('universityFilters');
+            if (!container) return;
+            
+            let html = '<button class="university-chip active" onclick="filterByUniversity(\'all\')">All Universities</button>';
+            
+            const universities = [...new Set(allDocuments.map(doc => doc.university))];
+            universities.forEach(uni => {
+                html += `<button class="university-chip" onclick="filterByUniversity('${uni}')">${uni}</button>`;
             });
+            
+            container.innerHTML = html;
+        }
 
-            // Admin password enter key
-            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    adminLogin();
+        function filterByUniversity(university) {
+            // Update active button
+            document.querySelectorAll('#universityFilters .university-chip').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            if (university === 'all') {
+                filteredDocuments = [...allDocuments];
+            } else {
+                filteredDocuments = allDocuments.filter(doc => doc.university === university);
+            }
+            
+            displayDocuments();
+        }
+
+        function searchDocuments() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!query) {
+                filteredDocuments = [...allDocuments];
+            } else {
+                filteredDocuments = allDocuments.filter(doc => {
+                    const searchText = `${doc.title} ${doc.university} ${doc.subject} ${doc.tags || ''}`.toLowerCase();
+                    return searchText.includes(query);
+                });
+            }
+            
+            displayDocuments();
+        }
+
+        function displayDocuments() {
+            const container = document.getElementById('documentsList');
+            
+            if (filteredDocuments.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+                        <i class="fas fa-search" style="font-size: 60px; color: var(--gray); margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--dark); margin-bottom: 10px;">No documents found</h3>
+                        <p style="color: var(--gray);">Try changing your search or filter criteria</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            filteredDocuments.forEach(doc => {
+                const isAccessible = doc.access === 'free' || currentUser || isAdmin;
+                
+                html += `
+                    <div class="document-card">
+                        <div style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: var(--primary); color: white; border-radius: 50px; font-size: 12px; font-weight: 600;">
+                            ${doc.type || 'Document'}
+                        </div>
+                        
+                        <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #e0f2fe; color: #0369a1; border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 20px;">
+                            <i class="fas fa-university"></i>
+                            ${doc.university}
+                        </div>
+                        
+                        <h3 style="font-size: 20px; font-weight: 700; color: var(--dark); margin-bottom: 15px;">
+                            ${doc.title}
+                            ${!isAccessible ? '<i class="fas fa-lock" style="color: var(--warning); margin-left: 10px;"></i>' : ''}
+                        </h3>
+                        
+                        <div style="display: flex; gap: 20px; margin: 20px 0; font-size: 14px; color: var(--gray);">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-book"></i>
+                                <span>${doc.subject || 'General'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-calendar"></i>
+                                <span>${doc.year || '2024'}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 25px;">
+                            ${isAccessible ? 
+                                `<button class="btn" onclick="viewDocument('${doc.id}')" style="background: var(--primary);">
+                                    <i class="fas fa-eye"></i> View Document
+                                </button>` :
+                                `<button class="btn" onclick="showSubscribeMessage()" style="background: var(--warning);">
+                                    <i class="fas fa-lock"></i> Subscribe to View
+                                </button>`
+                            }
+                            <button class="btn" onclick="showDocumentInfo('${doc.id}')" style="background: var(--info);">
+                                <i class="fas fa-info-circle"></i> Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            filteredDocuments = [...allDocuments];
+            displayDocuments();
+            
+            // Reset university filter
+            document.querySelectorAll('#universityFilters .university-chip').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === 'All Universities') {
+                    btn.classList.add('active');
                 }
             });
+        }
 
-            // Search enter key
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    searchDocuments();
+        // ==================== DOCUMENT UPLOAD ====================
+        function uploadDocument() {
+            const title = document.getElementById('uploadTitle').value.trim();
+            const university = document.getElementById('uploadUniversity').value;
+            const subject = document.getElementById('uploadSubject').value.trim();
+            const type = document.getElementById('uploadType').value;
+            const link = document.getElementById('uploadLink').value.trim();
+            const access = document.getElementById('uploadAccess').value;
+            
+            if (!title || !university || !subject || !link) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (!link.includes('http')) {
+                showNotification('Please enter a valid URL', 'error');
+                return;
+            }
+            
+            // Create document object
+            const document = {
+                id: Date.now().toString(),
+                title: title,
+                university: university,
+                subject: subject,
+                type: type,
+                year: new Date().getFullYear().toString(),
+                link: link,
+                access: access,
+                date: new Date().toISOString(),
+                views: 0,
+                downloads: 0,
+                format: 'PDF',
+                uploadedBy: 'admin'
+            };
+            
+            // Save to localStorage
+            let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            documents.unshift(document);
+            localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
+            
+            // Update UI
+            loadDocuments();
+            updateRecentUploads();
+            clearUploadForm();
+            
+            showNotification('Document uploaded successfully!', 'success');
+        }
+
+        function clearUploadForm() {
+            document.getElementById('uploadTitle').value = '';
+            document.getElementById('uploadUniversity').value = '';
+            document.getElementById('uploadSubject').value = '';
+            document.getElementById('uploadLink').value = '';
+            document.getElementById('uploadPreview').style.display = 'none';
+        }
+
+        function updateRecentUploads() {
+            const container = document.getElementById('recentUploads');
+            const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            const recent = documents.slice(0, 5);
+            
+            if (recent.length === 0) {
+                container.innerHTML = '<p style="color: var(--gray); text-align: center; padding: 20px;">No recent uploads</p>';
+                return;
+            }
+            
+            let html = '';
+            recent.forEach(doc => {
+                html += `
+                    <div style="padding: 15px; border-bottom: 1px solid var(--border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-weight: 600; color: var(--dark);">${doc.title}</div>
+                            <span style="font-size: 12px; color: var(--gray);">${new Date(doc.date).toLocaleDateString()}</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--gray); margin-top: 5px;">
+                            ${doc.university} • ${doc.subject}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ==================== DOCUMENT VIEWER ====================
+        function viewDocument(docId) {
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) {
+                showNotification('Document not found', 'error');
+                return;
+            }
+            
+            // Check access
+            if (doc.access === 'premium' && !currentUser && !isAdmin) {
+                showNotification('This document requires a subscription', 'error');
+                switchTab('student');
+                return;
+            }
+            
+            // Update view count
+            doc.views = (doc.views || 0) + 1;
+            updateDocumentInStorage(doc);
+            
+            // Set current document
+            currentDocument = doc;
+            
+            // Show viewer
+            document.getElementById('viewerTitle').textContent = doc.title;
+            document.getElementById('documentViewer').style.display = 'flex';
+            
+            // Load document
+            const iframe = document.getElementById('viewerFrame');
+            const viewerLink = getViewerLink(doc.link);
+            iframe.src = viewerLink;
+            
+            showNotification('Document opened successfully', 'success');
+        }
+
+        function getViewerLink(link) {
+            // Convert Google Drive link to embed view
+            if (link.includes('drive.google.com')) {
+                if (link.includes('/view')) {
+                    return link.replace('/view', '/preview');
+                } else if (link.includes('/file/d/')) {
+                    const fileId = link.split('/file/d/')[1].split('/')[0];
+                    return `https://drive.google.com/file/d/${fileId}/preview`;
                 }
-            });
-
-            // Upload link type change
-            document.getElementById('uploadLinkType').addEventListener('change', updateLinkPlaceholder);
-
-            // Real-time search
-            let searchTimeout;
-            document.getElementById('searchInput').addEventListener('input', function(e) {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    searchDocuments();
-                }, 300);
-            });
-
-            // User search
-            let userSearchTimeout;
-            document.getElementById('userSearch').addEventListener('input', function(e) {
-                clearTimeout(userSearchTimeout);
-                userSearchTimeout = setTimeout(() => {
-                    searchUsers();
-                }, 300);
-            });
-
-            // Auto-upload on link paste
-            document.getElementById('uploadLink').addEventListener('paste', function(e) {
-                setTimeout(() => {
-                    autoUploadIfValid();
-                }, 100);
-            });
+            }
+            return link;
         }
 
-        // ==================== PHONE NUMBER FORMATTING - FIXED ====================
-        function formatPhoneNumber(input) {
-            let value = input.value.replace(/\D/g, '');
+        function closeDocumentViewer() {
+            document.getElementById('documentViewer').style.display = 'none';
+            document.getElementById('viewerFrame').src = '';
+            currentDocument = null;
+        }
+
+        function downloadCurrentDocument() {
+            if (!currentDocument) return;
             
-            // Ensure starts with 07 and max 10 digits
-            if (value.length > 0 && !value.startsWith('07')) {
-                value = '07' + value.substring(2);
-            }
+            // Update download count
+            currentDocument.downloads = (currentDocument.downloads || 0) + 1;
+            updateDocumentInStorage(currentDocument);
             
-            // Limit to 10 digits
-            if (value.length > 10) {
-                value = value.substring(0, 10);
-            }
+            // Trigger download
+            const link = document.createElement('a');
+            link.href = currentDocument.link;
+            link.download = currentDocument.title;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
-            input.value = value;
-            
-            // Validate and show error if needed
-            if (value.length === 10 && !value.startsWith('07')) {
-                showNotification('Phone number must start with 07', 'error');
-                input.focus();
+            showNotification('Download started', 'success');
+        }
+
+        function updateDocumentInStorage(doc) {
+            let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            const index = documents.findIndex(d => d.id === doc.id);
+            if (index !== -1) {
+                documents[index] = doc;
+                localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
             }
         }
 
-        function validatePhoneNumber(phone) {
-            const cleanPhone = phone.replace(/\D/g, '');
-            return /^07\d{8}$/.test(cleanPhone) && cleanPhone.length === 10;
+        function showDocumentInfo(docId) {
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) return;
+            
+            alert(`Document Information:\n\n` +
+                  `Title: ${doc.title}\n` +
+                  `University: ${doc.university}\n` +
+                  `Subject: ${doc.subject}\n` +
+                  `Type: ${doc.type}\n` +
+                  `Year: ${doc.year}\n` +
+                  `Views: ${doc.views || 0}\n` +
+                  `Downloads: ${doc.downloads || 0}\n` +
+                  `Uploaded: ${new Date(doc.date).toLocaleDateString()}\n` +
+                  `Access: ${doc.access === 'premium' ? 'Premium (Subscribers Only)' : 'Free'}`);
         }
 
-        // ==================== TAB MANAGEMENT ====================
+        function showSubscribeMessage() {
+            showNotification('Please subscribe to access premium documents', 'warning');
+            switchTab('student');
+        }
+
+        // ==================== USER MANAGEMENT ====================
+        function submitPayment() {
+            const phone = document.getElementById('userPhone').value.trim();
+            const txnCode = document.getElementById('txnCode').value.trim();
+            const university = document.getElementById('userUniversity').value;
+            
+            // Basic validation
+            if (!phone || phone.length !== 10 || !phone.startsWith('07')) {
+                showNotification('Please enter a valid 10-digit phone number starting with 07', 'error');
+                return;
+            }
+            
+            if (!txnCode) {
+                showNotification('Please enter transaction code', 'error');
+                return;
+            }
+            
+            if (!university) {
+                showNotification('Please select university', 'error');
+                return;
+            }
+            
+            // Format phone
+            const formattedPhone = '254' + phone.substring(1);
+            
+            // Create pending payment
+            const pendingPayment = {
+                id: Date.now().toString(),
+                phone: formattedPhone,
+                displayPhone: phone,
+                txnCode: txnCode.toUpperCase(),
+                university: university,
+                amount: 67,
+                date: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            // Save to pending
+            let pendingPayments = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
+            pendingPayments.push(pendingPayment);
+            localStorage.setItem('revisionvault_pending', JSON.stringify(pendingPayments));
+            
+            // Show success message
+            showNotification('Payment submitted for verification. Access will be granted within minutes.', 'success');
+            
+            // Clear form
+            document.getElementById('userPhone').value = '';
+            document.getElementById('txnCode').value = '';
+            document.getElementById('userUniversity').value = '';
+            
+            // Auto-approve for demo (in real system, admin would verify)
+            setTimeout(() => {
+                verifyPayment(pendingPayment.id);
+            }, 2000);
+        }
+
+        function verifyPayment(paymentId) {
+            const pendingPayments = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
+            const payment = pendingPayments.find(p => p.id === paymentId);
+            
+            if (!payment) return;
+            
+            // Create user account
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 180); // 180 days
+            
+            const user = {
+                id: Date.now().toString(),
+                phone: payment.phone,
+                displayPhone: payment.displayPhone,
+                university: payment.university,
+                joined: new Date().toISOString(),
+                expiry: expiryDate.toISOString(),
+                status: 'active',
+                paymentDate: payment.date,
+                txnCode: payment.txnCode,
+                amount: payment.amount
+            };
+            
+            // Save user
+            let users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            users.push(user);
+            localStorage.setItem('revisionvault_users', JSON.stringify(users));
+            
+            // Remove from pending
+            const updatedPending = pendingPayments.filter(p => p.id !== paymentId);
+            localStorage.setItem('revisionvault_pending', JSON.stringify(updatedPending));
+            
+            // Set as current user
+            localStorage.setItem('revisionvault_current_user', JSON.stringify(user));
+            currentUser = user;
+            
+            // Update UI
+            showUserDashboard();
+            updateStats();
+            
+            showNotification('Payment verified! You now have access.', 'success');
+        }
+
+        function checkUserSession() {
+            const userData = localStorage.getItem('revisionvault_current_user');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    const expiry = new Date(user.expiry);
+                    const now = new Date();
+                    
+                    if (expiry > now) {
+                        currentUser = user;
+                        showUserDashboard();
+                    } else {
+                        logout();
+                    }
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                    logout();
+                }
+            }
+        }
+
+        function showUserDashboard() {
+            if (!currentUser) return;
+            
+            document.getElementById('subscriptionForm').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'block';
+            
+            const expiry = new Date(currentUser.expiry);
+            const now = new Date();
+            const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('subscriptionDetails').innerHTML = `
+                <div style="background: #d1fae5; color: #065f46; padding: 25px; border-radius: var(--radius); border: 2px solid #a7f3d0;">
+                    <h4 style="margin-bottom: 20px; color: #065f46;">
+                        <i class="fas fa-user"></i> Welcome, ${currentUser.displayPhone}
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div>
+                            <div style="font-size: 12px; color: #065f46;">UNIVERSITY</div>
+                            <div style="font-size: 18px; font-weight: 600;">${currentUser.university}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #065f46;">DAYS REMAINING</div>
+                            <div style="font-size: 32px; font-weight: 800;">${daysLeft}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #065f46;">EXPIRY DATE</div>
+                            <div style="font-size: 16px; font-weight: 600;">${expiry.toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            updatePublicStats();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('revisionvault_current_user');
+            
+            document.getElementById('subscriptionForm').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            
+            showNotification('Logged out successfully', 'info');
+        }
+
+        // ==================== ADMIN SYSTEM ====================
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value.trim();
+            
+            if (password === 'walter.zauko23') {
+                isAdmin = true;
+                localStorage.setItem('revisionvault_admin_session', 'true');
+                
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                document.getElementById('uploadTab').style.display = 'flex';
+                
+                loadPendingApprovals();
+                updateAdminStats();
+                
+                showNotification('Admin login successful!', 'success');
+                
+                // Clear password
+                document.getElementById('adminPassword').value = '';
+            } else {
+                showNotification('Invalid admin password', 'error');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function checkAdminSession() {
+            if (localStorage.getItem('revisionvault_admin_session') === 'true') {
+                isAdmin = true;
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                document.getElementById('uploadTab').style.display = 'flex';
+                loadPendingApprovals();
+                updateAdminStats();
+            }
+        }
+
+        function adminLogout() {
+            isAdmin = false;
+            localStorage.removeItem('revisionvault_admin_session');
+            
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('uploadTab').style.display = 'none';
+            
+            showNotification('Admin logged out', 'info');
+        }
+
+        function loadPendingApprovals() {
+            const container = document.getElementById('pendingApprovalsList');
+            const pending = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
+            
+            if (pending.length === 0) {
+                container.innerHTML = '<p style="color: var(--gray); text-align: center; padding: 20px;">No pending verifications</p>';
+                document.getElementById('pendingApprovalsCount').textContent = '0';
+                return;
+            }
+            
+            document.getElementById('pendingApprovalsCount').textContent = pending.length;
+            
+            let html = '';
+            pending.forEach(payment => {
+                html += `
+                    <div style="background: #fef3c7; padding: 25px; border-radius: 16px; border: 2px solid #fde68a; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div style="font-weight: 600; color: var(--dark);">${payment.displayPhone}</div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn" onclick="verifyPayment('${payment.id}')" style="background: var(--success); padding: 8px 16px;">
+                                    <i class="fas fa-check"></i> Verify
+                                </button>
+                                <button class="btn" onclick="rejectPayment('${payment.id}')" style="background: var(--danger); padding: 8px 16px;">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div>
+                                <div style="font-size: 12px; color: #92400e;">TRANSACTION CODE</div>
+                                <div style="font-size: 16px; font-weight: 600;">${payment.txnCode}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #92400e;">UNIVERSITY</div>
+                                <div style="font-size: 16px; font-weight: 600;">${payment.university}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #92400e;">AMOUNT</div>
+                                <div style="font-size: 16px; font-weight: 600;">Ksh ${payment.amount}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function rejectPayment(paymentId) {
+            let pendingPayments = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
+            pendingPayments = pendingPayments.filter(p => p.id !== paymentId);
+            localStorage.setItem('revisionvault_pending', JSON.stringify(pendingPayments));
+            
+            loadPendingApprovals();
+            updateAdminStats();
+            showNotification('Payment rejected', 'warning');
+        }
+
+        function autoApproveAll() {
+            const pendingPayments = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
+            
+            if (pendingPayments.length === 0) {
+                showNotification('No pending payments to approve', 'info');
+                return;
+            }
+            
+            pendingPayments.forEach(payment => {
+                verifyPayment(payment.id);
+            });
+            
+            showNotification('All payments approved successfully', 'success');
+        }
+
+        function backupSystem() {
+            const data = {
+                documents: JSON.parse(localStorage.getItem('revisionvault_documents') || '[]'),
+                users: JSON.parse(localStorage.getItem('revisionvault_users') || '[]'),
+                pending: JSON.parse(localStorage.getItem('revisionvault_pending') || '[]'),
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `revisionvault-backup-${new Date().getTime()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('System backup downloaded', 'success');
+        }
+
+        function updateAdminStats() {
+            const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            const pending = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
+            
+            // Count active users
+            const now = new Date();
+            const activeUsers = users.filter(user => new Date(user.expiry) > now);
+            
+            document.getElementById('totalDocuments').textContent = documents.length;
+            document.getElementById('totalStudents').textContent = activeUsers.length;
+            document.getElementById('pendingApprovalsCount').textContent = pending.length;
+        }
+
+        function updatePublicStats() {
+            const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            
+            // Count active users
+            const now = new Date();
+            const activeUsers = users.filter(user => new Date(user.expiry) > now);
+            
+            document.getElementById('publicDocCount').textContent = documents.length;
+            document.getElementById('activeStudentsCount').textContent = activeUsers.length;
+        }
+
+        function updateStats() {
+            updatePublicStats();
+            if (isAdmin) {
+                updateAdminStats();
+            }
+            
+            // Update statistics tab
+            const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            const today = new Date().toDateString();
+            const todayViews = documents.reduce((sum, doc) => sum + (doc.views || 0), 0);
+            
+            document.getElementById('dailyViews').textContent = todayViews;
+            document.getElementById('newUsersToday').textContent = '0';
+            document.getElementById('totalDownloads').textContent = documents.reduce((sum, doc) => sum + (doc.downloads || 0), 0);
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
         function switchTab(tabName) {
             // Update tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -2274,12 +1552,9 @@
                 case 'documents':
                     loadDocuments();
                     break;
-                case 'stats':
-                    updateStats();
-                    break;
                 case 'upload':
                     if (!isAdmin) {
-                        showNotification('Admin access required for uploads', 'error');
+                        showNotification('Admin access required', 'error');
                         switchTab('student');
                     } else {
                         updateRecentUploads();
@@ -2288,706 +1563,12 @@
                 case 'admin':
                     checkAdminSession();
                     break;
-            }
-            
-            // Add activity
-            addActivity(`Switched to ${tabName} tab`, 'user');
-        }
-
-        // ==================== USER MANAGEMENT ====================
-        function checkUserSession() {
-            const userData = localStorage.getItem('revisionvault_current_user');
-            if (userData) {
-                try {
-                    const user = JSON.parse(userData);
-                    const expiry = new Date(user.expiry);
-                    const now = new Date();
-                    
-                    if (expiry > now) {
-                        currentUser = user;
-                        showUserDashboard();
-                        startSessionTimer();
-                        showNotification(`Welcome back, ${user.displayPhone}!`, 'success');
-                    } else {
-                        logout();
-                        showNotification('Your subscription has expired', 'warning');
-                    }
-                } catch (e) {
-                    console.error('Error parsing user data:', e);
-                    logout();
-                }
-            }
-        }
-
-        function submitPayment() {
-            const phone = document.getElementById('userPhone').value.trim();
-            const txnCode = document.getElementById('txnCode').value.trim();
-            const university = document.getElementById('userUniversity').value;
-            const course = document.getElementById('userCourse').value.trim();
-            const year = document.getElementById('userYear').value;
-
-            // Validation - FIXED phone validation
-            const cleanPhone = phone.replace(/\D/g, '');
-            if (!validatePhoneNumber(cleanPhone)) {
-                showNotification('Please enter a valid 10-digit phone number starting with 07', 'error');
-                document.getElementById('userPhone').focus();
-                return;
-            }
-            
-            if (!txnCode || txnCode.length < 8) {
-                showNotification('Please enter a valid M-Pesa transaction code', 'error');
-                document.getElementById('txnCode').focus();
-                return;
-            }
-            
-            if (!university) {
-                showNotification('Please select your university', 'error');
-                document.getElementById('userUniversity').focus();
-                return;
-            }
-
-            // Format phone
-            const formattedPhone = '254' + cleanPhone.substring(1);
-
-            // Create pending payment
-            const pendingPayment = {
-                id: Date.now(),
-                phone: formattedPhone,
-                displayPhone: cleanPhone,
-                txnCode: txnCode.toUpperCase(),
-                university: university,
-                course: course,
-                year: year,
-                amount: CONFIG.subscriptionPrice,
-                date: new Date().toISOString(),
-                status: 'pending',
-                verified: false
-            };
-
-            // Save to pending
-            let pendingPayments = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
-            pendingPayments.push(pendingPayment);
-            localStorage.setItem('revisionvault_pending', JSON.stringify(pendingPayments));
-
-            // Show pending status
-            document.getElementById('subscriptionForm').style.display = 'none';
-            document.getElementById('pendingApproval').style.display = 'block';
-
-            document.getElementById('pendingDetails').innerHTML = `
-                <div class="status-message status-info">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <div style="text-align: left;">
-                        <h4>Payment Verification in Progress</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                            <div>
-                                <div style="font-size: 12px; color: #1e40af;">PHONE NUMBER</div>
-                                <div style="font-size: 18px; font-weight: 600;">${cleanPhone}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 12px; color: #1e40af;">TRANSACTION CODE</div>
-                                <div style="font-size: 18px; font-weight: 600;">${txnCode.toUpperCase()}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 12px; color: #1e40af;">UNIVERSITY</div>
-                                <div style="font-size: 16px; font-weight: 600;">${university}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 12px; color: #1e40af;">AMOUNT</div>
-                                <div style="font-size: 16px; font-weight: 600;">Ksh ${CONFIG.subscriptionPrice}</div>
-                            </div>
-                        </div>
-                        <p style="margin-top: 20px; color: var(--gray);">
-                            <i class="fas fa-info-circle"></i> Verification usually takes 1-5 minutes. You'll receive access immediately after verification.
-                        </p>
-                    </div>
-                </div>
-            `;
-
-            // Auto-verify for demo (in production, admin would verify)
-            setTimeout(() => {
-                autoVerifyPayment(pendingPayment);
-            }, 2000);
-
-            // Clear form
-            document.getElementById('userPhone').value = '';
-            document.getElementById('txnCode').value = '';
-            document.getElementById('userUniversity').value = '';
-            document.getElementById('userCourse').value = '';
-            document.getElementById('userYear').value = '';
-
-            // Add activity
-            addActivity('Payment submitted', 'payment', `${cleanPhone} - ${university}`);
-        }
-
-        function autoVerifyPayment(payment) {
-            // In production, this would be manual admin verification
-            verifyPayment(payment.id);
-        }
-
-        function verifyPayment(paymentId) {
-            const pendingPayments = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
-            const payment = pendingPayments.find(p => p.id === paymentId);
-            
-            if (!payment) return;
-
-            // Create user account
-            const expiryDate = new Date();
-            expiryDate.setDate(expiryDate.getDate() + CONFIG.subscriptionDays);
-            
-            const user = {
-                id: Date.now(),
-                phone: payment.phone,
-                displayPhone: payment.displayPhone,
-                university: payment.university,
-                course: payment.course,
-                year: payment.year,
-                joined: new Date().toISOString(),
-                expiry: expiryDate.toISOString(),
-                status: 'active',
-                paymentDate: payment.date,
-                txnCode: payment.txnCode,
-                amount: payment.amount,
-                username: payment.displayPhone // Set username as phone number
-            };
-
-            // Save user
-            let users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
-            users.push(user);
-            localStorage.setItem('revisionvault_users', JSON.stringify(users));
-
-            // Remove from pending
-            const updatedPending = pendingPayments.filter(p => p.id !== paymentId);
-            localStorage.setItem('revisionvault_pending', JSON.stringify(updatedPending));
-
-            // Set as current user
-            localStorage.setItem('revisionvault_current_user', JSON.stringify(user));
-            currentUser = user;
-
-            // Update UI
-            showUserDashboard();
-            loadPendingApprovals();
-            updateAdminStats();
-            
-            // Show success
-            showNotification('Payment verified! You now have access.', 'success');
-            
-            // Add activity
-            addActivity('Payment verified', 'admin', `${payment.displayPhone} - ${payment.university}`);
-        }
-
-        function checkApprovalStatus() {
-            const phoneInput = document.getElementById('userPhone');
-            const phone = phoneInput.value.trim().replace(/\D/g, '');
-            
-            if (!validatePhoneNumber(phone)) {
-                showNotification('Please enter your phone number first', 'error');
-                phoneInput.focus();
-                return;
-            }
-
-            const formattedPhone = '254' + phone.substring(1);
-            
-            // Check if user exists
-            const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
-            const user = users.find(u => u.phone === formattedPhone);
-            
-            if (user) {
-                // User found, show dashboard
-                localStorage.setItem('revisionvault_current_user', JSON.stringify(user));
-                currentUser = user;
-                showUserDashboard();
-                showNotification('Access granted! Welcome back.', 'success');
-            } else {
-                // Check pending
-                const pending = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
-                const pendingPayment = pending.find(p => p.phone === formattedPhone);
-                
-                if (pendingPayment) {
-                    showNotification('Payment still being verified...', 'info');
-                } else {
-                    showNotification('No subscription found for this number', 'error');
-                }
-            }
-        }
-
-        function showUserDashboard() {
-            if (!currentUser) return;
-            
-            const expiry = new Date(currentUser.expiry);
-            const now = new Date();
-            const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
-            
-            document.getElementById('subscriptionForm').style.display = 'none';
-            document.getElementById('userInfo').style.display = 'block';
-            document.getElementById('pendingApproval').style.display = 'none';
-            
-            let statusColor = '#059669';
-            let statusText = 'Active';
-            
-            if (daysLeft <= 7) {
-                statusColor = '#f59e0b';
-                statusText = 'Expiring Soon';
-            } else if (daysLeft <= 0) {
-                statusColor = '#dc2626';
-                statusText = 'Expired';
-            }
-            
-            // Set username as phone number
-            const username = currentUser.displayPhone || currentUser.phone.substring(3);
-            
-            document.getElementById('subscriptionDetails').innerHTML = `
-                <div class="status-message status-success">
-                    <div style="text-align: left; width: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h4 style="color: var(--dark);">
-                                <i class="fas fa-user"></i> Welcome, ${username}
-                            </h4>
-                            <span style="background: ${statusColor}; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
-                                ${statusText}
-                            </span>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                            <div>
-                                <div style="font-size: 12px; color: var(--gray);">USERNAME</div>
-                                <div style="font-size: 18px; font-weight: 600; color: var(--dark);">${username}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 12px; color: var(--gray);">UNIVERSITY</div>
-                                <div style="font-size: 18px; font-weight: 600; color: var(--dark);">${currentUser.university}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 12px; color: var(--gray);">DAYS REMAINING</div>
-                                <div style="font-size: 32px; font-weight: 800; color: ${statusColor};">${daysLeft}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 12px; color: var(--gray);">EXPIRY DATE</div>
-                                <div style="font-size: 16px; font-weight: 600; color: var(--dark);">${expiry.toLocaleDateString('en-GB')}</div>
-                            </div>
-                        </div>
-                        
-                        ${currentUser.course ? `
-                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                                <div style="font-size: 12px; color: var(--gray);">COURSE/YEAR</div>
-                                <div style="font-size: 16px; font-weight: 600; color: var(--dark);">
-                                    ${currentUser.course} ${currentUser.year ? '• ' + currentUser.year : ''}
-                                </div>
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-            
-            // Update session timer
-            startSessionTimer();
-            
-            // Update active students count
-            updatePublicStats();
-        }
-
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('revisionvault_current_user');
-            
-            document.getElementById('subscriptionForm').style.display = 'block';
-            document.getElementById('userInfo').style.display = 'none';
-            document.getElementById('pendingApproval').style.display = 'none';
-            
-            // Hide session timer
-            document.getElementById('sessionTimer').style.display = 'none';
-            
-            showNotification('Logged out successfully', 'info');
-            addActivity('User logged out', 'user');
-        }
-
-        // ==================== DOCUMENT MANAGEMENT - FIXED ====================
-        function loadDocuments() {
-            showLoading('Loading documents...');
-            
-            setTimeout(() => {
-                try {
-                    // Load from localStorage
-                    const documents = JSON.parse(localStorage.getItem('revisionvault_documents')) || [];
-                    allDocuments = documents;
-                    filteredDocuments = [...documents];
-                    
-                    // Update UI
-                    updateDocumentCount();
-                    generateUniversityFilters();
-                    generateSubjectFilters();
-                    displayDocuments();
-                    updatePublicStats();
-                    
-                    // Update last sync time
-                    document.getElementById('lastSync').textContent = `Last sync: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                    
-                    hideLoading();
-                    
-                    // Show notification if no documents
-                    if (documents.length === 0) {
-                        document.getElementById('noDocuments').style.display = 'block';
-                    } else {
-                        document.getElementById('noDocuments').style.display = 'none';
-                    }
-                    
-                } catch (error) {
-                    console.error('Error loading documents:', error);
-                    showNotification('Error loading documents', 'error');
-                    hideLoading();
-                }
-            }, 500);
-        }
-
-        function displayDocuments() {
-            const container = document.getElementById('documentsList');
-            const startIndex = (currentPage - 1) * documentsPerPage;
-            const endIndex = startIndex + documentsPerPage;
-            const pageDocuments = filteredDocuments.slice(startIndex, endIndex);
-            
-            if (pageDocuments.length === 0) {
-                container.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px;">
-                        <i class="fas fa-search" style="font-size: 60px; color: var(--gray); margin-bottom: 20px;"></i>
-                        <h3 style="color: var(--dark); margin-bottom: 10px;">No documents found</h3>
-                        <p style="color: var(--gray);">Try changing your search or filter criteria</p>
-                        <button class="btn btn-primary" onclick="clearFilters()" style="margin-top: 20px;">
-                            <i class="fas fa-times"></i> Clear Filters
-                        </button>
-                    </div>
-                `;
-                document.getElementById('pagination').style.display = 'none';
-                return;
-            }
-            
-            let html = '';
-            
-            pageDocuments.forEach(doc => {
-                const universityInfo = CONFIG.universities.find(u => u.name === doc.university) || CONFIG.universities[7];
-                const isAccessible = doc.access === 'free' || currentUser || isAdmin;
-                const accessClass = isAccessible ? '' : 'locked';
-                
-                html += `
-                    <div class="document-card ${accessClass}">
-                        <div class="document-badge" style="background: ${universityInfo.color}">
-                            ${doc.type || 'Document'}
-                        </div>
-                        
-                        <div class="document-university" style="background: ${universityInfo.color}20; color: ${universityInfo.color}">
-                            <i class="${universityInfo.icon}"></i>
-                            ${doc.university}
-                        </div>
-                        
-                        <h3 class="document-title">
-                            ${doc.title}
-                            ${!isAccessible ? '<i class="fas fa-lock" style="color: var(--warning); margin-left: 10px; font-size: 14px;"></i>' : ''}
-                        </h3>
-                        
-                        <div class="document-meta">
-                            <div class="document-meta-item">
-                                <i class="fas fa-book" style="color: ${universityInfo.color}"></i>
-                                <span>${doc.subject || 'General'}</span>
-                            </div>
-                            <div class="document-meta-item">
-                                <i class="fas fa-calendar" style="color: ${universityInfo.color}"></i>
-                                <span>${doc.year || '2024'}</span>
-                            </div>
-                            <div class="document-meta-item">
-                                <i class="fas fa-file" style="color: ${universityInfo.color}"></i>
-                                <span>${doc.format || 'PDF'}</span>
-                            </div>
-                        </div>
-                        
-                        ${doc.description ? `
-                            <p class="document-description">
-                                ${doc.description.substring(0, 150)}${doc.description.length > 150 ? '...' : ''}
-                            </p>
-                        ` : ''}
-                        
-                        ${doc.tags ? `
-                            <div class="document-tags">
-                                ${doc.tags.split(',').slice(0, 3).map(tag => `
-                                    <span class="document-tag">${tag.trim()}</span>
-                                `).join('')}
-                            </div>
-                        ` : ''}
-                        
-                        <div class="document-actions">
-                            ${isAccessible ? 
-                                `<button class="btn btn-primary btn-small" onclick="viewDocument(${doc.id})">
-                                    <i class="fas fa-eye"></i> View Document
-                                </button>` :
-                                `<button class="btn btn-warning btn-small" onclick="showSubscribeMessage()">
-                                    <i class="fas fa-lock"></i> Subscribe to View
-                                </button>`
-                            }
-                            <button class="btn btn-secondary btn-small" onclick="showDocumentInfo(${doc.id})">
-                                <i class="fas fa-info-circle"></i> Details
-                            </button>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: space-between; margin-top: 20px; font-size: 12px; color: var(--gray);">
-                            <span><i class="fas fa-eye"></i> ${doc.views || 0} views</span>
-                            <span><i class="fas fa-download"></i> ${doc.downloads || 0} downloads</span>
-                            <span><i class="fas fa-clock"></i> ${new Date(doc.date).toLocaleDateString()}</span>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-            // Update pagination
-            updatePagination();
-        }
-
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredDocuments.length / documentsPerPage);
-            const prevBtn = document.getElementById('prevPageBtn');
-            const nextBtn = document.getElementById('nextPageBtn');
-            
-            if (totalPages > 1) {
-                document.getElementById('pagination').style.display = 'block';
-                document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
-                
-                prevBtn.disabled = currentPage === 1;
-                nextBtn.disabled = currentPage === totalPages;
-            } else {
-                document.getElementById('pagination').style.display = 'none';
-            }
-        }
-
-        // ==================== DOCUMENT UPLOAD - ENHANCED ====================
-        function autoUploadIfValid() {
-            const link = document.getElementById('uploadLink').value.trim();
-            const title = document.getElementById('uploadTitle').value.trim();
-            const university = document.getElementById('uploadUniversity').value;
-            const subject = document.getElementById('uploadSubject').value.trim();
-            
-            if (link && title && university && subject && isValidUrl(link)) {
-                // Auto-populate other fields if empty
-                if (!document.getElementById('uploadYear').value) {
-                    document.getElementById('uploadYear').value = new Date().getFullYear();
-                }
-                
-                // Show preview
-                showUploadPreview();
-                
-                // If auto-upload is enabled and all required fields are filled
-                if (autoUploadEnabled) {
-                    setTimeout(() => {
-                        uploadDocument();
-                    }, 1000);
-                }
-            }
-        }
-
-        function updateLinkPlaceholder() {
-            const linkType = document.getElementById('uploadLinkType').value;
-            const linkInput = document.getElementById('uploadLink');
-            const helpText = document.getElementById('linkHelp');
-            
-            switch(linkType) {
-                case 'drive':
-                    linkInput.placeholder = 'https://drive.google.com/file/d/.../view?usp=sharing';
-                    helpText.textContent = 'For Google Drive: Use shareable link ending with /view?usp=sharing';
+                case 'stats':
+                    updateStats();
                     break;
-                case 'telegram':
-                    linkInput.placeholder = 'https://t.me/channel/123 or direct file link';
-                    helpText.textContent = 'Telegram channel link or direct file link';
-                    break;
-                case 'onedrive':
-                    linkInput.placeholder = 'https://1drv.ms/... or SharePoint link';
-                    helpText.textContent = 'OneDrive or SharePoint share link';
-                    break;
-                case 'dropbox':
-                    linkInput.placeholder = 'https://www.dropbox.com/s/...?dl=0';
-                    helpText.textContent = 'Dropbox share link (change ?dl=0 to ?raw=1 for direct access)';
-                    break;
-                default:
-                    linkInput.placeholder = 'https://example.com/document.pdf';
-                    helpText.textContent = 'Direct link to the document file';
             }
         }
 
-        function showUploadPreview() {
-            const title = document.getElementById('uploadTitle').value;
-            const university = document.getElementById('uploadUniversity').value;
-            const subject = document.getElementById('uploadSubject').value;
-            const link = document.getElementById('uploadLink').value;
-            
-            if (title && university && subject && link) {
-                document.getElementById('uploadPreview').style.display = 'block';
-                document.getElementById('previewContent').innerHTML = `
-                    <div style="padding: 15px; background: white; border-radius: var(--radius);">
-                        <h5 style="margin-bottom: 10px;">${title}</h5>
-                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                            <span style="background: var(--primary); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${university}</span>
-                            <span style="background: var(--info); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${subject}</span>
-                        </div>
-                        <p style="color: var(--gray); font-size: 12px; word-break: break-all;">${link}</p>
-                    </div>
-                `;
-            }
-        }
-
-        function uploadDocument() {
-            const title = document.getElementById('uploadTitle').value.trim();
-            const university = document.getElementById('uploadUniversity').value;
-            const subject = document.getElementById('uploadSubject').value.trim();
-            const type = document.getElementById('uploadType').value;
-            const year = document.getElementById('uploadYear').value.trim();
-            const link = document.getElementById('uploadLink').value.trim();
-            const linkType = document.getElementById('uploadLinkType').value;
-            const description = document.getElementById('uploadDescription').value.trim();
-            const tags = document.getElementById('uploadTags').value.trim();
-            const access = document.getElementById('uploadAccess').value;
-            
-            // Validation
-            if (!title || !university || !subject || !link) {
-                showNotification('Please fill in all required fields', 'error');
-                return;
-            }
-            
-            if (!isValidUrl(link)) {
-                showNotification('Please enter a valid URL', 'error');
-                return;
-            }
-            
-            // Create document
-            const document = {
-                id: Date.now(),
-                title: title,
-                university: university,
-                subject: subject,
-                type: type,
-                year: year || '2024',
-                link: link,
-                linkType: linkType,
-                description: description,
-                tags: tags,
-                access: access,
-                date: new Date().toISOString(),
-                views: 0,
-                downloads: 0,
-                format: getFileFormat(link),
-                uploadedBy: 'admin'
-            };
-            
-            // Save document
-            let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
-            documents.unshift(document); // Add to beginning
-            localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
-            
-            // Reload documents
-            loadDocuments();
-            
-            // Clear form
-            clearUploadForm();
-            
-            // Update recent uploads
-            updateRecentUploads();
-            
-            // Show success
-            showNotification('Document uploaded successfully!', 'success');
-            addActivity('Document uploaded', 'admin', title);
-            
-            // Auto-sync indicator
-            showAutoSyncIndicator();
-        }
-
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (_) {
-                return false;
-            }
-        }
-
-        function getFileFormat(link) {
-            const ext = link.split('.').pop().toLowerCase();
-            const formats = {
-                'pdf': 'PDF',
-                'doc': 'DOC',
-                'docx': 'DOCX',
-                'ppt': 'PPT',
-                'pptx': 'PPTX',
-                'xls': 'XLS',
-                'xlsx': 'XLSX',
-                'txt': 'TXT',
-                'jpg': 'JPG',
-                'jpeg': 'JPEG',
-                'png': 'PNG'
-            };
-            return formats[ext] || 'File';
-        }
-
-        function showAutoSyncIndicator() {
-            const indicator = document.getElementById('autoSyncIndicator');
-            indicator.style.display = 'flex';
-            
-            setTimeout(() => {
-                indicator.style.display = 'none';
-            }, 3000);
-        }
-
-        // ==================== ADMIN SYSTEM - ENHANCED ====================
-        function adminLogin() {
-            const password = document.getElementById('adminPassword').value.trim();
-            
-            if (password === CONFIG.adminPassword) {
-                isAdmin = true;
-                localStorage.setItem('revisionvault_admin_session', 'true');
-                
-                document.getElementById('adminLogin').style.display = 'none';
-                document.getElementById('adminDashboard').style.display = 'block';
-                
-                // Show upload tab for admin
-                document.getElementById('uploadTab').classList.remove('hidden');
-                
-                loadPendingApprovals();
-                loadUsersTable();
-                updateAdminStats();
-                
-                showNotification('Admin login successful!', 'success');
-                addActivity('Admin logged in', 'admin');
-                
-                // Clear password
-                document.getElementById('adminPassword').value = '';
-            } else {
-                showNotification('Invalid admin password', 'error');
-                document.getElementById('adminPassword').value = '';
-                document.getElementById('adminPassword').focus();
-            }
-        }
-
-        function checkAdminSession() {
-            if (localStorage.getItem('revisionvault_admin_session') === 'true') {
-                isAdmin = true;
-                document.getElementById('adminLogin').style.display = 'none';
-                document.getElementById('adminDashboard').style.display = 'block';
-                document.getElementById('uploadTab').classList.remove('hidden');
-                loadPendingApprovals();
-                loadUsersTable();
-                updateAdminStats();
-            } else {
-                document.getElementById('uploadTab').classList.add('hidden');
-            }
-        }
-
-        function adminLogout() {
-            isAdmin = false;
-            localStorage.removeItem('revisionvault_admin_session');
-            
-            document.getElementById('adminLogin').style.display = 'block';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('uploadTab').classList.add('hidden');
-            
-            showNotification('Admin logged out', 'info');
-            addActivity('Admin logged out', 'admin');
-        }
-
-        // ==================== UTILITY FUNCTIONS ====================
         function showLoading(text = 'Loading...') {
             document.getElementById('loadingOverlay').style.display = 'flex';
             document.getElementById('loadingText').textContent = text;
@@ -3016,129 +1597,75 @@
             
             // Remove after 5 seconds
             setTimeout(() => {
-                notification.style.animation = 'slideInRight 0.3s ease reverse';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.remove();
-                    }
-                }, 300);
+                notification.remove();
             }, 5000);
-        }
-
-        function updateDocumentCount() {
-            const count = allDocuments.length;
-            document.getElementById('docCountBadge').textContent = `${count} documents`;
-        }
-
-        function startSessionTimer() {
-            if (currentUser) {
-                document.getElementById('sessionTimer').style.display = 'flex';
-                updateTimerText();
-                
-                // Update every minute
-                setInterval(updateTimerText, 60000);
-            }
-        }
-
-        function updateTimerText() {
-            if (!currentUser) return;
-            
-            const expiry = new Date(currentUser.expiry);
-            const now = new Date();
-            const minutesLeft = Math.ceil((expiry - now) / (1000 * 60));
-            
-            if (minutesLeft > 0) {
-                const hours = Math.floor(minutesLeft / 60);
-                const mins = minutesLeft % 60;
-                
-                if (hours > 0) {
-                    document.getElementById('timerText').textContent = `Session: ${hours}h ${mins}m left`;
-                } else {
-                    document.getElementById('timerText').textContent = `Session: ${mins}m left`;
-                }
-                
-                // Change color based on time left
-                const timer = document.getElementById('sessionTimer');
-                if (minutesLeft <= 60) {
-                    timer.style.background = 'linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%)';
-                } else if (minutesLeft <= 180) {
-                    timer.style.background = 'linear-gradient(135deg, var(--info) 0%, #60a5fa 100%)';
-                } else {
-                    timer.style.background = 'linear-gradient(135deg, var(--success) 0%, #34d399 100%)';
-                }
-            } else {
-                document.getElementById('sessionTimer').style.display = 'none';
-            }
         }
 
         function showAdminSecretAccess() {
             const secret = prompt('Enter admin secret code:');
             if (secret === 'RV2024@Walter') {
-                document.getElementById('adminPassword').value = CONFIG.adminPassword;
+                document.getElementById('adminPassword').value = 'walter.zauko23';
                 showNotification('Admin access granted', 'success');
                 switchTab('admin');
-                
-                setTimeout(() => {
-                    document.getElementById('adminPassword').focus();
-                }, 500);
             } else if (secret) {
                 showNotification('Invalid secret code', 'error');
             }
         }
 
-        // ==================== DEMO DATA AND INITIALIZATION ====================
+        // ==================== DEMO DATA ====================
         function loadDemoDocuments() {
             const demoDocs = [
                 {
-                    id: 1,
+                    id: '1',
                     title: 'Mathematics 101 - Calculus Past Papers',
                     university: 'Egerton University',
                     subject: 'Mathematics',
                     type: 'Past Paper',
                     year: '2023',
                     link: 'https://drive.google.com/file/d/1ABC123DEF456/preview',
-                    linkType: 'drive',
-                    description: 'Complete calculus past papers with solutions for first year students.',
-                    tags: 'calculus, mathematics, past-paper, egerton',
                     access: 'free',
                     views: 1245,
                     downloads: 456,
-                    format: 'PDF',
                     date: new Date(Date.now() - 86400000).toISOString()
                 },
                 {
-                    id: 2,
-                    title: 'Computer Science Data Structures',
+                    id: '2',
+                    title: 'Computer Science Data Structures Notes',
                     university: 'University of Nairobi',
                     subject: 'Computer Science',
                     type: 'Lecture Notes',
                     year: '2024',
                     link: 'https://drive.google.com/file/d/2XYZ789ABC123/preview',
-                    linkType: 'drive',
-                    description: 'Data structures and algorithms comprehensive notes.',
-                    tags: 'computer-science, algorithms, data-structures, uon',
                     access: 'premium',
                     views: 856,
                     downloads: 234,
-                    format: 'PDF',
                     date: new Date(Date.now() - 172800000).toISOString()
                 },
                 {
-                    id: 3,
+                    id: '3',
                     title: 'Physics Laboratory Manual',
                     university: 'Kenyatta University',
                     subject: 'Physics',
                     type: 'Lab Manual',
                     year: '2023',
                     link: 'https://drive.google.com/file/d/3DEF456GHI789/preview',
-                    linkType: 'drive',
-                    description: 'Complete physics laboratory experiments and procedures.',
-                    tags: 'physics, laboratory, experiments, ku',
                     access: 'free',
                     views: 567,
                     downloads: 123,
-                    format: 'PDF',
                     date: new Date(Date.now() - 259200000).toISOString()
+                },
+                {
+                    id: '4',
+                    title: 'Chemistry Organic Reactions Guide',
+                    university: 'Masinde Muliro University',
+                    subject: 'Chemistry',
+                    type: 'Revision Guide',
+                    year: '2024',
+                    link: 'https://drive.google.com/file/d/4JKL123MNO456/preview',
+                    access: 'premium',
+                    views: 432,
+                    downloads: 98,
+                    date: new Date(Date.now() - 345600000).toISOString()
                 }
             ];
             
@@ -3146,36 +1673,16 @@
             allDocuments = demoDocs;
             filteredDocuments = [...demoDocs];
             
-            showNotification('Demo documents loaded', 'info');
+            showNotification('Demo documents loaded successfully', 'success');
         }
 
-        // Initialize the remaining functions...
-        // Note: Due to character limit, I've provided the critical fixes.
-        // The remaining functions from the original code should work with these fixes.
-
-        // Initialize remaining functionality
-        function setupScreenshotProtection() {
-            // Implementation
-        }
-
-        function viewDocument(docId) {
-            // Implementation
-        }
-
-        function closeDocumentViewer() {
-            // Implementation
-        }
-
-        function zoomIn() {
-            // Implementation
-        }
-
-        function zoomOut() {
-            // Implementation
-        }
-
-        // Add other necessary functions here...
-
+        // Initialize on load
+        window.onload = function() {
+            initSystem();
+            loadDocuments();
+            checkUserSession();
+            showNotification('RevisionVault Pro Ready!', 'success');
+        };
     </script>
 </body>
 </html>
