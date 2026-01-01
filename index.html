@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevisionVault Pro - Premium University Materials</title>
+    <style>
+        /* Previous styles remain unchanged, adding new styles below */
+
+        /* Enhanced Search Container */
+        .enhanced-search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .search-type-toggle {
+            display: flex;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: white;
+        }
+
+        .search-type-btn {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: var(--gray);
+        }
+
+        .search-type-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .unit-code-search {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .unit-code-input {
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 16px;
+            text-transform: uppercase;
+            width: 150px;
+        }
+
+        .unit-code-search-btn {
+            padding: 12px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Advanced Admin Features */
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .batch-upload {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+        }
+
+        .export-data {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+
+        .backup-data {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        }
+
+        .system-stats {
+            background: var(--light);
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Document Viewer Enhancements */
+        .viewer-controls {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .viewer-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .viewer-disabled {
+            pointer-events: none;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .viewer-iframe {
+            width: 100%;
+            height: calc(100% - 60px);
+            border: none;
+        }
+
+        /* Batch Upload Modal */
+        .batch-upload-modal {
+            max-width: 700px;
+        }
+
+        .upload-instructions {
+            background: #F0F9FF;
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: var(--light);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        /* Auto-Complete Suggestions */
+        .suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0 0 var(--radius) var(--radius);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .suggestion-item:hover {
+            background: var(--light);
+        }
+
+        .suggestion-code {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .suggestion-title {
+            color: var(--dark);
+            flex-grow: 1;
+            margin: 0 10px;
+        }
+
+        .suggestion-university {
+            font-size: 12px;
+            color: var(--gray);
+            background: var(--light);
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        /* Document Categories */
+        .category-tags {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-tag {
+            padding: 8px 16px;
+            background: var(--light);
+            border-radius: 50px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .category-tag:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .category-tag.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Quick Stats Cards */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .quick-stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            text-align: center;
+        }
+
+        /* Admin User Actions */
+        .user-actions-modal {
+            max-width: 600px;
+        }
+
+        .user-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .user-info-item {
+            background: var(--light);
+            padding: 15px;
+            border-radius: var(--radius);
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .enhanced-search-container {
+                flex-direction: column;
+            }
+            
+            .unit-code-search {
+                width: 100%;
+            }
+            
+            .unit-code-input {
+                flex-grow: 1;
+            }
+            
+            .admin-actions {
+                flex-direction: column;
+            }
+            
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Enhanced Document Viewer without download */
+        .viewer-content {
+            position: relative;
+        }
+
+        .viewer-content::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            pointer-events: none;
+        }
+
+        /* Remove context menu from viewer */
+        #viewerFrame {
+            pointer-events: auto;
+        }
+
+        /* Disable right-click in viewer */
+        .viewer-content {
+            user-select: none;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="notificationContainer"></div>
+
+    <!-- Document Viewer (Enhanced) -->
+    <div class="document-viewer-container" id="documentViewer">
+        <div style="background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="viewerTitle" style="font-size: 18px; font-weight: 600;">Loading Document...</h3>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="closeDocumentViewer()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0 10px;">×</button>
+            </div>
+        </div>
+        <div class="viewer-controls">
+            <div class="viewer-nav">
+                <button class="nav-btn" onclick="zoomOut()" title="Zoom Out">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <button class="nav-btn" onclick="zoomIn()" title="Zoom In">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button class="nav-btn" onclick="fitToWidth()" title="Fit to Width">
+                    <i class="fas fa-arrows-alt-h"></i>
+                </button>
+            </div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 14px;">
+                <span id="viewerPageInfo">Page: 1</span>
+            </div>
+        </div>
+        <div class="viewer-content">
+            <div class="viewer-loading" id="viewerLoading">
+                <div class="spinner"></div>
+                <p>Loading document...</p>
+            </div>
+            <iframe id="viewerFrame" class="viewer-iframe" 
+                    sandbox="allow-scripts allow-same-origin allow-popups"
+                    referrerpolicy="no-referrer"
+                    allow="fullscreen">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Batch Upload Modal -->
+    <div class="modal-overlay" id="batchUploadModal">
+        <div class="modal batch-upload-modal">
+            <h3 style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 20px;">
+                <i class="fas fa-upload"></i> Batch Upload Documents
+            </h3>
+            <div class="upload-instructions">
+                <p><strong>Instructions:</strong> Upload a CSV file with columns: Title, University, Subject, Year, Date, Link, UnitCode</p>
+                <p style="font-size: 12px; margin-top: 5px;">Format: CSV (comma-separated values)</p>
+            </div>
+            <div class="upload-area" id="dropArea" onclick="document.getElementById('csvFileInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop CSV file here or click to browse</p>
+                <p style="font-size: 12px; color: var(--gray); margin-top: 5px;">Max file size: 5MB</p>
+            </div>
+            <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleCSVUpload(event)">
+            
+            <div id="uploadPreview" style="display: none; margin-top: 20px;">
+                <h4 style="margin-bottom: 10px;">Upload Preview (First 5 rows)</h4>
+                <div style="background: var(--light); padding: 15px; border-radius: var(--radius); max-height: 200px; overflow-y: auto;">
+                    <table style="width: 100%; font-size: 12px;">
+                        <thead id="previewHeader"></thead>
+                        <tbody id="previewBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" id="processUploadBtn" style="display: none;" onclick="processBatchUpload()">
+                    <i class="fas fa-check"></i> Process Upload
+                </button>
+                <button class="btn btn-secondary" onclick="closeModal('batchUploadModal')">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Secret Button -->
+    <div style="position: fixed; top: 15px; right: 15px; z-index: 9999;">
+        <button onclick="showAdminSecretAccess()" style="background: var(--primary); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer;">
+            <i class="fas fa-shield-alt"></i>
+        </button>
+    </div>
+
+    <div class="container">
+        <!-- Header and Tabs remain the same until DOCUMENTS SECTION -->
+        
+        <!-- DOCUMENTS SECTION (Enhanced) -->
+        <div id="documents" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
+                <div>
+                    <h3 style="font-size: 28px; font-weight: 700; color: var(--primary);">
+                        <i class="fas fa-file-alt"></i> University Study Materials
+                    </h3>
+                    <p style="color: var(--gray); margin-top: 10px;">Premium content unlocked with 5-month subscription</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div style="background: var(--primary); color: white; padding: 12px 24px; border-radius: 50px; font-weight: 600;">
+                        <i class="fas fa-file-alt"></i>
+                        <span id="docCountBadge">0 materials</span>
+                    </div>
+                    <div id="accessStatus" style="color: var(--success); font-size: 14px; font-weight: 500; display: none;">
+                        <i class="fas fa-unlock"></i> 5-Month Access Active
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Search -->
+            <div class="enhanced-search-container">
+                <div class="search-type-toggle">
+                    <button class="search-type-btn active" onclick="setSearchType('general')" id="searchGeneralBtn">
+                        <i class="fas fa-search"></i> General
+                    </button>
+                    <button class="search-type-btn" onclick="setSearchType('unitcode')" id="searchUnitBtn">
+                        <i class="fas fa-code"></i> Unit Code
+                    </button>
+                </div>
+                
+                <div style="flex-grow: 1; position: relative;" id="generalSearchContainer">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search materials by title, subject, keywords..." onkeyup="searchDocuments()" onfocus="showSuggestions()">
+                    <button style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--gray); font-size: 22px; cursor: pointer;" onclick="searchDocuments()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <div class="suggestions-container" id="searchSuggestions"></div>
+                </div>
+                
+                <div class="unit-code-search" id="unitCodeSearchContainer" style="display: none;">
+                    <input type="text" id="unitCodeInput" class="unit-code-input" placeholder="BOTA241" onkeyup="if(event.key === 'Enter') searchByUnitCode()">
+                    <button class="unit-code-search-btn" onclick="searchByUnitCode()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearUnitCodeSearch()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Filters -->
+            <div class="category-tags" id="categoryTags">
+                <span class="category-tag active" onclick="filterByCategory('all')">All Materials</span>
+                <span class="category-tag" onclick="filterByCategory('recent')">
+                    <i class="fas fa-clock"></i> Recent
+                </span>
+                <span class="category-tag" onclick="filterByCategory('popular')">
+                    <i class="fas fa-fire"></i> Popular
+                </span>
+                <span class="category-tag" onclick="filterByCategory('notes')">
+                    <i class="fas fa-sticky-note"></i> Notes
+                </span>
+                <span class="category-tag" onclick="filterByCategory('past_papers')">
+                    <i class="fas fa-file-pdf"></i> Past Papers
+                </span>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats" id="quickStats" style="display: none;">
+                <div class="quick-stat-card">
+                    <div class="stat-value" id="totalDocsStat">0</div>
+                    <div class="stat-label">Total Documents</div>
+                </div>
+                <div class="quick-stat-card">
+                    <div class="stat-value" id="totalViewsStat">0</div>
+                    <div class="stat-label">Total Views</div>
+                </div>
+                <div class="quick-stat-card">
+                    <div class="stat-value" id="avgRatingStat">0.0</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+                <div class="quick-stat-card">
+                    <div class="stat-value" id="lastUpdatedStat">-</div>
+                    <div class="stat-label">Last Updated</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-container">
+                <select id="universityFilter" class="filter-select" onchange="filterDocuments()">
+                    <option value="">All Universities</option>
+                    <option value="Egerton University">Egerton University</option>
+                    <option value="University of Nairobi">University of Nairobi</option>
+                    <option value="Kenyatta University">Kenyatta University</option>
+                    <option value="Masinde Muliro University">Masinde Muliro University</option>
+                    <option value="JKUAT">JKUAT</option>
+                    <option value="Moi University">Moi University</option>
+                    <option value="Technical University of Kenya">Technical University of Kenya</option>
+                </select>
+                <select id="yearFilter" class="filter-select" onchange="filterDocuments()">
+                    <option value="">All Years</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                </select>
+                <select id="subjectFilter" class="filter-select" onchange="filterDocuments()">
+                    <option value="">All Subjects</option>
+                    <!-- Will be populated dynamically -->
+                </select>
+            </div>
+
+            <!-- Access Messages -->
+            <div id="documentsAccessMessage" style="display: none; text-align: center; padding: 40px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: var(--radius); margin-bottom: 30px;">
+                <h4 style="color: var(--primary); margin-bottom: 15px;">
+                    <i class="fas fa-unlock"></i> All Materials Unlocked!
+                </h4>
+                <p style="color: var(--gray);">You have full access to all study materials for 5 months. Click on any document to view.</p>
+            </div>
+
+            <div id="documentsLockedMessage" style="text-align: center; padding: 40px; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-radius: var(--radius); margin-bottom: 30px;">
+                <h4 style="color: var(--warning); margin-bottom: 15px;">
+                    <i class="fas fa-lock"></i> All Documents Locked
+                </h4>
+                <p style="color: var(--gray); margin-bottom: 20px;">Subscribe with Ksh 67 for 5 months access to study materials.</p>
+                <button class="btn btn-primary" onclick="switchTab('student')">
+                    <i class="fas fa-sign-in-alt"></i> Subscribe to Get Access
+                </button>
+            </div>
+
+            <!-- Documents Grid -->
+            <div class="documents-grid" id="documentsList">
+                <!-- Documents will load here -->
+            </div>
+
+            <div id="noDocuments" style="text-align: center; padding: 60px; color: var(--gray); display: none;">
+                <i class="fas fa-file-alt" style="font-size: 80px; margin-bottom: 30px; color: #e5e7eb;"></i>
+                <h3 style="font-size: 28px; margin-bottom: 15px; color: var(--dark);">No Materials Found</h3>
+                <p style="font-size: 18px; margin-bottom: 30px;">Try changing your search criteria.</p>
+            </div>
+
+            <!-- Pagination -->
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 40px;" id="pagination" style="display: none;">
+                <button class="btn btn-secondary" onclick="changePage(-1)" id="prevPageBtn">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                </div>
+                <button class="btn btn-secondary" onclick="changePage(1)" id="nextPageBtn">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ADMIN PANEL (Enhanced) -->
+        <div id="admin" class="tab-content">
+            <div id="adminLogin">
+                <div class="form-container" style="max-width: 500px; margin: 0 auto;">
+                    <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
+                        <i class="fas fa-lock"></i> Admin Authentication
+                    </h3>
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Admin Password</label>
+                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password" required>
+                        <small style="color: var(--gray); margin-top: 5px; display: block;">Password: walter.zauko23</small>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="adminLogin()">
+                        <i class="fas fa-sign-in-alt"></i> Login as Admin
+                    </button>
+                </div>
+            </div>
+
+            <div id="adminDashboard" style="display: none;">
+                <div class="admin-header">
+                    <div>
+                        <h3 style="font-size: 32px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                        </h3>
+                        <p style="color: var(--gray);">Manage Subscriptions & Documents</p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-info" onclick="showSystemStats()">
+                            <i class="fas fa-chart-bar"></i> System Stats
+                        </button>
+                        <button class="btn btn-danger" onclick="adminLogout()">
+                            <i class="fas fa-sign-out-alt"></i> Logout Admin
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Admin Actions -->
+                <div class="admin-actions">
+                    <button class="btn batch-upload" onclick="showBatchUpload()">
+                        <i class="fas fa-file-import"></i> Batch Upload
+                    </button>
+                    <button class="btn export-data" onclick="exportData()">
+                        <i class="fas fa-file-export"></i> Export Data
+                    </button>
+                    <button class="btn backup-data" onclick="createBackup()">
+                        <i class="fas fa-database"></i> Backup System
+                    </button>
+                    <button class="btn btn-warning" onclick="cleanupSystem()">
+                        <i class="fas fa-broom"></i> Cleanup System
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshAllData()">
+                        <i class="fas fa-sync-alt"></i> Refresh All
+                    </button>
+                </div>
+
+                <!-- System Statistics -->
+                <div class="system-stats" id="systemStats" style="display: none;">
+                    <h4 style="margin-bottom: 15px; color: var(--primary);">
+                        <i class="fas fa-chart-line"></i> System Statistics
+                    </h4>
+                    <div class="stat-row">
+                        <div class="stat-item">
+                            <div class="stat-value" id="sysTotalDocs">0</div>
+                            <div class="stat-label">Total Documents</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="sysTotalUsers">0</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="sysActiveSubs">0</div>
+                            <div class="stat-label">Active Subscriptions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="sysStorageUsed">0 KB</div>
+                            <div class="stat-label">Storage Used</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tabs -->
+                <div class="tab-switcher">
+                    <button class="tab-btn active" onclick="switchAdminTab('pending')">Pending Approvals</button>
+                    <button class="tab-btn" onclick="switchAdminTab('users')">Active Users</button>
+                    <button class="tab-btn" onclick="switchAdminTab('expired')">Expired Users</button>
+                    <button class="tab-btn" onclick="switchAdminTab('documents')">Manage Documents</button>
+                    <button class="tab-btn" onclick="switchAdminTab('unitcodes')">Unit Codes</button>
+                    <button class="tab-btn" onclick="switchAdminTab('analytics')">Analytics</button>
+                </div>
+
+                <!-- Pending Approvals -->
+                <div id="pendingApprovals" class="admin-tab-content">
+                    <!-- Content remains the same -->
+                </div>
+
+                <!-- Approved Users -->
+                <div id="approvedUsers" class="admin-tab-content" style="display: none;">
+                    <!-- Content remains the same -->
+                </div>
+
+                <!-- Expired Users -->
+                <div id="expiredUsers" class="admin-tab-content" style="display: none;">
+                    <!-- Content remains the same -->
+                </div>
+
+                <!-- Manage Documents -->
+                <div id="manageDocuments" class="admin-tab-content" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="font-size: 24px; font-weight: 700; color: var(--primary);">
+                            <i class="fas fa-file-alt"></i> Manage Documents
+                        </h3>
+                        <button class="btn btn-primary" onclick="document.getElementById('unitCodeInput').focus()">
+                            <i class="fas fa-code"></i> Add Unit Codes
+                        </button>
+                    </div>
+                    <div class="admin-table-container" id="documentsTable">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Unit Codes Management -->
+                <div id="unitCodes" class="admin-tab-content" style="display: none;">
+                    <h3 style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 20px;">
+                        <i class="fas fa-code"></i> Manage Unit Codes
+                    </h3>
+                    <div class="form-container" style="margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label style="display: block; margin-bottom: 12px; font-weight: 600;">Add/Update Unit Code</label>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="unitCodeDocSelect" class="form-control" style="flex-grow: 1;">
+                                    <option value="">Select Document</option>
+                                </select>
+                                <input type="text" id="unitCodeValue" class="form-control" placeholder="BOTA241" style="width: 200px;" onkeyup="this.value = this.value.toUpperCase()">
+                                <button class="btn btn-primary" onclick="saveUnitCode()">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                            <small style="color: var(--gray); margin-top: 5px; display: block;">
+                                Unit codes are case-insensitive. Both "BOTA241" and "bota241" will match.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="admin-table-container" id="unitCodesTable">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Analytics -->
+                <div id="analytics" class="admin-tab-content" style="display: none;">
+                    <h3 style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 20px;">
+                        <i class="fas fa-chart-pie"></i> System Analytics
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                        <div class="form-container">
+                            <h4 style="margin-bottom: 15px;">Document Statistics</h4>
+                            <div id="docStatsChart"></div>
+                        </div>
+                        <div class="form-container">
+                            <h4 style="margin-bottom: 15px;">User Statistics</h4>
+                            <div id="userStatsChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPLOAD SECTION (Enhanced) -->
+        <div id="upload" class="tab-content">
+            <div class="form-container">
+                <h3 style="font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px;">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload Study Materials
+                </h3>
+                
+                <!-- Upload Tabs -->
+                <div class="tab-switcher" style="margin-bottom: 30px;">
+                    <button class="tab-btn active" onclick="switchUploadTab('single')">Single Upload</button>
+                    <button class="tab-btn" onclick="switchUploadTab('bulk')">Bulk Upload</button>
+                </div>
+
+                <!-- Single Upload -->
+                <div id="singleUpload" class="upload-tab-content">
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Title *</label>
+                        <input type="text" id="uploadTitle" class="form-control" placeholder="e.g., Animal Physiology Notes" required>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Unit Code (Optional)</label>
+                        <input type="text" id="uploadUnitCode" class="form-control" placeholder="e.g., BOTA241, COMP 101" onkeyup="this.value = this.value.toUpperCase()">
+                        <small style="color: var(--gray); margin-top: 5px; display: block;">
+                            Students can search using this code (case-insensitive)
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Select University *</label>
+                        <select id="uploadUniversity" class="form-control" required>
+                            <option value="Egerton University">Egerton University</option>
+                            <option value="University of Nairobi">University of Nairobi</option>
+                            <option value="Kenyatta University">Kenyatta University</option>
+                            <option value="Masinde Muliro University">Masinde Muliro University</option>
+                            <option value="JKUAT">JKUAT</option>
+                            <option value="Moi University">Moi University</option>
+                            <option value="Technical University of Kenya">Technical University of Kenya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Subject *</label>
+                        <input type="text" id="uploadSubject" class="form-control" placeholder="e.g., Biology, Chemistry, Physics" required>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Year *</label>
+                        <input type="text" id="uploadYear" class="form-control" placeholder="e.g., 2024, 2023" required>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Type</label>
+                        <select id="uploadType" class="form-control">
+                            <option value="Study Material">Study Material</option>
+                            <option value="Lecture Notes">Lecture Notes</option>
+                            <option value="Past Paper">Past Paper</option>
+                            <option value="Revision Guide">Revision Guide</option>
+                            <option value="Lab Manual">Lab Manual</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Date *</label>
+                        <input type="date" id="uploadDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Link *</label>
+                        <input type="text" id="uploadLink" class="form-control" placeholder="Enter direct PDF link or Google Drive shareable link" required>
+                        <small style="color: var(--gray); margin-top: 5px; display: block;">
+                            <strong>For Google Drive:</strong> Make sure file is shared with "Anyone with the link"<br>
+                            <strong>Direct PDF:</strong> Use any direct PDF link
+                        </small>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="uploadDocument()">
+                        <i class="fas fa-upload"></i> Upload Document
+                    </button>
+                </div>
+
+                <!-- Bulk Upload -->
+                <div id="bulkUpload" class="upload-tab-content" style="display: none;">
+                    <div class="upload-instructions">
+                        <p><strong>Bulk Upload Format:</strong> Prepare a CSV file with the following columns:</p>
+                        <ul style="font-size: 14px; margin-top: 5px;">
+                            <li>Title (required)</li>
+                            <li>University (required)</li>
+                            <li>Subject (required)</li>
+                            <li>Year (required)</li>
+                            <li>Date (YYYY-MM-DD)</li>
+                            <li>Link (required)</li>
+                            <li>UnitCode (optional)</li>
+                            <li>Type (optional: Study Material, Lecture Notes, Past Paper)</li>
+                        </ul>
+                    </div>
+                    <div class="upload-area" onclick="document.getElementById('bulkCsvFile').click()">
+                        <i class="fas fa-file-csv"></i>
+                        <p>Click to upload CSV file</p>
+                        <p style="font-size: 12px; color: var(--gray); margin-top: 5px;">Max 100 documents per upload</p>
+                    </div>
+                    <input type="file" id="bulkCsvFile" accept=".csv" style="display: none;" onchange="handleBulkUpload(event)">
+                    
+                    <div id="bulkUploadPreview" style="display: none; margin-top: 20px;">
+                        <h4 style="margin-bottom: 10px;">Upload Preview</h4>
+                        <div style="background: var(--light); padding: 15px; border-radius: var(--radius); max-height: 300px; overflow-y: auto;">
+                            <table style="width: 100%; font-size: 12px;" id="bulkPreviewTable">
+                                <!-- Preview will be shown here -->
+                            </table>
+                        </div>
+                        <button class="btn btn-success" style="width: 100%; margin-top: 20px;" onclick="processBulkUpload()">
+                            <i class="fas fa-check-circle"></i> Confirm & Upload All
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" style="width: 100%; margin-top: 15px;" onclick="switchTab('admin')">
+                    <i class="fas fa-arrow-left"></i> Back to Admin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== ENHANCED FEATURES ====================
+        
+        // Unit code search functionality
+        let searchType = 'general';
+        let currentPage = 1;
+        let docsPerPage = 12;
+        let currentCategory = 'all';
+        let unitCodeMap = {}; // Maps unit codes to document IDs
+
+        function setSearchType(type) {
+            searchType = type;
+            document.getElementById('searchGeneralBtn').classList.toggle('active', type === 'general');
+            document.getElementById('searchUnitBtn').classList.toggle('active', type === 'unitcode');
+            document.getElementById('generalSearchContainer').style.display = type === 'general' ? 'block' : 'none';
+            document.getElementById('unitCodeSearchContainer').style.display = type === 'unitcode' ? 'flex' : 'none';
+            
+            if (type === 'unitcode') {
+                document.getElementById('unitCodeInput').focus();
+            }
+        }
+
+        function searchByUnitCode() {
+            const unitCode = document.getElementById('unitCodeInput').value.trim().toUpperCase();
+            if (!unitCode) return;
+            
+            // Normalize unit code (remove spaces, handle variations)
+            const normalizedCode = unitCode.replace(/\s+/g, '').toUpperCase();
+            
+            // Search in unit code map
+            const matchedDocs = [];
+            allDocuments.forEach(doc => {
+                if (doc.unitCode) {
+                    const docUnitCode = doc.unitCode.replace(/\s+/g, '').toUpperCase();
+                    if (docUnitCode === normalizedCode) {
+                        matchedDocs.push(doc);
+                    }
+                }
+                
+                // Also check if unit code is in title
+                if (doc.title.toUpperCase().includes(normalizedCode)) {
+                    matchedDocs.push(doc);
+                }
+            });
+            
+            filteredDocuments = [...new Set(matchedDocs)];
+            currentPage = 1;
+            displayDocuments();
+            
+            if (filteredDocuments.length > 0) {
+                showNotification(`Found ${filteredDocuments.length} document(s) for unit code: ${unitCode}`, 'success');
+            } else {
+                showNotification(`No documents found for unit code: ${unitCode}`, 'warning');
+            }
+        }
+
+        function clearUnitCodeSearch() {
+            document.getElementById('unitCodeInput').value = '';
+            filteredDocuments = [...allDocuments];
+            currentPage = 1;
+            displayDocuments();
+        }
+
+        function normalizeUnitCode(code) {
+            if (!code) return '';
+            return code.replace(/\s+/g, '').toUpperCase();
+        }
+
+        // Enhanced search with suggestions
+        function showSuggestions() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (query.length < 2) {
+                hideSuggestions();
+                return;
+            }
+            
+            const suggestions = [];
+            
+            // Search in titles
+            allDocuments.forEach(doc => {
+                if (doc.title.toLowerCase().includes(query)) {
+                    suggestions.push({
+                        type: 'title',
+                        title: doc.title,
+                        university: doc.university,
+                        subject: doc.subject
+                    });
+                }
+                
+                // Search in unit codes
+                if (doc.unitCode && doc.unitCode.toLowerCase().includes(query)) {
+                    suggestions.push({
+                        type: 'unitcode',
+                        code: doc.unitCode,
+                        title: doc.title,
+                        university: doc.university
+                    });
+                }
+            });
+            
+            // Limit suggestions
+            const limitedSuggestions = suggestions.slice(0, 10);
+            
+            if (limitedSuggestions.length > 0) {
+                displaySuggestions(limitedSuggestions);
+            } else {
+                hideSuggestions();
+            }
+        }
+
+        function displaySuggestions(suggestions) {
+            const container = document.getElementById('searchSuggestions');
+            container.innerHTML = '';
+            
+            suggestions.forEach((suggestion, index) => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.onclick = () => {
+                    if (suggestion.type === 'unitcode') {
+                        document.getElementById('searchInput').value = suggestion.code;
+                        setSearchType('unitcode');
+                        document.getElementById('unitCodeInput').value = suggestion.code;
+                        searchByUnitCode();
+                    } else {
+                        document.getElementById('searchInput').value = suggestion.title;
+                        searchDocuments();
+                    }
+                    hideSuggestions();
+                };
+                
+                if (suggestion.type === 'unitcode') {
+                    div.innerHTML = `
+                        <div class="suggestion-code">${suggestion.code}</div>
+                        <div class="suggestion-title">${suggestion.title}</div>
+                        <div class="suggestion-university">${suggestion.university}</div>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <div class="suggestion-title">${suggestion.title}</div>
+                        <div class="suggestion-university">${suggestion.university}</div>
+                    `;
+                }
+                
+                container.appendChild(div);
+            });
+            
+            container.style.display = 'block';
+        }
+
+        function hideSuggestions() {
+            document.getElementById('searchSuggestions').style.display = 'none';
+        }
+
+        // Enhanced document search
+        function searchDocuments() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const university = document.getElementById('universityFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            const subject = document.getElementById('subjectFilter').value;
+            
+            filteredDocuments = allDocuments.filter(doc => {
+                // Search query matching
+                const matchesSearch = !query || 
+                    doc.title.toLowerCase().includes(query) ||
+                    (doc.subject && doc.subject.toLowerCase().includes(query)) ||
+                    (doc.unitCode && doc.unitCode.toLowerCase().includes(query)) ||
+                    (doc.description && doc.description.toLowerCase().includes(query));
+                
+                // Filter matching
+                const matchesUniversity = !university || doc.university === university;
+                const matchesYear = !year || doc.year === year;
+                const matchesSubject = !subject || (doc.subject && doc.subject === subject);
+                
+                // Category filter
+                let matchesCategory = true;
+                if (currentCategory === 'recent') {
+                    const docDate = new Date(doc.date || doc.uploadDate);
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    matchesCategory = docDate > thirtyDaysAgo;
+                } else if (currentCategory === 'popular') {
+                    matchesCategory = (doc.views || 0) > 10;
+                } else if (currentCategory === 'notes') {
+                    matchesCategory = doc.title.toLowerCase().includes('notes') || 
+                                     (doc.type && doc.type.toLowerCase().includes('notes'));
+                } else if (currentCategory === 'past_papers') {
+                    matchesCategory = doc.title.toLowerCase().includes('past paper') || 
+                                     (doc.type && doc.type.toLowerCase().includes('past'));
+                }
+                
+                return matchesSearch && matchesUniversity && matchesYear && 
+                       matchesSubject && matchesCategory;
+            });
+            
+            currentPage = 1;
+            displayDocuments();
+        }
+
+        // Category filtering
+        function filterByCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            searchDocuments();
+        }
+
+        // Enhanced document display with pagination
+        function displayDocuments() {
+            const container = document.getElementById('documentsList');
+            const hasAccess = canAccessDocuments();
+            
+            // Update quick stats
+            updateQuickStats();
+            
+            // Show/hide access messages
+            if (hasAccess) {
+                document.getElementById('documentsAccessMessage').style.display = 'block';
+                document.getElementById('documentsLockedMessage').style.display = 'none';
+                document.getElementById('accessStatus').style.display = 'block';
+                document.getElementById('quickStats').style.display = 'grid';
+            } else {
+                document.getElementById('documentsAccessMessage').style.display = 'none';
+                document.getElementById('documentsLockedMessage').style.display = 'block';
+                document.getElementById('accessStatus').style.display = 'none';
+                document.getElementById('quickStats').style.display = 'none';
+            }
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(filteredDocuments.length / docsPerPage);
+            const startIndex = (currentPage - 1) * docsPerPage;
+            const endIndex = Math.min(startIndex + docsPerPage, filteredDocuments.length);
+            const pageDocuments = filteredDocuments.slice(startIndex, endIndex);
+            
+            // Update pagination UI
+            const pagination = document.getElementById('pagination');
+            const currentPageSpan = document.getElementById('currentPage');
+            const totalPagesSpan = document.getElementById('totalPages');
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            
+            if (filteredDocuments.length > docsPerPage) {
+                pagination.style.display = 'flex';
+                currentPageSpan.textContent = currentPage;
+                totalPagesSpan.textContent = totalPages;
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === totalPages;
+            } else {
+                pagination.style.display = 'none';
+            }
+            
+            if (pageDocuments.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+                        <i class="fas fa-search" style="font-size: 60px; color: var(--gray); margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--dark); margin-bottom: 10px;">No materials found</h3>
+                        <p style="color: var(--gray);">Try changing your search criteria</p>
+                    </div>
+                `;
+                document.getElementById('noDocuments').style.display = 'block';
+                return;
+            }
+            
+            document.getElementById('noDocuments').style.display = 'none';
+            
+            const fragment = document.createDocumentFragment();
+            
+            pageDocuments.forEach(doc => {
+                const card = createEnhancedDocumentCard(doc, hasAccess);
+                fragment.appendChild(card);
+            });
+            
+            container.innerHTML = '';
+            container.appendChild(fragment);
+        }
+
+        function createEnhancedDocumentCard(doc, hasAccess) {
+            const card = document.createElement('div');
+            card.className = `document-card ${!hasAccess ? 'locked-card' : ''}`;
+            card.setAttribute('data-doc-id', doc.id);
+            
+            // Calculate rating stars
+            const rating = doc.rating || 0;
+            const stars = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+            
+            card.innerHTML = `
+                ${!hasAccess ? `<div class="premium-badge" style="position: absolute; top: 20px; right: 20px;">
+                    <i class="fas fa-crown"></i> SUBSCRIBE TO ACCESS
+                </div>` : ''}
+                
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                    <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #e0f2fe; color: #0369a1; border-radius: 50px; font-size: 14px; font-weight: 600;">
+                        <i class="fas fa-university"></i>
+                        ${doc.university}
+                    </div>
+                    ${doc.unitCode ? `
+                        <div style="padding: 6px 12px; background: var(--primary); color: white; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                            <i class="fas fa-code"></i> ${doc.unitCode}
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--dark); margin-bottom: 15px; min-height: 60px;">
+                    ${doc.title}
+                </h3>
+                
+                ${doc.description ? `
+                    <p style="color: var(--gray); font-size: 14px; margin-bottom: 15px; line-height: 1.4;">
+                        ${doc.description.substring(0, 100)}${doc.description.length > 100 ? '...' : ''}
+                    </p>
+                ` : ''}
+                
+                <div style="font-size: 14px; color: var(--gray); margin-bottom: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <span><i class="fas fa-book"></i> ${doc.subject || 'General'}</span>
+                        <span><i class="fas fa-calendar"></i> ${doc.year || 'N/A'}</span>
+                        ${doc.type ? `<span><i class="fas fa-tag"></i> ${doc.type}</span>` : ''}
+                    </div>
+                    ${doc.date ? `<div style="margin-top: 5px;"><i class="fas fa-clock"></i> ${new Date(doc.date).toLocaleDateString()}</div>` : ''}
+                </div>
+                
+                ${rating > 0 ? `
+                    <div style="margin-bottom: 15px;">
+                        <span style="color: #F59E0B;">${stars}</span>
+                        <span style="font-size: 12px; color: var(--gray); margin-left: 5px;">(${rating.toFixed(1)})</span>
+                    </div>
+                ` : ''}
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                    <div style="font-size: 12px; color: var(--gray);">
+                        <i class="fas fa-eye"></i> ${doc.views || 0} views
+                        ${doc.downloads ? ` • <i class="fas fa-download"></i> ${doc.downloads} downloads` : ''}
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        ${hasAccess ? 
+                            `<button class="btn" onclick="viewDocument('${doc.id}')" style="background: var(--primary); padding: 10px 20px; font-size: 14px;">
+                                <i class="fas fa-eye"></i> View
+                            </button>` :
+                            `<button class="btn" onclick="showSubscribePrompt()" style="background: var(--warning); padding: 10px 20px; font-size: 14px;">
+                                <i class="fas fa-lock"></i> Subscribe to View
+                            </button>`
+                        }
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Pagination
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredDocuments.length / docsPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                displayDocuments();
+                
+                // Scroll to top of documents
+                document.getElementById('documentsList').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        // Enhanced document viewer without download
+        function viewDocument(docId) {
+            if (!canAccessDocuments()) {
+                if (currentUser) {
+                    const status = checkSubscriptionStatus(currentUser);
+                    if (status === 'expired') {
+                        document.getElementById('expiredModal').style.display = 'flex';
+                    } else {
+                        showNotification('🔒 Please subscribe or renew subscription to access documents', 'error');
+                        switchTab('student');
+                    }
+                } else {
+                    showNotification('🔒 Please login with your approved subscription', 'error');
+                    switchTab('student');
+                }
+                return;
+            }
+            
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) {
+                showNotification('Document not found', 'error');
+                return;
+            }
+            
+            // Update stats
+            doc.views = (doc.views || 0) + 1;
+            updateDocumentInStorage(doc);
+            
+            if (currentUser) {
+                currentUser.views = (currentUser.views || 0) + 1;
+                updateUserInStorage(currentUser);
+            }
+            
+            currentDocument = doc;
+            
+            // Show viewer
+            document.getElementById('viewerTitle').textContent = doc.title;
+            document.getElementById('documentViewer').style.display = 'flex';
+            document.getElementById('viewerLoading').style.display = 'block';
+            
+            const viewerLink = getSecureViewerLink(doc.link);
+            const iframe = document.getElementById('viewerFrame');
+            
+            // Load the document
+            loadDocumentIntoViewer(viewerLink);
+        }
+
+        function getSecureViewerLink(link) {
+            if (!link) return '';
+            
+            // For Google Drive, use embedded viewer with minimal controls
+            if (link.includes('drive.google.com')) {
+                let fileId = '';
+                
+                // Extract file ID
+                const match1 = link.match(/\/d\/([^\/]+)/);
+                const match2 = link.match(/[?&]id=([^&]+)/);
+                
+                if (match1) fileId = match1[1];
+                else if (match2) fileId = match2[1];
+                
+                if (fileId) {
+                    // Enhanced viewer with minimal controls and no download
+                    return `https://drive.google.com/file/d/${fileId}/preview?rm=minimal&toolbar=0&navpanes=0`;
+                }
+            }
+            
+            // For direct PDF links, use Google Docs viewer as proxy to remove controls
+            if (link.toLowerCase().endsWith('.pdf')) {
+                return `https://docs.google.com/gview?url=${encodeURIComponent(link)}&embedded=true&rm=minimal`;
+            }
+            
+            return link;
+        }
+
+        function loadDocumentIntoViewer(url) {
+            const iframe = document.getElementById('viewerFrame');
+            const loading = document.getElementById('viewerLoading');
+            
+            // Set timeout for loading
+            const loadingTimeout = setTimeout(() => {
+                loading.style.display = 'none';
+                showNotification('Document loaded', 'info');
+            }, 5000);
+            
+            // Load the document
+            iframe.src = url;
+            
+            // Disable context menu on iframe
+            iframe.onload = function() {
+                clearTimeout(loadingTimeout);
+                loading.style.display = 'none';
+                
+                // Inject JavaScript to disable right-click and keyboard shortcuts
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const script = iframeDoc.createElement('script');
+                    script.text = `
+                        document.addEventListener('contextmenu', function(e) {
+                            e.preventDefault();
+                            return false;
+                        });
+                        
+                        document.addEventListener('keydown', function(e) {
+                            // Disable Ctrl+S, Ctrl+P, Ctrl+Shift+S, etc.
+                            if ((e.ctrlKey || e.metaKey) && 
+                                (e.key === 's' || e.key === 'p' || e.key === 'S' || e.key === 'P')) {
+                                e.preventDefault();
+                                return false;
+                            }
+                            
+                            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+                            if (e.key === 'F12' || 
+                                ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                                ((e.ctrlKey || e.metaKey) && e.key === 'U')) {
+                                e.preventDefault();
+                                return false;
+                            }
+                        });
+                    `;
+                    iframeDoc.head.appendChild(script);
+                } catch (e) {
+                    console.log('Security restrictions prevent modifying iframe content');
+                }
+            };
+            
+            iframe.onerror = function() {
+                clearTimeout(loadingTimeout);
+                loading.style.display = 'none';
+                showNotification('Error loading document. Please try again later.', 'error');
+            };
+        }
+
+        // Enhanced upload function with unit code
+        function uploadDocument() {
+            const title = document.getElementById('uploadTitle').value.trim();
+            const unitCode = document.getElementById('uploadUnitCode').value.trim().toUpperCase();
+            const university = document.getElementById('uploadUniversity').value;
+            const subject = document.getElementById('uploadSubject').value.trim();
+            const year = document.getElementById('uploadYear').value.trim();
+            const type = document.getElementById('uploadType').value;
+            const date = document.getElementById('uploadDate').value;
+            const link = document.getElementById('uploadLink').value.trim();
+            
+            if (!title || !university || !subject || !year || !date || !link) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            // Check if unit code already exists
+            if (unitCode) {
+                const existingDoc = allDocuments.find(doc => 
+                    doc.unitCode && normalizeUnitCode(doc.unitCode) === normalizeUnitCode(unitCode)
+                );
+                if (existingDoc) {
+                    if (!confirm(`Unit code ${unitCode} already exists for document: ${existingDoc.title}. Do you want to continue?`)) {
+                        return;
+                    }
+                }
+            }
+            
+            const newDoc = {
+                id: 'doc_' + Date.now(),
+                title: title,
+                unitCode: unitCode || '',
+                university: university,
+                subject: subject,
+                type: type,
+                year: year,
+                date: date,
+                link: link,
+                uploadDate: new Date().toISOString(),
+                views: 0,
+                downloads: 0,
+                format: 'PDF',
+                rating: 0,
+                ratingCount: 0
+            };
+            
+            let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            documents.unshift(newDoc);
+            localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
+            
+            allDocuments.unshift(newDoc);
+            filteredDocuments.unshift(newDoc);
+            
+            loadDocuments();
+            updateSubjectFilter();
+            
+            // Clear form
+            document.getElementById('uploadTitle').value = '';
+            document.getElementById('uploadUnitCode').value = '';
+            document.getElementById('uploadSubject').value = '';
+            document.getElementById('uploadYear').value = '';
+            document.getElementById('uploadDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('uploadLink').value = '';
+            
+            showNotification('✅ Document uploaded successfully!', 'success');
+            
+            setTimeout(() => {
+                switchTab('documents');
+            }, 1000);
+        }
+
+        // Batch upload functionality
+        function showBatchUpload() {
+            document.getElementById('batchUploadModal').style.display = 'flex';
+        }
+
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showNotification('Please upload a CSV file', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csvData = e.target.result;
+                parseCSVData(csvData);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSVData(csvData) {
+            const lines = csvData.split('\n');
+            if (lines.length < 2) {
+                showNotification('CSV file is empty or invalid', 'error');
+                return;
+            }
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const requiredHeaders = ['Title', 'University', 'Subject', 'Year', 'Link'];
+            
+            // Validate headers
+            const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+            if (missingHeaders.length > 0) {
+                showNotification(`Missing required headers: ${missingHeaders.join(', ')}`, 'error');
+                return;
+            }
+            
+            const previewRows = [];
+            for (let i = 1; i < Math.min(6, lines.length); i++) {
+                if (lines[i].trim()) {
+                    const values = lines[i].split(',').map(v => v.trim());
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index] || '';
+                    });
+                    previewRows.push(row);
+                }
+            }
+            
+            displayUploadPreview(headers, previewRows);
+        }
+
+        function displayUploadPreview(headers, rows) {
+            const headerHtml = headers.map(h => `<th>${h}</th>`).join('');
+            const bodyHtml = rows.map(row => `
+                <tr>
+                    ${headers.map(h => `<td>${row[h] || ''}</td>`).join('')}
+                </tr>
+            `).join('');
+            
+            document.getElementById('previewHeader').innerHTML = `<tr>${headerHtml}</tr>`;
+            document.getElementById('previewBody').innerHTML = bodyHtml;
+            document.getElementById('uploadPreview').style.display = 'block';
+            document.getElementById('processUploadBtn').style.display = 'block';
+        }
+
+        function processBatchUpload() {
+            showNotification('Batch upload feature would process CSV data here', 'info');
+            // In a real implementation, this would parse the CSV and add all documents
+            closeModal('batchUploadModal');
+        }
+
+        // Unit code management
+        function loadUnitCodesForAdmin() {
+            const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            const container = document.getElementById('unitCodesTable');
+            const select = document.getElementById('unitCodeDocSelect');
+            
+            // Populate select dropdown
+            select.innerHTML = '<option value="">Select Document</option>';
+            documents.forEach(doc => {
+                const option = document.createElement('option');
+                option.value = doc.id;
+                option.textContent = `${doc.title} (${doc.university})`;
+                select.appendChild(option);
+            });
+            
+            // Display unit codes table
+            const docsWithUnitCodes = documents.filter(doc => doc.unitCode);
+            
+            if (docsWithUnitCodes.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-code" style="font-size: 60px; margin-bottom: 20px;"></i>
+                        <h4>No unit codes assigned yet</h4>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Unit Code</th>
+                            <th>Document Title</th>
+                            <th>University</th>
+                            <th>Subject</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            docsWithUnitCodes.forEach(doc => {
+                html += `
+                    <tr>
+                        <td><strong>${doc.unitCode}</strong></td>
+                        <td>${doc.title}</td>
+                        <td>${doc.university}</td>
+                        <td>${doc.subject || 'N/A'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn edit" onclick="editUnitCode('${doc.id}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="action-btn delete" onclick="removeUnitCode('${doc.id}')">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function saveUnitCode() {
+            const docId = document.getElementById('unitCodeDocSelect').value;
+            const unitCode = document.getElementById('unitCodeValue').value.trim().toUpperCase();
+            
+            if (!docId || !unitCode) {
+                showNotification('Please select a document and enter a unit code', 'error');
+                return;
+            }
+            
+            let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            const docIndex = documents.findIndex(d => d.id === docId);
+            
+            if (docIndex === -1) {
+                showNotification('Document not found', 'error');
+                return;
+            }
+            
+            // Check if unit code already exists
+            const existingDoc = documents.find(d => 
+                d.id !== docId && d.unitCode && normalizeUnitCode(d.unitCode) === normalizeUnitCode(unitCode)
+            );
+            
+            if (existingDoc) {
+                showNotification(`Unit code ${unitCode} already assigned to: ${existingDoc.title}`, 'warning');
+                return;
+            }
+            
+            documents[docIndex].unitCode = unitCode;
+            localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
+            
+            // Update local data
+            allDocuments = documents;
+            filteredDocuments = [...documents];
+            
+            // Clear form
+            document.getElementById('unitCodeValue').value = '';
+            
+            loadUnitCodesForAdmin();
+            showNotification(`✅ Unit code ${unitCode} saved successfully!`, 'success');
+        }
+
+        function editUnitCode(docId) {
+            const doc = allDocuments.find(d => d.id === docId);
+            if (!doc) return;
+            
+            document.getElementById('unitCodeDocSelect').value = docId;
+            document.getElementById('unitCodeValue').value = doc.unitCode || '';
+            document.getElementById('unitCodeValue').focus();
+        }
+
+        function removeUnitCode(docId) {
+            if (!confirm('Are you sure you want to remove this unit code?')) return;
+            
+            let documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            const docIndex = documents.findIndex(d => d.id === docId);
+            
+            if (docIndex !== -1) {
+                documents[docIndex].unitCode = '';
+                localStorage.setItem('revisionvault_documents', JSON.stringify(documents));
+                
+                // Update local data
+                allDocuments = documents;
+                filteredDocuments = [...documents];
+                
+                loadUnitCodesForAdmin();
+                showNotification('Unit code removed', 'success');
+            }
+        }
+
+        // Enhanced admin features
+        function showSystemStats() {
+            const statsContainer = document.getElementById('systemStats');
+            statsContainer.style.display = statsContainer.style.display === 'none' ? 'block' : 'none';
+            
+            if (statsContainer.style.display === 'block') {
+                updateSystemStats();
+            }
+        }
+
+        function updateSystemStats() {
+            const documents = JSON.parse(localStorage.getItem('revisionvault_documents') || '[]');
+            const users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+            const pending = JSON.parse(localStorage.getItem('revisionvault_pending') || '[]');
+            
+            // Calculate storage used
+            const data = {
+                documents: documents,
+                users: users,
+                pending: pending
+            };
+            const storageSize = new Blob([JSON.stringify(data)]).size;
+            
+            // Count active subscriptions
+            const activeUsers = users.filter(user => {
+                const status = checkSubscriptionStatus(user);
+                return status === 'active' || status === 'expiring_soon';
+            }).length;
+            
+            document.getElementById('sysTotalDocs').textContent = documents.length;
+            document.getElementById('sysTotalUsers').textContent = users.length + pending.length;
+            document.getElementById('sysActiveSubs').textContent = activeUsers;
+            document.getElementById('sysStorageUsed').textContent = formatBytes(storageSize);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function exportData() {
+            const data = {
+                documents: JSON.parse(localStorage.getItem('revisionvault_documents') || '[]'),
+                users: JSON.parse(localStorage.getItem('revisionvault_users') || '[]'),
+                pending: JSON.parse(localStorage.getItem('revisionvault_pending') || '[]'),
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `revisionvault_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Data exported successfully', 'success');
+        }
+
+        function createBackup() {
+            // Create a backup in localStorage
+            const backup = {
+                timestamp: new Date().toISOString(),
+                documents: JSON.parse(localStorage.getItem('revisionvault_documents') || '[]'),
+                users: JSON.parse(localStorage.getItem('revisionvault_users') || '[]'),
+                pending: JSON.parse(localStorage.getItem('revisionvault_pending') || '[]')
+            };
+            
+            localStorage.setItem('revisionvault_backup', JSON.stringify(backup));
+            showNotification('System backup created successfully', 'success');
+        }
+
+        function cleanupSystem() {
+            if (confirm('This will remove expired users and temporary data. Continue?')) {
+                let users = JSON.parse(localStorage.getItem('revisionvault_users') || '[]');
+                const expiredUsers = users.filter(user => checkSubscriptionStatus(user) === 'expired');
+                
+                // Keep only users expired more than 30 days ago
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                
+                users = users.filter(user => {
+                    if (checkSubscriptionStatus(user) !== 'expired') return true;
+                    const expiryDate = new Date(user.expiry);
+                    return expiryDate > thirtyDaysAgo;
+                });
+                
+                localStorage.setItem('revisionvault_users', JSON.stringify(users));
+                showNotification(`Cleaned up ${expiredUsers.length} expired users`, 'success');
+                loadAdminData();
+            }
+        }
+
+        function refreshAllData() {
+            loadDocuments();
+            loadAdminData();
+            updateStats();
+            showNotification('All data refreshed', 'success');
+        }
+
+        // Update quick stats
+        function updateQuickStats() {
+            const totalViews = allDocuments.reduce((sum, doc) => sum + (doc.views || 0), 0);
+            const totalDownloads = allDocuments.reduce((sum, doc) => sum + (doc.downloads || 0), 0);
+            const totalRating = allDocuments.reduce((sum, doc) => sum + (doc.rating || 0), 0);
+            const ratedDocs = allDocuments.filter(doc => doc.rating > 0).length;
+            const avgRating = ratedDocs > 0 ? (totalRating / ratedDocs).toFixed(1) : '0.0';
+            
+            // Find most recent document
+            const recentDocs = [...allDocuments].sort((a, b) => 
+                new Date(b.uploadDate || b.date) - new Date(a.uploadDate || a.date)
+            );
+            const lastUpdated = recentDocs.length > 0 ? 
+                new Date(recentDocs[0].uploadDate || recentDocs[0].date).toLocaleDateString() : '-';
+            
+            document.getElementById('totalDocsStat').textContent = allDocuments.length;
+            document.getElementById('totalViewsStat').textContent = totalViews;
+            document.getElementById('avgRatingStat').textContent = avgRating;
+            document.getElementById('lastUpdatedStat').textContent = lastUpdated;
+        }
+
+        // Update subject filter dynamically
+        function updateSubjectFilter() {
+            const subjects = [...new Set(allDocuments.map(doc => doc.subject).filter(Boolean))];
+            const select = document.getElementById('subjectFilter');
+            
+            // Clear existing options except first
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            // Add subject options
+            subjects.sort().forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                select.appendChild(option);
+            });
+        }
+
+        // Initialize enhanced features
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📚 RevisionVault Pro Enhanced Edition Initialized');
+            initSystem();
+            loadDocuments();
+            checkUserSession();
+            checkAdminSession();
+            updateStats();
+            
+            // Set today's date as default in upload form
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('uploadDate').value = today;
+            
+            // Initialize unit code map
+            updateUnitCodeMap();
+            
+            // Update subject filter
+            updateSubjectFilter();
+            
+            // Close suggestions when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('#searchInput') && !event.target.closest('.suggestions-container')) {
+                    hideSuggestions();
+                }
+            });
+        });
+
+        function updateUnitCodeMap() {
+            unitCodeMap = {};
+            allDocuments.forEach(doc => {
+                if (doc.unitCode) {
+                    const normalizedCode = normalizeUnitCode(doc.unitCode);
+                    unitCodeMap[normalizedCode] = doc.id;
+                }
+            });
+        }
+
+        function switchUploadTab(tab) {
+            document.querySelectorAll('.upload-tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            document.querySelectorAll('.tab-switcher .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tab + 'Upload').style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Enhanced admin tab switching
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            let targetId = '';
+            switch(tabName) {
+                case 'pending': targetId = 'pendingApprovals'; break;
+                case 'users': targetId = 'approvedUsers'; break;
+                case 'expired': targetId = 'expiredUsers'; break;
+                case 'documents': targetId = 'manageDocuments'; break;
+                case 'unitcodes': 
+                    targetId = 'unitCodes';
+                    loadUnitCodesForAdmin();
+                    break;
+                case 'analytics': 
+                    targetId = 'analytics';
+                    updateSystemStats();
+                    break;
+            }
+            
+            if (targetId) {
+                document.getElementById(targetId).style.display = 'block';
+            }
+            
+            event.target.classList.add('active');
+        }
+
+        // Viewer controls
+        function zoomIn() {
+            const iframe = document.getElementById('viewerFrame');
+            try {
+                iframe.contentWindow.postMessage({ type: 'zoom', action: 'in' }, '*');
+            } catch (e) {
+                // Fallback: reload with zoom parameter
+                const currentSrc = iframe.src;
+                if (currentSrc.includes('zoom=')) {
+                    iframe.src = currentSrc.replace(/zoom=(\d+)/, (match, p1) => `zoom=${parseInt(p1) + 10}`);
+                } else {
+                    iframe.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 'zoom=110';
+                }
+            }
+        }
+
+        function zoomOut() {
+            const iframe = document.getElementById('viewerFrame');
+            try {
+                iframe.contentWindow.postMessage({ type: 'zoom', action: 'out' }, '*');
+            } catch (e) {
+                const currentSrc = iframe.src;
+                if (currentSrc.includes('zoom=')) {
+                    iframe.src = currentSrc.replace(/zoom=(\d+)/, (match, p1) => `zoom=${Math.max(50, parseInt(p1) - 10)}`);
+                }
+            }
+        }
+
+        function fitToWidth() {
+            const iframe = document.getElementById('viewerFrame');
+            try {
+                iframe.contentWindow.postMessage({ type: 'zoom', action: 'fit' }, '*');
+            } catch (e) {
+                // Ignore errors
+            }
+        }
+
+        // Handle bulk upload
+        function handleBulkUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csvContent = e.target.result;
+                parseBulkCSV(csvContent);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseBulkCSV(csvContent) {
+            const lines = csvContent.split('\n').filter(line => line.trim());
+            if (lines.length < 2) {
+                showNotification('CSV file is empty or invalid', 'error');
+                return;
+            }
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const previewRows = [];
+            
+            for (let i = 1; i < Math.min(11, lines.length); i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index] || '';
+                });
+                previewRows.push(row);
+            }
+            
+            displayBulkPreview(headers, previewRows);
+        }
+
+        function displayBulkPreview(headers, rows) {
+            const table = document.getElementById('bulkPreviewTable');
+            table.innerHTML = `
+                <thead>
+                    <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                </thead>
+                <tbody>
+                    ${rows.map(row => `
+                        <tr>${headers.map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>
+                    `).join('')}
+                </tbody>
+            `;
+            
+            document.getElementById('bulkUploadPreview').style.display = 'block';
+        }
+
+        function processBulkUpload() {
+            showNotification('Bulk upload would process all documents here', 'info');
+            // Implementation would parse the CSV and add all documents to the system
+        }
+
+    </script>
+</body>
+</html>
