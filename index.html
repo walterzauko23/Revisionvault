@@ -560,7 +560,7 @@
                 <div class="spinner"></div>
                 <p>Loading document...</p>
             </div>
-            <iframe id="viewerFrame" class="viewer-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+            <iframe id="viewerFrame" class="viewer-iframe" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
         </div>
     </div>
 
@@ -1024,9 +1024,10 @@
                 </div>
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 12px; font-weight: 600;">Document Link *</label>
-                    <input type="text" id="uploadLink" class="form-control" placeholder="https://drive.google.com/file/d/FILE_ID/view" required>
+                    <input type="text" id="uploadLink" class="form-control" placeholder="Enter direct PDF link or Google Drive shareable link" required>
                     <small style="color: var(--gray); margin-top: 5px; display: block;">
-                        <strong>Format:</strong> https://drive.google.com/file/d/FILE_ID/view
+                        <strong>For Google Drive:</strong> Make sure file is shared with "Anyone with the link"<br>
+                        <strong>Direct PDF:</strong> Use any direct PDF link
                     </small>
                 </div>
                 <button class="btn btn-primary" style="width: 100%;" onclick="uploadDocument()">
@@ -1055,6 +1056,10 @@
             checkUserSession();
             checkAdminSession();
             updateStats();
+            
+            // Set today's date as default in upload form
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('uploadDate').value = today;
         });
 
         function initSystem() {
@@ -1263,26 +1268,81 @@
             
             iframe.src = viewerLink;
             
+            // Set timeout to hide loading after 5 seconds regardless
+            const loadingTimeout = setTimeout(() => {
+                document.getElementById('viewerLoading').style.display = 'none';
+            }, 5000);
+            
             iframe.onload = function() {
+                clearTimeout(loadingTimeout);
                 document.getElementById('viewerLoading').style.display = 'none';
                 showNotification(`Document loaded successfully!`, 'success');
             };
             
             iframe.onerror = function() {
+                clearTimeout(loadingTimeout);
                 document.getElementById('viewerLoading').style.display = 'none';
-                showNotification('Error loading document. Please try again.', 'error');
+                // Try alternative method for Google Drive links
+                if (doc.link.includes('drive.google.com')) {
+                    const directLink = convertToDirectDownloadLink(doc.link);
+                    if (directLink !== doc.link) {
+                        showNotification('Trying alternative method...', 'info');
+                        setTimeout(() => {
+                            iframe.src = directLink;
+                        }, 1000);
+                    } else {
+                        showNotification('Error loading document. Please try downloading instead.', 'error');
+                    }
+                } else {
+                    showNotification('Error loading document. Please try downloading instead.', 'error');
+                }
             };
         }
 
         function getViewerLink(link) {
             if (!link) return '';
             
+            // If it's already a direct PDF link, use it
+            if (link.toLowerCase().endsWith('.pdf')) {
+                return link;
+            }
+            
+            // Handle Google Drive links
             if (link.includes('drive.google.com')) {
-                // Extract file ID
-                const match = link.match(/\/d\/([^\/]+)/) || link.match(/id=([^&]+)/);
-                if (match && match[1]) {
-                    return `https://drive.google.com/file/d/${match[1]}/preview`;
+                // Extract file ID from various Google Drive URL formats
+                let fileId = '';
+                
+                // Format 1: https://drive.google.com/file/d/FILE_ID/view
+                const match1 = link.match(/\/d\/([^\/]+)/);
+                if (match1) {
+                    fileId = match1[1];
+                } else {
+                    // Format 2: https://drive.google.com/open?id=FILE_ID
+                    const match2 = link.match(/[?&]id=([^&]+)/);
+                    if (match2) {
+                        fileId = match2[1];
+                    }
                 }
+                
+                if (fileId) {
+                    return `https://drive.google.com/file/d/${fileId}/preview`;
+                }
+            }
+            
+            return link;
+        }
+
+        function convertToDirectDownloadLink(link) {
+            if (!link.includes('drive.google.com')) return link;
+            
+            let fileId = '';
+            const match = link.match(/\/d\/([^\/]+)/) || link.match(/[?&]id=([^&]+)/);
+            if (match) {
+                fileId = match[1];
+            }
+            
+            if (fileId) {
+                return `https://drive.google.com/uc?export=download&id=${fileId}`;
             }
             
             return link;
@@ -1316,8 +1376,19 @@
                 updateUserInStorage(currentUser);
             }
             
+            // Create download link
+            let downloadLink = currentDocument.link;
+            
+            // Convert Google Drive preview link to download link
+            if (downloadLink.includes('drive.google.com/file/d/')) {
+                const fileIdMatch = downloadLink.match(/\/d\/([^\/]+)/);
+                if (fileIdMatch) {
+                    downloadLink = `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+                }
+            }
+            
             const link = document.createElement('a');
-            link.href = currentDocument.link;
+            link.href = downloadLink;
             link.target = '_blank';
             link.download = currentDocument.title.replace(/[^a-z0-9]/gi, '_') + '.pdf';
             
@@ -2115,7 +2186,7 @@
             document.getElementById('uploadTitle').value = '';
             document.getElementById('uploadSubject').value = '';
             document.getElementById('uploadYear').value = '';
-            document.getElementById('uploadDate').value = '';
+            document.getElementById('uploadDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('uploadLink').value = '';
             
             showNotification('✅ Document uploaded successfully!', 'success');
@@ -2266,7 +2337,7 @@
                     type: 'Lecture Notes',
                     year: '2024',
                     date: '2024-01-15',
-                    link: 'https://drive.google.com/file/d/1uSBqGCfeWPr-upLjKOu-cCkwQUVW7GOU/preview',
+                    link: 'https://drive.google.com/file/d/1uSBqGCfeWPr-upLjKOu-cCkwQUVW7GOU/view?usp=sharing',
                     description: 'Complete biology lecture notes for first year students',
                     views: 0,
                     downloads: 0,
@@ -2281,7 +2352,7 @@
                     type: 'Study Guide',
                     year: '2023',
                     date: '2023-11-20',
-                    link: 'https://drive.google.com/file/d/1LZ5P_t9qRlxZq2AyAI8JoG-bZAdS6G_c/preview',
+                    link: 'https://drive.google.com/file/d/1LZ5P_t9qRlxZq2AyAI8JoG-bZAdS6G_c/view?usp=sharing',
                     description: 'Essential chemistry concepts and practice problems',
                     views: 0,
                     downloads: 0,
