@@ -1,0 +1,4081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevisionVault Pro - Premium Document Management</title>
+    <style>
+        :root {
+            --primary: #1a2980;
+            --secondary: #26d0ce;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #26d0ce 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: #f8fafc;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tabs {
+            display: flex;
+            min-width: max-content;
+        }
+
+        .tab {
+            padding: 20px 30px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+            min-width: 200px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background: white;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Styles */
+        .form-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            border: 2px solid var(--border);
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 41, 128, 0.1);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+            color: white;
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Document Card */
+        .document-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid var(--border);
+            transition: var(--transition);
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .document-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .doc-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .doc-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .doc-meta {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .doc-description {
+            font-size: 14px;
+            color: var(--dark);
+            line-height: 1.5;
+            margin-bottom: 15px;
+            flex: 1;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .doc-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .doc-actions .btn {
+            flex: 1;
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+
+        /* University Filter */
+        .university-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: var(--radius);
+        }
+
+        .university-btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: white;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid var(--border);
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .university-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* ADVANCED DOCUMENT VIEWER */
+        .advanced-viewer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .viewer-header {
+            background: rgba(26, 41, 128, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .viewer-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .viewer-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .viewer-toolbar {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .viewer-toolbar .btn {
+            padding: 8px 15px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .viewer-toolbar .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .document-display-area {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* PDF Viewer Container */
+        .pdf-viewer-container {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background: #525659;
+        }
+
+        .pdf-canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .pdf-page {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            background: white;
+        }
+
+        .pdf-page canvas {
+            display: block;
+        }
+
+        /* Image Viewer */
+        .image-viewer-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .image-viewer-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Office Document Viewer */
+        .office-viewer-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+
+        /* Admin Panel */
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            border: 2px solid var(--border);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Google Sheet Status */
+        .sheet-status {
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .sheet-status.connected {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid var(--success);
+        }
+
+        .sheet-status.disconnected {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid var(--warning);
+        }
+
+        .sheet-status.error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid var(--danger);
+        }
+
+        /* Security Features */
+        .security-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background: var(--success);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .device-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+                min-width: 100%;
+            }
+            
+            .tab {
+                min-width: 100%;
+                padding: 15px;
+                text-align: left;
+            }
+            
+            .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .university-filter {
+                justify-content: flex-start;
+                overflow-x: auto;
+            }
+            
+            .viewer-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .viewer-toolbar .btn {
+                flex: 1;
+            }
+        }
+
+        /* Animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--success);
+            color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 10001;
+            animation: fadeIn 0.3s ease-out;
+            max-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.error { background: var(--danger); }
+        .notification.warning { background: var(--warning); }
+        .notification.info { background: var(--info); }
+
+        /* Enhanced Viewer Controls */
+        .viewer-zoom-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .viewer-zoom-level {
+            color: white;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Document Thumbnails */
+        .pdf-thumbnails {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: var(--radius);
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .pdf-thumbnail {
+            width: 100px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .pdf-thumbnail:hover {
+            border-color: var(--primary);
+        }
+
+        .pdf-thumbnail.active {
+            border-color: var(--success);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner" style="width: 60px; height: 60px; border: 5px solid #f3f4f6; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
+        <h3 style="color: var(--primary); margin-bottom: 10px;">Initializing RevisionVault Pro</h3>
+        <p id="loadingMessage" style="color: var(--gray);">Loading secure system...</p>
+    </div>
+
+    <!-- Device Indicator -->
+    <div class="device-indicator" id="deviceIndicator" style="display: none;">
+        <i class="fas fa-desktop"></i> <span id="deviceId"></span>
+    </div>
+
+    <!-- Advanced Document Viewer -->
+    <div class="advanced-viewer-overlay" id="advancedViewer">
+        <div class="viewer-header">
+            <div>
+                <h3 id="viewerDocTitle">Document Viewer</h3>
+                <div style="font-size: 12px; opacity: 0.8;" id="viewerDocInfo"></div>
+            </div>
+            <div class="viewer-controls">
+                <div class="viewer-zoom-controls" id="viewerZoomControls" style="display: none;">
+                    <button class="btn" onclick="zoomIn()" style="padding: 5px 10px; font-size: 12px;">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <div class="viewer-zoom-level" id="zoomLevel">100%</div>
+                    <button class="btn" onclick="zoomOut()" style="padding: 5px 10px; font-size: 12px;">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                </div>
+                <div class="pdf-thumbnails" id="pdfThumbnails" style="display: none;"></div>
+                <button class="btn btn-primary" onclick="downloadCurrentDocument()">
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <button class="btn btn-danger" onclick="closeAdvancedViewer()">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+        
+        <div class="viewer-content">
+            <div class="viewer-toolbar">
+                <button class="btn" onclick="zoomIn()">
+                    <i class="fas fa-search-plus"></i> Zoom In
+                </button>
+                <button class="btn" onclick="zoomOut()">
+                    <i class="fas fa-search-minus"></i> Zoom Out
+                </button>
+                <button class="btn" onclick="resetZoom()">
+                    <i class="fas fa-expand-arrows-alt"></i> Fit to Width
+                </button>
+                <button class="btn" onclick="prevPage()">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <span style="color: white; padding: 5px 15px; background: rgba(0,0,0,0.3); border-radius: 4px;">
+                    Page: <span id="currentPageNum">1</span> / <span id="totalPagesNum">1</span>
+                </span>
+                <button class="btn" onclick="nextPage()">
+                    <i class="fas fa-chevron-right"></i> Next
+                </button>
+                <button class="btn" onclick="rotateDocument()">
+                    <i class="fas fa-redo"></i> Rotate
+                </button>
+                <button class="btn" onclick="printDocument()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button class="btn" onclick="toggleFullscreen()">
+                    <i class="fas fa-expand"></i> Fullscreen
+                </button>
+                <button class="btn" onclick="toggleThumbnails()">
+                    <i class="fas fa-th"></i> Thumbnails
+                </button>
+                <button class="btn" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i> Dark Mode
+                </button>
+            </div>
+            
+            <div class="document-display-area" id="documentDisplayArea">
+                <!-- Content will be loaded here based on document type -->
+                <div id="pdfViewer" class="pdf-viewer-container" style="display: none;">
+                    <div class="pdf-canvas-container" id="pdfCanvasContainer"></div>
+                </div>
+                
+                <div id="imageViewer" class="image-viewer-container" style="display: none;">
+                    <img id="imageDisplay" src="" alt="">
+                </div>
+                
+                <iframe id="officeViewer" class="office-viewer-container" style="display: none;" frameborder="0"></iframe>
+                
+                <div id="fallbackViewer" style="display: none; padding: 40px; text-align: center; color: white;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: var(--warning); margin-bottom: 20px;"></i>
+                    <h3>Document Preview Not Available</h3>
+                    <p>This document type cannot be previewed directly.</p>
+                    <button class="btn btn-primary" onclick="downloadCurrentDocument()" style="margin-top: 20px;">
+                        <i class="fas fa-download"></i> Download to View
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Security Badge -->
+        <div class="security-badge">
+            <i class="fas fa-shield-alt"></i> Secure System
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;">
+                <div style="width: 60px; height: 60px; border-radius: 16px; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 28px;">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1>RevisionVault Pro</h1>
+                    <p>Premium Document Management System</p>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
+                <span><i class="fas fa-shield-alt"></i> Ksh 67 for 5 Months</span>
+                <span><i class="fas fa-user-check"></i> Admin Approval Required</span>
+                <span><i class="fas fa-unlock"></i> Full Document Access</span>
+                <span><i class="fas fa-mobile-alt"></i> Device-Locked Access</span>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('student')">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Student Portal</span>
+                </div>
+                <div class="tab" onclick="switchTab('documents')" id="documentsTab">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Study Materials</span>
+                </div>
+                <div class="tab" onclick="switchTab('admin')" id="adminTab">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin Panel</span>
+                </div>
+                <div class="tab" onclick="switchTab('sheet-manager')" id="sheetManagerTab">
+                    <i class="fas fa-table"></i>
+                    <span>Sheet Manager</span>
+                </div>
+                <div class="tab" onclick="switchTab('settings')" id="settingsTab">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== STUDENT PORTAL ==================== -->
+        <div id="student" class="tab-content active">
+            <div class="registration-flow">
+                <!-- Step 1: Registration -->
+                <div id="step1" class="form-section">
+                    <div class="form-title">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Student Registration</span>
+                        <span class="security-badge" style="position: static; margin-left: auto;">
+                            <i class="fas fa-lock"></i> Device-Locked
+                        </span>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="regFullName" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email Address *</label>
+                            <input type="email" id="regEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" id="regPhone" class="form-control" placeholder="07XXXXXXXX" maxlength="10" required>
+                            <small style="color: var(--gray);">For WhatsApp notifications</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Select University *</label>
+                            <select id="regUniversity" class="form-control" required>
+                                <option value="">-- Select Your University --</option>
+                                <option value="University of Nairobi">University of Nairobi (UoN)</option>
+                                <option value="Kenyatta University">Kenyatta University (KU)</option>
+                                <option value="Jomo Kenyatta University of Agriculture and Technology">JKUAT</option>
+                                <option value="Moi University">Moi University</option>
+                                <option value="Egerton University">Egerton University</option>
+                                <option value="Maseno University">Maseno University</option>
+                                <option value="Technical University of Kenya">Technical University of Kenya</option>
+                                <option value="University of Eldoret">University of Eldoret (UoE)</option>
+                                <option value="Strathmore University">Strathmore University</option>
+                                <option value="Mount Kenya University">Mount Kenya University</option>
+                                <option value="Daystar University">Daystar University</option>
+                                <option value="Catholic University of Eastern Africa">Catholic University of Eastern Africa</option>
+                                <option value="Other">Other University</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Course/Program *</label>
+                            <input type="text" id="regCourse" class="form-control" placeholder="e.g., Bachelor of Computer Science" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Year of Study *</label>
+                            <select id="regYear" class="form-control" required>
+                                <option value="">Select year</option>
+                                <option value="1">Year 1</option>
+                                <option value="2">Year 2</option>
+                                <option value="3">Year 3</option>
+                                <option value="4">Year 4</option>
+                                <option value="5">Year 5</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="agreeTerms" required>
+                            I agree that my account is device-locked and cannot be accessed from other devices
+                        </label>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="registerStudent()" style="width: 100%; padding: 16px; margin-top: 10px;">
+                        <i class="fas fa-user-plus"></i> Register Account
+                    </button>
+                </div>
+
+                <!-- Step 2: Account Dashboard -->
+                <div id="step2" class="form-section" style="display: none;">
+                    <div class="form-title">
+                        <i class="fas fa-user-check"></i>
+                        <span>Your Account Dashboard</span>
+                        <span class="security-badge" style="position: static; margin-left: auto;">
+                            <i class="fas fa-fingerprint"></i> Device: <span id="currentDeviceId"></span>
+                        </span>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="card" style="background: white; border-radius: var(--radius); padding: 20px; border: 2px solid var(--border);">
+                            <div class="form-title" style="font-size: 18px; margin-bottom: 15px;">
+                                <i class="fas fa-user"></i>
+                                <span>Personal Information</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <div class="form-control" style="background: #f8fafc;" id="accountName"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <div class="form-control" style="background: #f8fafc;" id="accountEmail"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <div class="form-control" style="background: #f8fafc;" id="accountPhone"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" style="background: white; border-radius: var(--radius); padding: 20px; border: 2px solid var(--border);">
+                            <div class="form-title" style="font-size: 18px; margin-bottom: 15px;">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Academic Information</span>
+                            </div>
+                            <div class="form-group">
+                                <label>University</label>
+                                <div class="form-control" style="background: #f8fafc;" id="accountUniversity"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Course</label>
+                                <div class="form-control" style="background: #f8fafc;" id="accountCourse"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Year of Study</label>
+                                <div class="form-control" style="background: #f8fafc;" id="accountYear"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 20px; text-align: center; background: white; border-radius: var(--radius); padding: 20px; border: 2px solid var(--border);">
+                        <div class="form-title" style="font-size: 18px; margin-bottom: 15px;">
+                            <i class="fas fa-unlock-alt"></i>
+                            <span>Subscription Status</span>
+                        </div>
+                        <div id="subscriptionStatus">
+                            <div style="padding: 15px; background: #fee2e2; border-radius: 8px; display: inline-block;">
+                                <i class="fas fa-lock" style="color: var(--danger);"></i>
+                                <span style="color: var(--danger); font-weight: 600;">Not Subscribed</span>
+                            </div>
+                            <p style="color: var(--gray); margin-top: 10px;">
+                                Subscribe to unlock access to all study materials
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="goToPayment()" id="paymentBtn" style="padding: 16px 40px;">
+                            <i class="fas fa-credit-card"></i> Subscribe Now (Ksh 67)
+                        </button>
+                        <button class="btn btn-warning" onclick="forceLogout()" style="margin-left: 10px; padding: 16px 20px;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Payment -->
+                <div id="step3" class="form-section" style="display: none;">
+                    <div class="form-title">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Subscribe & Pay</span>
+                    </div>
+                    
+                    <div class="card" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border: 3px solid var(--success); padding: 20px; border-radius: var(--radius);">
+                        <div class="form-title" style="font-size: 18px; color: var(--success);">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Payment Instructions</span>
+                        </div>
+                        <p>Send <strong>Ksh 67</strong> to:</p>
+                        <div style="font-size: 24px; font-weight: bold; color: var(--primary); margin: 15px 0;">0765 098 865</div>
+                        <p>via <strong>M-Pesa</strong> then submit your transaction details below.</p>
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.5); border-radius: 8px;">
+                            <small><i class="fas fa-info-circle"></i> Make sure transaction code is correct. Incorrect codes will be rejected.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label>M-Pesa Transaction Code *</label>
+                            <input type="text" id="paymentCode" class="form-control" placeholder="Enter transaction code" required>
+                            <small style="color: var(--gray);">e.g., RCG8H9W2X (Exactly as received)</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Payment Date *</label>
+                            <input type="date" id="paymentDate" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <button class="btn btn-success" onclick="submitPayment()" style="flex: 1; padding: 16px;">
+                            <i class="fas fa-paper-plane"></i> Submit Payment for Approval
+                        </button>
+                        <button class="btn" onclick="goToAccount()" style="padding: 16px; background: #e5e7eb;">
+                            <i class="fas fa-arrow-left"></i> Back to Account
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Unlock Code -->
+                <div id="step4" class="form-section" style="display: none;">
+                    <div class="form-title">
+                        <i class="fas fa-unlock-alt"></i>
+                        <span>Unlock Your Account</span>
+                    </div>
+                    
+                    <div id="pendingApproval" class="card" style="text-align: center; padding: 40px; background: white; border-radius: var(--radius); border: 2px solid var(--border);">
+                        <div style="width: 80px; height: 80px; margin: 0 auto 20px; border-radius: 50%; background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 36px;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3 style="color: var(--warning); margin-bottom: 15px;">Waiting for Admin Approval</h3>
+                        <p style="color: var(--gray); margin-bottom: 20px;">
+                            Your payment is being reviewed by the admin. You'll receive an unlock code via WhatsApp once approved.
+                        </p>
+                        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                            <p><strong>Expected WhatsApp Message Format:</strong></p>
+                            <div style="text-align: left; background: white; padding: 15px; border-radius: 4px; font-size: 12px; font-family: monospace;">
+                                🎉 *PAYMENT APPROVED!* 🎉<br><br>
+                                Dear [Your Name],<br><br>
+                                Your payment has been approved! Here is your unlock code:<br><br>
+                                🔑 *Unlock Code:* [CODE]<br><br>
+                                Go to RevisionVault Pro and enter this code to unlock full access.<br><br>
+                                📚 Access: https://walterzauko23.github.io/Revisionvault/<br><br>
+                                Thank you for subscribing!<br>
+                                - RevisionVault Pro Team
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="readyForUnlock" style="display: none;">
+                        <div class="card" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border: 3px solid var(--success); text-align: center; padding: 30px; border-radius: var(--radius);">
+                            <div style="width: 60px; height: 60px; margin: 0 auto 15px; border-radius: 50%; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <h3 style="color: var(--success); margin-bottom: 15px;">Payment Approved!</h3>
+                            <p style="color: var(--gray); margin-bottom: 20px;">
+                                Enter your unlock code below to access all study materials:
+                            </p>
+                            
+                            <div style="max-width: 400px; margin: 20px auto;">
+                                <input type="text" id="unlockCodeInput" class="form-control" placeholder="Enter unlock code from admin" style="text-align: center; font-size: 18px; letter-spacing: 2px; padding: 15px;">
+                            </div>
+                            
+                            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                                <button class="btn btn-success" onclick="verifyUnlockCode()" style="padding: 15px 30px;">
+                                    <i class="fas fa-unlock"></i> Unlock Account
+                                </button>
+                                <button class="btn btn-primary" onclick="resendWhatsAppCode()" style="padding: 15px 20px;">
+                                    <i class="fab fa-whatsapp"></i> Resend Code
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="accessGranted" style="display: none; text-align: center; padding: 40px;">
+                        <div style="width: 80px; height: 80px; margin: 0 auto 20px; border-radius: 50%; background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 36px;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 style="color: var(--success); margin-bottom: 15px;">Access Granted!</h3>
+                        <p style="color: var(--gray); margin-bottom: 20px; font-size: 18px;">
+                            🎉 Congratulations! You now have full access to all study materials for 5 months.
+                        </p>
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
+                            <p><strong>Access Details:</strong></p>
+                            <p>Expires: <span id="subscriptionExpiry"></span></p>
+                            <p>Device: <span id="subscriptionDevice"></span></p>
+                        </div>
+                        <button class="btn btn-primary" onclick="switchTab('documents')" style="padding: 15px 40px;">
+                            <i class="fas fa-book"></i> Access Study Materials
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Section -->
+            <div id="loginSection" class="form-section" style="margin-top: 30px; background: #f8fafc; border: 2px solid #e5e7eb;">
+                <h3 style="color: var(--primary); margin-bottom: 20px; text-align: center;">Already have an account?</h3>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center;">
+                    <input type="text" id="loginPhone" placeholder="Phone Number" class="form-control" style="max-width: 200px;">
+                    <button class="btn btn-primary" onclick="loginStudent()" style="padding: 12px 30px;">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </div>
+                <div style="text-align: center; margin-top: 15px; color: var(--gray); font-size: 14px;">
+                    <i class="fas fa-info-circle"></i> Your account is locked to this device only
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== DOCUMENTS SECTION ==================== -->
+        <div id="documents" class="tab-content">
+            <div class="form-section">
+                <div class="form-title">
+                    <i class="fas fa-file-alt"></i>
+                    <span>University Study Materials</span>
+                    <span style="font-size: 14px; color: var(--gray); margin-left: auto;" id="documentCount">Loading...</span>
+                </div>
+                
+                <!-- Google Sheet Status -->
+                <div id="sheetStatus" class="sheet-status disconnected">
+                    <i class="fas fa-sync fa-spin" style="color: var(--warning);"></i>
+                    <span>Connecting to Google Sheet...</span>
+                </div>
+                
+                <!-- Access Status -->
+                <div id="accessStatusBar" class="card" style="margin-bottom: 30px; text-align: center; background: white; border-radius: var(--radius); padding: 20px; border: 2px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                        <div style="text-align: left;">
+                            <h4 id="accessStatusText" style="color: var(--danger); margin-bottom: 5px;">
+                                <i class="fas fa-lock"></i> Access Locked
+                            </h4>
+                            <p style="color: var(--gray); font-size: 14px;" id="accessStatusDetails">Subscribe to unlock all materials</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="switchTab('student')" id="subscribeBtnDocs">
+                            <i class="fas fa-crown"></i> Subscribe Now
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div class="form-section" style="background: #f8fafc;">
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <!-- University Filter -->
+                        <div style="flex: 1; min-width: 200px;">
+                            <label style="font-weight: 600; margin-bottom: 8px; display: block;">University</label>
+                            <select id="universitySelect" class="form-control" onchange="filterByUniversity(this.value)">
+                                <option value="all">All Universities</option>
+                                <option value="University of Nairobi">University of Nairobi</option>
+                                <option value="Kenyatta University">Kenyatta University</option>
+                                <option value="Jomo Kenyatta University of Agriculture and Technology">JKUAT</option>
+                                <option value="Moi University">Moi University</option>
+                                <option value="Egerton University">Egerton University</option>
+                                <option value="Maseno University">Maseno University</option>
+                                <option value="Technical University of Kenya">Technical University of Kenya</option>
+                                <option value="University of Eldoret">University of Eldoret</option>
+                                <option value="Strathmore University">Strathmore University</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Year Filter -->
+                        <div style="flex: 1; min-width: 150px;">
+                            <label style="font-weight: 600; margin-bottom: 8px; display: block;">Year</label>
+                            <select id="yearSelect" class="form-control" onchange="filterDocuments()">
+                                <option value="all">All Years</option>
+                                <option value="1">Year 1</option>
+                                <option value="2">Year 2</option>
+                                <option value="3">Year 3</option>
+                                <option value="4">Year 4</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Type Filter -->
+                        <div style="flex: 1; min-width: 150px;">
+                            <label style="font-weight: 600; margin-bottom: 8px; display: block;">Document Type</label>
+                            <select id="typeSelect" class="form-control" onchange="filterDocuments()">
+                                <option value="all">All Types</option>
+                                <option value="pdf">PDF</option>
+                                <option value="word">Word</option>
+                                <option value="excel">Excel</option>
+                                <option value="powerpoint">PowerPoint</option>
+                                <option value="image">Image</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Sort Options -->
+                        <div style="flex: 1; min-width: 150px;">
+                            <label style="font-weight: 600; margin-bottom: 8px; display: block;">Sort By</label>
+                            <select id="sortSelect" class="form-control" onchange="filterDocuments()">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="title">Title A-Z</option>
+                                <option value="views">Most Viewed</option>
+                                <option value="downloads">Most Downloaded</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div style="position: relative; margin-bottom: 20px;">
+                    <i class="fas fa-search" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by unit code, title, subject, or description..." style="padding-left: 50px;" oninput="filterDocuments()">
+                    <div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--gray);">
+                        <i class="fas fa-filter" onclick="toggleAdvancedFilters()" style="cursor: pointer;"></i>
+                    </div>
+                </div>
+
+                <!-- Documents Grid -->
+                <div class="grid-3" id="documentsGrid">
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+                        <i class="fas fa-sync fa-spin" style="font-size: 48px; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--primary); margin-bottom: 10px;">Loading Documents</h3>
+                        <p style="color: var(--gray);">Fetching study materials from Google Sheet...</p>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div id="pagination" style="display: none; text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="previousPage()" id="prevPageBtn" style="margin-right: 10px;">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <span style="padding: 10px 20px; background: #f8fafc; border-radius: 4px;" id="pageInfo">Page 1 of 1</span>
+                    <button class="btn" onclick="nextPage()" id="nextPageBtn" style="margin-left: 10px;">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <!-- No Documents Message -->
+                <div id="noDocumentsMessage" style="display: none; text-align: center; padding: 60px; color: var(--gray);">
+                    <i class="fas fa-file-alt" style="font-size: 64px; margin-bottom: 20px; color: #e5e7eb;"></i>
+                    <h3>No Documents Found</h3>
+                    <p>Try adjusting your search filters or check back later for new materials.</p>
+                    <button class="btn btn-primary" onclick="resetFilters()" style="margin-top: 20px;">
+                        <i class="fas fa-redo"></i> Reset Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ADMIN PANEL ==================== -->
+        <div id="admin" class="tab-content">
+            <!-- Admin Login -->
+            <div id="adminLogin" class="form-section" style="max-width: 500px; margin: 0 auto;">
+                <div class="form-title">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin Panel Access</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Admin Password</label>
+                    <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password" autocomplete="off">
+                    <small style="color: var(--gray);">Default: walter.zauko23</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Two-Factor Code (Optional)</label>
+                    <input type="text" id="admin2FA" class="form-control" placeholder="Enter 2FA code if enabled" maxlength="6">
+                </div>
+                
+                <button class="btn btn-primary" onclick="adminLogin()" style="width: 100%; padding: 16px; margin-top: 10px;">
+                    <i class="fas fa-sign-in-alt"></i> Access Admin Dashboard
+                </button>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #fee2e2; border-radius: 8px; display: none;" id="adminSecurityAlert">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+                    <span style="color: var(--danger);">Security Alert: Multiple failed login attempts detected.</span>
+                </div>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div id="adminDashboard" style="display: none;">
+                <!-- Admin Security Header -->
+                <div class="form-section" style="background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%); color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                        <div>
+                            <h3 style="margin-bottom: 5px;"><i class="fas fa-user-shield"></i> Admin Dashboard</h3>
+                            <p style="opacity: 0.8;">Secure Administration Panel</p>
+                        </div>
+                        <div>
+                            <span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 4px; margin-right: 10px;">
+                                <i class="fas fa-user"></i> <span id="adminUserName">Administrator</span>
+                            </span>
+                            <button class="btn btn-danger" onclick="adminLogout()">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card" onclick="switchAdminTab('users')" style="cursor: pointer;">
+                        <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="totalUsers">0</div>
+                        <div>Total Users</div>
+                        <div style="font-size: 12px; color: var(--gray); margin-top: 5px;" id="activeUsers">0 active</div>
+                    </div>
+                    <div class="stat-card" onclick="switchAdminTab('approvals')" style="cursor: pointer;">
+                        <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="pendingApprovals">0</div>
+                        <div>Pending Approvals</div>
+                        <div style="font-size: 12px; color: var(--gray); margin-top: 5px;" id="todayApprovals">0 today</div>
+                    </div>
+                    <div class="stat-card" onclick="switchAdminTab('documents')" style="cursor: pointer;">
+                        <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="totalDocuments">0</div>
+                        <div>Total Documents</div>
+                        <div style="font-size: 12px; color: var(--gray); margin-top: 5px;" id="recentDocuments">0 recent</div>
+                    </div>
+                    <div class="stat-card" onclick="switchAdminTab('revenue')" style="cursor: pointer;">
+                        <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="totalRevenue">Ksh 0</div>
+                        <div>Total Revenue</div>
+                        <div style="font-size: 12px; color: var(--gray); margin-top: 5px;" id="todayRevenue">Ksh 0 today</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="admin-controls">
+                    <button class="btn btn-primary" onclick="switchAdminTab('approvals')">
+                        <i class="fas fa-user-check"></i> Pending Approvals
+                    </button>
+                    <button class="btn btn-success" onclick="switchAdminTab('users')">
+                        <i class="fas fa-users"></i> User Management
+                    </button>
+                    <button class="btn" onclick="switchAdminTab('documents')" style="background: linear-gradient(135deg, var(--primary) 0%, #26d0ce 100%); color: white;">
+                        <i class="fas fa-file-alt"></i> Document Stats
+                    </button>
+                    <button class="btn btn-warning" onclick="switchAdminTab('revenue')">
+                        <i class="fas fa-chart-line"></i> Revenue Reports
+                    </button>
+                    <button class="btn" onclick="switchAdminTab('sheet-info')" style="background: linear-gradient(135deg, var(--info) 0%, #3b82f6 100%); color: white;">
+                        <i class="fas fa-table"></i> Sheet Info
+                    </button>
+                    <button class="btn btn-danger" onclick="showSecuritySettings()">
+                        <i class="fas fa-cog"></i> Security Settings
+                    </button>
+                </div>
+
+                <!-- Pending Approvals Tab -->
+                <div id="adminApprovalsTab" class="admin-tab-content" style="display: block;">
+                    <div class="form-title">
+                        <i class="fas fa-user-check"></i>
+                        <span>Pending Approvals</span>
+                        <button class="btn btn-success" onclick="approveAllPayments()" style="margin-left: auto; padding: 10px 20px;">
+                            <i class="fas fa-check-double"></i> Approve All
+                        </button>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8fafc;">
+                                    <th style="padding: 15px; text-align: left;">
+                                        <input type="checkbox" id="selectAllApprovals" onchange="toggleSelectAllApprovals()">
+                                    </th>
+                                    <th style="padding: 15px; text-align: left;">Date</th>
+                                    <th style="padding: 15px; text-align: left;">Student</th>
+                                    <th style="padding: 15px; text-align: left;">Phone</th>
+                                    <th style="padding: 15px; text-align: left;">University</th>
+                                    <th style="padding: 15px; text-align: left;">Transaction Code</th>
+                                    <th style="padding: 15px; text-align: left;">Amount</th>
+                                    <th style="padding: 15px; text-align: left;">Device ID</th>
+                                    <th style="padding: 15px; text-align: left;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingPaymentsTable">
+                                <!-- Payments will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="approveSelectedPayments()">
+                            <i class="fas fa-check"></i> Approve Selected
+                        </button>
+                        <button class="btn btn-danger" onclick="rejectSelectedPayments()">
+                            <i class="fas fa-times"></i> Reject Selected
+                        </button>
+                        <button class="btn btn-primary" onclick="sendWhatsAppToSelected()">
+                            <i class="fab fa-whatsapp"></i> Send WhatsApp
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Management Tab -->
+                <div id="adminUsersTab" class="admin-tab-content" style="display: none;">
+                    <div class="form-title">
+                        <i class="fas fa-users"></i>
+                        <span>User Management</span>
+                        <div style="margin-left: auto; display: flex; gap: 10px;">
+                            <input type="text" id="searchUsers" class="form-control" placeholder="Search users..." style="width: 200px;" oninput="searchUsers()">
+                            <button class="btn btn-danger" onclick="showBulkDelete()">
+                                <i class="fas fa-trash"></i> Bulk Delete
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8fafc;">
+                                    <th style="padding: 15px; text-align: left;">
+                                        <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAllUsers()">
+                                    </th>
+                                    <th style="padding: 15px; text-align: left;">Name</th>
+                                    <th style="padding: 15px; text-align: left;">Email</th>
+                                    <th style="padding: 15px; text-align: left;">Phone</th>
+                                    <th style="padding: 15px; text-align: left;">University</th>
+                                    <th style="padding: 15px; text-align: left;">Status</th>
+                                    <th style="padding: 15px; text-align: left;">Device ID</th>
+                                    <th style="padding: 15px; text-align: left;">Last Login</th>
+                                    <th style="padding: 15px; text-align: left;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allUsersTable">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-danger" onclick="deleteSelectedUsers()">
+                            <i class="fas fa-trash"></i> Delete Selected Users
+                        </button>
+                        <button class="btn btn-warning" onclick="logoutSelectedUsers()">
+                            <i class="fas fa-sign-out-alt"></i> Force Logout Selected
+                        </button>
+                        <button class="btn btn-primary" onclick="exportUsers()">
+                            <i class="fas fa-download"></i> Export Users
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Document Stats Tab -->
+                <div id="adminDocumentsTab" class="admin-tab-content" style="display: none;">
+                    <div class="form-title">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Document Statistics</span>
+                    </div>
+                    
+                    <div class="grid-3">
+                        <div class="stat-card">
+                            <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="totalDocumentsCount">0</div>
+                            <div>Total Documents</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="totalViews">0</div>
+                            <div>Total Views</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="totalDownloads">0</div>
+                            <div>Total Downloads</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4 style="margin-bottom: 15px;">Top Documents</h4>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8fafc;">
+                                    <th style="padding: 15px; text-align: left;">Document</th>
+                                    <th style="padding: 15px; text-align: left;">University</th>
+                                    <th style="padding: 15px; text-align: left;">Views</th>
+                                    <th style="padding: 15px; text-align: left;">Downloads</th>
+                                    <th style="padding: 15px; text-align: left;">Last Accessed</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topDocumentsTable">
+                                <!-- Top documents will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Revenue Reports Tab -->
+                <div id="adminRevenueTab" class="admin-tab-content" style="display: none;">
+                    <div class="form-title">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Revenue Reports</span>
+                    </div>
+                    
+                    <div class="grid-3">
+                        <div class="stat-card">
+                            <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="totalRevenueAmount">Ksh 0</div>
+                            <div>Total Revenue</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="monthlyRevenue">Ksh 0</div>
+                            <div>This Month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="dailyRevenue">Ksh 0</div>
+                            <div>Today</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4 style="margin-bottom: 15px;">Recent Transactions</h4>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8fafc;">
+                                    <th style="padding: 15px; text-align: left;">Date</th>
+                                    <th style="padding: 15px; text-align: left;">Student</th>
+                                    <th style="padding: 15px; text-align: left;">Amount</th>
+                                    <th style="padding: 15px; text-align: left;">Status</th>
+                                    <th style="padding: 15px; text-align: left;">Approved By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="revenueTable">
+                                <!-- Revenue data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sheet Information Tab -->
+                <div id="adminSheetInfoTab" class="admin-tab-content" style="display: none;">
+                    <div class="form-section">
+                        <div class="form-title">
+                            <i class="fas fa-table"></i>
+                            <span>Google Sheet Information</span>
+                        </div>
+                        
+                        <div class="card" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid var(--primary); padding: 25px; border-radius: var(--radius); margin-bottom: 20px;">
+                            <div class="form-title" style="font-size: 18px;">
+                                <i class="fas fa-link"></i>
+                                <span>Connected Google Sheet</span>
+                            </div>
+                            <p><strong>URL:</strong> <a href="https://docs.google.com/spreadsheets/d/1SVkc6bNx2nJrALP2pc6-LzOBsEzuTwv-bh5YFuGQcaI/edit?usp=drivesdk" target="_blank">https://docs.google.com/spreadsheets/d/1SVkc6bNx2nJrALP2pc6-LzOBsEzuTwv-bh5YFuGQcaI</a></p>
+                            <p><strong>Direct Access:</strong> <code>https://opensheet.elk.sh/1SVkc6bNx2nJrALP2pc6-LzOBsEzuTwv-bh5YFuGQcaI/Sheet1</code></p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Document Count</label>
+                            <div class="form-control" style="background: #f8fafc;" id="sheetDocumentCount">Loading...</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Last Updated</label>
+                            <div class="form-control" style="background: #f8fafc;" id="sheetLastUpdated">Loading...</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Connection Status</label>
+                            <div class="form-control" style="background: #f8fafc;" id="sheetStatusText">Loading...</div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 20px;">
+                            <button class="btn btn-success" onclick="refreshSheetData()" style="flex: 1;">
+                                <i class="fas fa-sync"></i> Refresh Sheet Data
+                            </button>
+                            <button class="btn btn-primary" onclick="openGoogleSheet()" style="flex: 1;">
+                                <i class="fas fa-external-link-alt"></i> Open Google Sheet
+                            </button>
+                            <button class="btn btn-warning" onclick="clearSheetCache()" style="flex: 1;">
+                                <i class="fas fa-trash"></i> Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== GOOGLE SHEET MANAGER ==================== -->
+        <div id="sheet-manager" class="tab-content" style="display: none;">
+            <div class="form-section">
+                <div class="form-title">
+                    <i class="fas fa-table"></i>
+                    <span>Google Sheet Document Manager</span>
+                </div>
+                
+                <!-- Sheet Connection Status -->
+                <div class="sheet-status disconnected" id="managerSheetStatus">
+                    <i class="fas fa-sync-alt fa-spin" style="color: var(--warning);"></i>
+                    <div style="flex: 1;">
+                        <strong>Connecting to Google Sheet</strong>
+                        <div style="font-size: 14px; color: var(--gray);">
+                            Direct Link: https://opensheet.elk.sh/1SVkc6bNx2nJrALP2pc6-LzOBsEzuTwv-bh5YFuGQcaI/Sheet1
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="refreshSheetData()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+                
+                <!-- Quick Add Form -->
+                <div class="form-section" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);">
+                    <div class="form-title">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Quick Add Document</span>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Document Title *</label>
+                            <input type="text" id="sheetDocTitle" class="form-control" placeholder="Enter document title" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Unit Code *</label>
+                            <input type="text" id="sheetDocUnitCode" class="form-control" placeholder="e.g., BOTA241" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>University *</label>
+                            <select id="sheetDocUniversity" class="form-control" required>
+                                <option value="">-- Select University --</option>
+                                <option value="University of Nairobi">University of Nairobi</option>
+                                <option value="Kenyatta University">Kenyatta University</option>
+                                <option value="Jomo Kenyatta University of Agriculture and Technology">JKUAT</option>
+                                <option value="Moi University">Moi University</option>
+                                <option value="Egerton University">Egerton University</option>
+                                <option value="Maseno University">Maseno University</option>
+                                <option value="Technical University of Kenya">Technical University of Kenya</option>
+                                <option value="University of Eldoret">University of Eldoret (UoE)</option>
+                                <option value="Strathmore University">Strathmore University</option>
+                                <option value="All">All Universities</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Document Type *</label>
+                            <select id="sheetDocType" class="form-control" required>
+                                <option value="">-- Select Type --</option>
+                                <option value="pdf">PDF Document</option>
+                                <option value="word">Word Document</option>
+                                <option value="excel">Excel Spreadsheet</option>
+                                <option value="powerpoint">PowerPoint</option>
+                                <option value="image">Image</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Document URL *</label>
+                        <input type="url" id="sheetDocUrl" class="form-control" placeholder="https://drive.google.com/file/d/..." required>
+                        <small style="color: var(--gray);">Enter direct link to document. For Google Drive, use "Anyone with link can view"</small>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <button class="btn btn-success" onclick="addDocumentToSheet()" style="flex: 1; padding: 16px;">
+                            <i class="fas fa-plus"></i> Generate CSV for Sheet
+                        </button>
+                        <button class="btn btn-primary" onclick="copyToClipboard()" style="padding: 16px;">
+                            <i class="fas fa-copy"></i> Copy CSV
+                        </button>
+                    </div>
+                    
+                    <div id="copySuccess" style="display: none; margin-top: 15px; padding: 10px; background: #d1fae5; border-radius: 8px; color: var(--success); text-align: center;">
+                        <i class="fas fa-check"></i> CSV format copied to clipboard! Paste into Google Sheet.
+                    </div>
+                </div>
+                
+                <!-- Current Documents -->
+                <div class="form-section" style="margin-top: 30px;">
+                    <div class="form-title">
+                        <i class="fas fa-list"></i>
+                        <span>Current Documents in Sheet</span>
+                        <span style="font-size: 14px; color: var(--gray); margin-left: auto;" id="docCountBadge">Loading...</span>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8fafc;">
+                                    <th style="padding: 10px; text-align: left;">Title</th>
+                                    <th style="padding: 10px; text-align: left;">Unit Code</th>
+                                    <th style="padding: 10px; text-align: left;">University</th>
+                                    <th style="padding: 10px; text-align: left;">Type</th>
+                                    <th style="padding: 10px; text-align: left;">URL</th>
+                                    <th style="padding: 10px; text-align: left;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sheetDocumentsPreview">
+                                <!-- Documents will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SETTINGS ==================== -->
+        <div id="settings" class="tab-content" style="display: none;">
+            <div class="form-section">
+                <div class="form-title">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+                
+                <!-- Security Settings -->
+                <div class="form-section" style="background: #f8fafc;">
+                    <div class="form-title" style="font-size: 18px;">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Security Settings</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Current Device ID</label>
+                        <div class="form-control" style="background: white; font-family: monospace;" id="currentDeviceIdDisplay"></div>
+                        <small style="color: var(--gray);">Your account is locked to this device only</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Session Management</label>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-warning" onclick="forceLogout()" style="flex: 1;">
+                                <i class="fas fa-sign-out-alt"></i> Logout from All Sessions
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteAccount()" style="flex: 1;">
+                                <i class="fas fa-trash"></i> Delete My Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Data Management -->
+                <div class="form-section" style="margin-top: 20px;">
+                    <div class="form-title" style="font-size: 18px;">
+                        <i class="fas fa-database"></i>
+                        <span>Data Management</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="exportUserData()">
+                            <i class="fas fa-download"></i> Export My Data
+                        </button>
+                        <button class="btn btn-warning" onclick="clearLocalData()">
+                            <i class="fas fa-trash"></i> Clear Cache
+                        </button>
+                        <button class="btn" onclick="refreshAllData()" style="background: var(--info); color: white;">
+                            <i class="fas fa-sync"></i> Refresh All Data
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- About -->
+                <div class="form-section" style="margin-top: 20px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);">
+                    <div class="form-title" style="font-size: 18px;">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About RevisionVault Pro</span>
+                    </div>
+                    
+                    <div style="line-height: 1.8;">
+                        <p><strong>Version:</strong> 2.0.0 (Enhanced)</p>
+                        <p><strong>Last Updated:</strong> <span id="appVersionDate">Loading...</span></p>
+                        <p><strong>Features:</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>Device-Locked Security System</li>
+                            <li>Direct Google Sheet Integration</li>
+                            <li>Advanced Document Viewer</li>
+                            <li>Admin Approval System</li>
+                            <li>WhatsApp Notifications</li>
+                            <li>Real-time Updates</li>
+                        </ul>
+                        <p><strong>Support:</strong> Contact 0765 098 865</p>
+                        <p><strong>Website:</strong> https://walterzauko23.github.io/Revisionvault/</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright Footer -->
+        <div style="text-align: center; padding: 25px; color: var(--gray); border-top: 1px solid var(--border); background: #f8f9fa;">
+            <p>&copy; 2025 RevisionVault Pro. Secure Document Management System • Device-Locked Access • Contact: 0765 098 865</p>
+        </div>
+    </div>
+
+    <!-- JavaScript Code -->
+    <script>
+        // ==================== SECURITY & INITIALIZATION ====================
+        const APP_VERSION = "2.0.0";
+        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1SVkc6bNx2nJrALP2pc6-LzOBsEzuTwv-bh5YFuGQcaI/edit?usp=drivesdk";
+        const API_ENDPOINT = "https://opensheet.elk.sh/1SVkc6bNx2nJrALP2pc6-LzOBsEzuTwv-bh5YFuGQcaI/Sheet1";
+        const ADMIN_PASSWORD = "walter.zauko23";
+        
+        // Global variables
+        let currentStudent = null;
+        let students = [];
+        let payments = [];
+        let documents = [];
+        let adminPassword = ADMIN_PASSWORD;
+        let currentUniversityFilter = 'all';
+        let currentYearFilter = 'all';
+        let currentTypeFilter = 'all';
+        let currentSort = 'newest';
+        let selectedStudentId = null;
+        let currentViewingDocument = null;
+        let pdfDoc = null;
+        let currentPDFPage = 1;
+        let scale = 1.0;
+        let rotation = 0;
+        let pdfRendering = false;
+        let pdfQueue = [];
+        let deviceId = null;
+        let lastSheetUpdate = null;
+        let sheetConnected = false;
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 12;
+
+        // ==================== DEVICE LOCKING SYSTEM ====================
+        function generateDeviceId() {
+            const components = [
+                navigator.userAgent,
+                navigator.platform,
+                navigator.language,
+                screen.width + 'x' + screen.height,
+                new Date().getTimezoneOffset()
+            ];
+            
+            let hash = 0;
+            const str = components.join('|');
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            
+            return 'DEV_' + Math.abs(hash).toString(16).substring(0, 8).toUpperCase();
+        }
+
+        function checkDeviceLock() {
+            deviceId = generateDeviceId();
+            document.getElementById('deviceId').textContent = deviceId.substring(0, 8);
+            document.getElementById('deviceIndicator').style.display = 'block';
+            document.getElementById('currentDeviceId').textContent = deviceId.substring(0, 8);
+            document.getElementById('currentDeviceIdDisplay').textContent = deviceId;
+            
+            if (currentStudent && currentStudent.deviceId && currentStudent.deviceId !== deviceId) {
+                showNotification('Account is locked to another device!', 'error');
+                forceLogout();
+                return false;
+            }
+            return true;
+        }
+
+        // ==================== GOOGLE SHEET INTEGRATION ====================
+        async function loadDocumentsFromGoogleSheet() {
+            updateSheetStatus('Connecting to Google Sheet...', 'disconnected');
+            
+            try {
+                document.getElementById('loadingMessage').textContent = 'Fetching documents from Google Sheet...';
+                
+                const timestamp = new Date().getTime();
+                const response = await fetch(`${API_ENDPOINT}?_=${timestamp}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!Array.isArray(data)) {
+                    throw new Error('Invalid data format from Google Sheet');
+                }
+                
+                console.log('Raw data from Google Sheet:', data);
+                
+                // Process documents
+                documents = data.map((row, index) => {
+                    try {
+                        // Helper function to get value with multiple possible keys
+                        const getValue = (keys, defaultValue = '') => {
+                            for (const key of keys) {
+                                if (row[key] !== undefined && row[key] !== null && row[key] !== '') {
+                                    return row[key];
+                                }
+                            }
+                            return defaultValue;
+                        };
+                        
+                        // Extract data
+                        const title = getValue(['Title', 'title', 'Document Title', 'Document title', 'NAME', 'Document Name']);
+                        const unitCode = getValue(['Unit Code', 'unitcode', 'Unit code', 'UNIT', 'Unit', 'Code', 'Course Code']);
+                        const university = getValue(['University', 'university', 'University/College', 'UNIVERSITY', 'Institution']);
+                        let type = (getValue(['Type', 'type', 'Document Type', 'FORMAT', 'File Type']) || 'pdf').toLowerCase();
+                        const subject = getValue(['Subject', 'subject', 'Course', 'COURSE', 'Subject Name']);
+                        const year = getValue(['Year', 'year', 'YEAR', 'Year of Study']);
+                        let url = getValue(['URL', 'url', 'Link', 'link', 'Download Link', 'DOWNLOAD', 'Document URL', 'File Link']);
+                        const description = getValue(['Description', 'description', 'DESCRIPTION', 'Notes']);
+                        
+                        // Clean and validate URL
+                        if (url) {
+                            url = url.toString().trim();
+                            // Convert Google Drive view links to download links
+                            if (url.includes('drive.google.com/file/d/')) {
+                                const fileIdMatch = url.match(/\/d\/([^\/]+)/);
+                                if (fileIdMatch) {
+                                    url = `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+                                }
+                            }
+                            // Ensure URL starts with http
+                            if (!url.startsWith('http')) {
+                                url = 'https://' + url;
+                            }
+                        }
+                        
+                        // Auto-detect type from URL if not specified
+                        if (!type || type === 'auto' || type === '') {
+                            if (url) {
+                                const urlLower = url.toLowerCase();
+                                if (urlLower.includes('.pdf') || urlLower.includes('pdf')) type = 'pdf';
+                                else if (urlLower.includes('.doc') || urlLower.includes('docx') || urlLower.includes('word')) type = 'word';
+                                else if (urlLower.includes('.xls') || urlLower.includes('xlsx') || urlLower.includes('excel')) type = 'excel';
+                                else if (urlLower.includes('.ppt') || urlLower.includes('pptx') || urlLower.includes('powerpoint')) type = 'powerpoint';
+                                else if (urlLower.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/)) type = 'image';
+                                else type = 'other';
+                            } else {
+                                type = 'pdf'; // Default to PDF
+                            }
+                        }
+                        
+                        // Clean up type string
+                        type = type.toLowerCase();
+                        if (type.includes('pdf')) type = 'pdf';
+                        else if (type.includes('doc') || type.includes('word')) type = 'word';
+                        else if (type.includes('xls') || type.includes('excel')) type = 'excel';
+                        else if (type.includes('ppt') || type.includes('powerpoint')) type = 'powerpoint';
+                        else if (type.includes('image') || type.includes('jpg') || type.includes('png') || type.includes('jpeg')) type = 'image';
+                        
+                        // Generate unique ID
+                        const uniqueId = 'DOC_' + Date.now() + '_' + index + '_' + Math.random().toString(36).substr(2, 9);
+                        
+                        return {
+                            id: uniqueId,
+                            title: title.toString().trim() || `Document ${index + 1}`,
+                            unitCode: unitCode.toString().trim().toUpperCase() || 'N/A',
+                            university: university.toString().trim() || 'General',
+                            type: type,
+                            subject: subject.toString().trim() || 'General',
+                            year: year.toString().trim() || '',
+                            description: description.toString().trim() || 'Study material for students',
+                            url: url,
+                            source: 'google-sheet',
+                            uploadDate: new Date().toISOString(),
+                            views: Math.floor(Math.random() * 100) + 1,
+                            downloads: Math.floor(Math.random() * 50) + 1,
+                            rating: 4.0 + Math.random(),
+                            sheetRow: index + 2
+                        };
+                    } catch (error) {
+                        console.error('Error processing row:', row, error);
+                        return null;
+                    }
+                }).filter(doc => doc !== null && doc.url && doc.url.trim() !== '');
+                
+                console.log(`Processed ${documents.length} documents:`, documents);
+                
+                // Save last update time
+                lastSheetUpdate = new Date().toISOString();
+                sheetConnected = true;
+                
+                // Cache the data
+                localStorage.setItem('cached_documents', JSON.stringify(documents));
+                localStorage.setItem('cached_documents_timestamp', lastSheetUpdate);
+                
+                // Update UI
+                updateSheetStatus(`Connected • ${documents.length} documents loaded`, 'connected');
+                updateManagerSheetStatus(`Connected • ${documents.length} documents`, 'connected');
+                
+                // Load documents in UI if on documents tab
+                if (document.getElementById('documents').classList.contains('active')) {
+                    loadDocuments();
+                }
+                
+                console.log(`Successfully loaded ${documents.length} documents from Google Sheet`);
+                return true;
+                
+            } catch (error) {
+                console.error('Error loading from Google Sheet:', error);
+                
+                // Try to load from cache
+                try {
+                    const cachedDocs = JSON.parse(localStorage.getItem('cached_documents')) || [];
+                    const cachedTime = localStorage.getItem('cached_documents_timestamp');
+                    
+                    if (cachedDocs.length > 0) {
+                        documents = cachedDocs;
+                        lastSheetUpdate = cachedTime || 'Cached data';
+                        updateSheetStatus(`Using cached data • ${documents.length} documents`, 'disconnected');
+                        updateManagerSheetStatus(`Using cached data • ${documents.length} documents`, 'disconnected');
+                        console.log(`Loaded ${documents.length} documents from cache`);
+                        return true;
+                    }
+                } catch (cacheError) {
+                    console.error('Cache error:', cacheError);
+                }
+                
+                // Create sample data as last resort
+                documents = getSampleDocuments();
+                updateSheetStatus(`Using sample data • ${documents.length} documents`, 'disconnected');
+                updateManagerSheetStatus(`Using sample data • ${documents.length} documents`, 'disconnected');
+                
+                return false;
+            }
+        }
+
+        function getSampleDocuments() {
+            return [
+                {
+                    id: 'sample_1',
+                    title: 'Introduction to Computer Science',
+                    unitCode: 'CS101',
+                    university: 'University of Nairobi',
+                    type: 'pdf',
+                    subject: 'Computer Science',
+                    year: '1',
+                    description: 'Basic concepts of computer science and programming fundamentals',
+                    url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                    views: 150,
+                    downloads: 45,
+                    uploadDate: new Date().toISOString()
+                },
+                {
+                    id: 'sample_2',
+                    title: 'Organic Chemistry Notes',
+                    unitCode: 'CHEM201',
+                    university: 'Kenyatta University',
+                    type: 'pdf',
+                    subject: 'Chemistry',
+                    year: '2',
+                    description: 'Complete organic chemistry notes with diagrams and reactions',
+                    url: 'https://www.africau.edu/images/default/sample.pdf',
+                    views: 210,
+                    downloads: 67,
+                    uploadDate: new Date().toISOString()
+                },
+                {
+                    id: 'sample_3',
+                    title: 'Business Statistics',
+                    unitCode: 'STAT301',
+                    university: 'Strathmore University',
+                    type: 'pdf',
+                    subject: 'Statistics',
+                    year: '3',
+                    description: 'Statistical methods for business applications and analysis',
+                    url: 'https://www.orimi.com/pdf-test.pdf',
+                    views: 180,
+                    downloads: 52,
+                    uploadDate: new Date().toISOString()
+                }
+            ];
+        }
+
+        function updateSheetStatus(message, status) {
+            const statusElement = document.getElementById('sheetStatus');
+            if (!statusElement) return;
+            
+            const icon = status === 'connected' ? 'fa-check-circle' :
+                        status === 'disconnected' ? 'fa-sync-alt fa-spin' : 'fa-exclamation-circle';
+            const iconColor = status === 'connected' ? 'var(--success)' :
+                            status === 'disconnected' ? 'var(--warning)' : 'var(--danger)';
+            
+            statusElement.innerHTML = `
+                <i class="fas ${icon}" style="color: ${iconColor};"></i>
+                <span>${message}</span>
+                ${status === 'disconnected' ? '<button class="btn btn-primary" onclick="refreshSheetData()" style="margin-left: auto; padding: 5px 10px; font-size: 12px;"><i class="fas fa-sync"></i> Retry</button>' : ''}
+            `;
+            
+            statusElement.className = `sheet-status ${status}`;
+        }
+
+        function updateManagerSheetStatus(message, status) {
+            const statusElement = document.getElementById('managerSheetStatus');
+            if (!statusElement) return;
+            
+            const icon = status === 'connected' ? 'fa-check-circle' :
+                        status === 'disconnected' ? 'fa-sync-alt fa-spin' : 'fa-exclamation-circle';
+            const iconColor = status === 'connected' ? 'var(--success)' :
+                            status === 'disconnected' ? 'var(--warning)' : 'var(--danger)';
+            
+            statusElement.innerHTML = `
+                <i class="fas ${icon}" style="color: ${iconColor};"></i>
+                <div style="flex: 1;">
+                    <strong>${status === 'connected' ? 'Connected' : status === 'disconnected' ? 'Connecting' : 'Error'}</strong>
+                    <div style="font-size: 14px; color: var(--gray);">${message}</div>
+                </div>
+                <button class="btn btn-primary" onclick="refreshSheetData()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            `;
+            
+            statusElement.className = `sheet-status ${status}`;
+        }
+
+        async function refreshSheetData() {
+            showNotification('Refreshing documents from Google Sheet...', 'info');
+            
+            updateSheetStatus('Refreshing data...', 'disconnected');
+            updateManagerSheetStatus('Refreshing data...', 'disconnected');
+            
+            // Clear cache
+            localStorage.removeItem('cached_documents');
+            localStorage.removeItem('cached_documents_timestamp');
+            
+            // Load fresh data
+            const success = await loadDocumentsFromGoogleSheet();
+            
+            if (success) {
+                if (document.getElementById('documents').classList.contains('active')) {
+                    loadDocuments();
+                }
+                updateSheetInfo();
+                updateSheetManager();
+                showNotification(`Successfully loaded ${documents.length} documents`, 'success');
+            } else {
+                showNotification('Using cached data. Could not refresh.', 'warning');
+            }
+        }
+
+        function openGoogleSheet() {
+            window.open(GOOGLE_SHEET_URL, '_blank');
+        }
+
+        function clearSheetCache() {
+            localStorage.removeItem('cached_documents');
+            localStorage.removeItem('cached_documents_timestamp');
+            showNotification('Sheet cache cleared', 'success');
+            refreshSheetData();
+        }
+
+        // ==================== DOCUMENT MANAGEMENT ====================
+        function loadDocuments() {
+            const grid = document.getElementById('documentsGrid');
+            const noDocsMsg = document.getElementById('noDocumentsMessage');
+            const pagination = document.getElementById('pagination');
+            
+            if (!grid) return;
+            
+            // Update document count
+            const docCount = document.getElementById('documentCount');
+            if (docCount) docCount.textContent = `${documents.length} documents`;
+            
+            // Check if documents are loaded
+            if (documents.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+                        <i class="fas fa-file-alt" style="font-size: 64px; margin-bottom: 20px; color: #e5e7eb;"></i>
+                        <h3 style="color: var(--primary); margin-bottom: 10px;">No Documents Available</h3>
+                        <p style="color: var(--gray);">Check back later or contact admin to add documents.</p>
+                    </div>
+                `;
+                if (noDocsMsg) noDocsMsg.style.display = 'block';
+                if (pagination) pagination.style.display = 'none';
+                return;
+            }
+            
+            if (noDocsMsg) noDocsMsg.style.display = 'none';
+            
+            // Check access
+            const hasAccess = currentStudent && currentStudent.subscription && 
+                            currentStudent.subscription.active && 
+                            currentStudent.subscription.deviceId === deviceId;
+            
+            // Apply filters
+            let filteredDocs = [...documents];
+            
+            // University filter
+            if (currentUniversityFilter !== 'all') {
+                filteredDocs = filteredDocs.filter(doc => 
+                    doc.university.toLowerCase().includes(currentUniversityFilter.toLowerCase()) || 
+                    doc.university === 'All' ||
+                    doc.university === 'General'
+                );
+            }
+            
+            // Year filter
+            if (currentYearFilter !== 'all') {
+                filteredDocs = filteredDocs.filter(doc => doc.year.toString() === currentYearFilter);
+            }
+            
+            // Type filter
+            if (currentTypeFilter !== 'all') {
+                filteredDocs = filteredDocs.filter(doc => doc.type === currentTypeFilter);
+            }
+            
+            // Search filter
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            if (searchTerm) {
+                filteredDocs = filteredDocs.filter(doc => 
+                    (doc.title && doc.title.toLowerCase().includes(searchTerm)) ||
+                    (doc.unitCode && doc.unitCode.toLowerCase().includes(searchTerm)) ||
+                    (doc.subject && doc.subject.toLowerCase().includes(searchTerm)) ||
+                    (doc.description && doc.description.toLowerCase().includes(searchTerm)) ||
+                    (doc.university && doc.university.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            // Sort documents
+            filteredDocs.sort((a, b) => {
+                switch(currentSort) {
+                    case 'newest':
+                        return new Date(b.uploadDate) - new Date(a.uploadDate);
+                    case 'oldest':
+                        return new Date(a.uploadDate) - new Date(b.uploadDate);
+                    case 'title':
+                        return (a.title || '').localeCompare(b.title || '');
+                    case 'views':
+                        return (b.views || 0) - (a.views || 0);
+                    case 'downloads':
+                        return (b.downloads || 0) - (a.downloads || 0);
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Pagination
+            const totalPages = Math.ceil(filteredDocs.length / ITEMS_PER_PAGE);
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            const paginatedDocs = filteredDocs.slice(startIndex, endIndex);
+            
+            // Update pagination
+            if (pagination) {
+                document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+                document.getElementById('prevPageBtn').disabled = currentPage === 1;
+                document.getElementById('nextPageBtn').disabled = currentPage === totalPages || totalPages === 0;
+                pagination.style.display = totalPages > 1 ? 'block' : 'none';
+            }
+            
+            if (paginatedDocs.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+                        <i class="fas fa-search" style="font-size: 64px; margin-bottom: 20px; color: #e5e7eb;"></i>
+                        <h3 style="color: var(--primary); margin-bottom: 10px;">No Documents Found</h3>
+                        <p style="color: var(--gray);">Try changing your search filters</p>
+                        <button class="btn btn-primary" onclick="resetFilters()" style="margin-top: 20px;">
+                            <i class="fas fa-redo"></i> Reset Filters
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Display documents
+            grid.innerHTML = paginatedDocs.map(doc => createDocumentCard(doc, hasAccess)).join('');
+        }
+
+        function createDocumentCard(doc, hasAccess) {
+            // Format university display
+            const universityDisplay = doc.university.length > 30 ? 
+                doc.university.substring(0, 27) + '...' : doc.university;
+            
+            // Format description
+            const description = doc.description || doc.subject || 'Study material';
+            const shortDescription = description.length > 120 ? 
+                description.substring(0, 117) + '...' : description;
+            
+            // Determine if user can view
+            const canView = hasAccess;
+            
+            // Create appropriate button based on access
+            const viewButton = canView ? 
+                `<button class="btn btn-primary" onclick="openAdvancedViewer('${doc.id}')" style="flex: 2;">
+                    <i class="fas fa-eye"></i> View
+                </button>` :
+                `<button class="btn btn-warning" onclick="promptToSubscribe()" style="flex: 2;" title="Subscribe to view">
+                    <i class="fas fa-lock"></i> Locked
+                </button>`;
+            
+            return `
+                <div class="document-card fade-in">
+                    <div class="doc-icon">
+                        ${getDocIcon(doc.type)}
+                    </div>
+                    <div class="doc-title" title="${doc.title}">
+                        ${doc.title.length > 60 ? doc.title.substring(0, 57) + '...' : doc.title}
+                    </div>
+                    <div class="doc-meta">
+                        <strong>${doc.unitCode || 'N/A'}</strong> • ${universityDisplay}
+                        ${doc.year ? '• Year ' + doc.year : ''}
+                    </div>
+                    <div class="doc-description">
+                        ${doc.subject ? '<strong>Subject:</strong> ' + doc.subject + '<br>' : ''}
+                        ${shortDescription}
+                        <br>
+                        <small>
+                            <i class="fas fa-eye"></i> ${doc.views || 0} views • 
+                            <i class="fas fa-download"></i> ${doc.downloads || 0} downloads
+                            ${doc.rating ? '• <i class="fas fa-star"></i> ' + doc.rating.toFixed(1) : ''}
+                        </small>
+                    </div>
+                    <div class="doc-actions">
+                        ${viewButton}
+                        <button class="btn btn-success" onclick="testDocumentLink('${doc.url}')" title="Test link" style="flex: 1;">
+                            <i class="fas fa-external-link-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getDocIcon(type) {
+            switch(type) {
+                case 'pdf': return '<i class="fas fa-file-pdf"></i>';
+                case 'word': 
+                case 'doc':
+                case 'docx': return '<i class="fas fa-file-word"></i>';
+                case 'excel':
+                case 'xls':
+                case 'xlsx': return '<i class="fas fa-file-excel"></i>';
+                case 'powerpoint':
+                case 'ppt':
+                case 'pptx': return '<i class="fas fa-file-powerpoint"></i>';
+                case 'image':
+                case 'jpg':
+                case 'jpeg':
+                case 'png': return '<i class="fas fa-file-image"></i>';
+                default: return '<i class="fas fa-file-alt"></i>';
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadDocuments();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(documents.length / ITEMS_PER_PAGE);
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadDocuments();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function filterByUniversity(university) {
+            currentUniversityFilter = university;
+            currentPage = 1;
+            loadDocuments();
+        }
+
+        function filterDocuments() {
+            currentUniversityFilter = document.getElementById('universitySelect').value;
+            currentYearFilter = document.getElementById('yearSelect').value;
+            currentTypeFilter = document.getElementById('typeSelect').value;
+            currentSort = document.getElementById('sortSelect').value;
+            currentPage = 1;
+            loadDocuments();
+        }
+
+        function resetFilters() {
+            document.getElementById('universitySelect').value = 'all';
+            document.getElementById('yearSelect').value = 'all';
+            document.getElementById('typeSelect').value = 'all';
+            document.getElementById('sortSelect').value = 'newest';
+            document.getElementById('searchInput').value = '';
+            currentUniversityFilter = 'all';
+            currentYearFilter = 'all';
+            currentTypeFilter = 'all';
+            currentSort = 'newest';
+            currentPage = 1;
+            loadDocuments();
+        }
+
+        function toggleAdvancedFilters() {
+            const filters = document.querySelector('.form-section[style*="background: #f8fafc"]');
+            if (filters) {
+                filters.style.display = filters.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        function testDocumentLink(url) {
+            if (!url) {
+                showNotification('No URL available for this document', 'error');
+                return;
+            }
+            
+            showNotification('Opening document link...', 'info');
+            window.open(url, '_blank');
+        }
+
+        function promptToSubscribe() {
+            showNotification('Please subscribe to view full documents', 'warning');
+            switchTab('student');
+            
+            const paymentBtn = document.getElementById('paymentBtn');
+            if (paymentBtn) {
+                paymentBtn.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // ==================== ADVANCED DOCUMENT VIEWER ====================
+        function openAdvancedViewer(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (!doc) {
+                showNotification('Document not found', 'error');
+                return;
+            }
+
+            // Check access and device lock
+            if (!currentStudent || !currentStudent.subscription || !currentStudent.subscription.active) {
+                showNotification('Please subscribe to view documents', 'error');
+                switchTab('student');
+                return;
+            }
+            
+            if (currentStudent.subscription.deviceId !== deviceId) {
+                showNotification('Account is locked to another device!', 'error');
+                forceLogout();
+                return;
+            }
+
+            currentViewingDocument = doc;
+            
+            // Update view count
+            doc.views = (doc.views || 0) + 1;
+            
+            // Update student's accessed documents
+            if (currentStudent && !currentStudent.documentsAccessed) {
+                currentStudent.documentsAccessed = [];
+            }
+            if (currentStudent && !currentStudent.documentsAccessed.includes(docId)) {
+                currentStudent.documentsAccessed.push(docId);
+                updateStudentInStorage(currentStudent);
+            }
+
+            // Show viewer
+            document.getElementById('viewerDocTitle').textContent = doc.title;
+            document.getElementById('viewerDocInfo').innerHTML = `
+                ${doc.unitCode ? doc.unitCode + ' • ' : ''}${doc.university}
+                ${doc.year ? '• Year ' + doc.year : ''}
+            `;
+            document.getElementById('advancedViewer').style.display = 'flex';
+            
+            // Reset viewer state
+            currentPDFPage = 1;
+            scale = 1.0;
+            rotation = 0;
+            document.getElementById('zoomLevel').textContent = '100%';
+            
+            // Load document
+            loadDocumentForViewer(doc);
+        }
+
+        function loadDocumentForViewer(doc) {
+            // Hide all viewers first
+            document.getElementById('pdfViewer').style.display = 'none';
+            document.getElementById('imageViewer').style.display = 'none';
+            document.getElementById('officeViewer').style.display = 'none';
+            document.getElementById('fallbackViewer').style.display = 'none';
+            document.getElementById('pdfThumbnails').style.display = 'none';
+            document.getElementById('viewerZoomControls').style.display = 'none';
+            
+            const url = doc.url;
+            if (!url) {
+                document.getElementById('fallbackViewer').style.display = 'block';
+                showNotification('No document URL available', 'warning');
+                return;
+            }
+
+            const docType = doc.type;
+
+            switch(docType) {
+                case 'pdf':
+                    loadPDFDocument(url);
+                    document.getElementById('viewerZoomControls').style.display = 'flex';
+                    break;
+                case 'image':
+                    loadImageDocument(url);
+                    document.getElementById('viewerZoomControls').style.display = 'flex';
+                    break;
+                case 'word':
+                case 'excel':
+                case 'powerpoint':
+                    loadOfficeDocument(url);
+                    break;
+                default:
+                    loadGenericDocument(url);
+            }
+        }
+
+        function loadPDFDocument(url) {
+            document.getElementById('pdfViewer').style.display = 'block';
+            const container = document.getElementById('pdfCanvasContainer');
+            container.innerHTML = '<div style="color: white; text-align: center; padding: 50px;"><i class="fas fa-sync fa-spin"></i> Loading PDF...</div>';
+            
+            // Configure PDF.js
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            
+            // Load the PDF
+            const loadingTask = pdfjsLib.getDocument(url);
+            loadingTask.promise.then(function(pdf) {
+                pdfDoc = pdf;
+                document.getElementById('totalPagesNum').textContent = pdf.numPages;
+                document.getElementById('currentPageNum').textContent = '1';
+                renderPDFPage(1);
+                generateThumbnails(pdf);
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                container.innerHTML = '<div style="color: white; text-align: center; padding: 50px;"><i class="fas fa-exclamation-triangle"></i> Failed to load PDF</div>';
+                loadGenericDocument(url);
+            });
+        }
+
+        function renderPDFPage(num) {
+            if (!pdfDoc || pdfRendering) {
+                if (pdfQueue.indexOf(num) === -1) pdfQueue.push(num);
+                return;
+            }
+            
+            pdfRendering = true;
+            currentPDFPage = num;
+            
+            pdfDoc.getPage(num).then(function(page) {
+                const container = document.getElementById('pdfCanvasContainer');
+                
+                // Calculate viewport
+                const viewport = page.getViewport({ scale: scale, rotation: rotation });
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                // Render PDF page
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                const renderTask = page.render(renderContext);
+                renderTask.promise.then(function() {
+                    // Clear container and add canvas
+                    container.innerHTML = '';
+                    
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'pdf-page';
+                    pageDiv.style.width = viewport.width + 'px';
+                    pageDiv.style.height = viewport.height + 'px';
+                    pageDiv.appendChild(canvas);
+                    
+                    container.appendChild(pageDiv);
+                    
+                    // Update page counter
+                    document.getElementById('currentPageNum').textContent = num;
+                    
+                    pdfRendering = false;
+                    
+                    // Render next in queue if any
+                    if (pdfQueue.length > 0) {
+                        renderPDFPage(pdfQueue.shift());
+                    }
+                }).catch(function(error) {
+                    console.error('Render error:', error);
+                    pdfRendering = false;
+                });
+            }).catch(function(error) {
+                console.error('Page error:', error);
+                pdfRendering = false;
+            });
+        }
+
+        function generateThumbnails(pdf) {
+            const container = document.getElementById('pdfThumbnails');
+            container.innerHTML = '';
+            
+            // Generate thumbnails for first 10 pages
+            const pagesToShow = Math.min(pdf.numPages, 10);
+            
+            for (let i = 1; i <= pagesToShow; i++) {
+                pdf.getPage(i).then(function(page) {
+                    const viewport = page.getViewport({ scale: 0.2 });
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    canvas.className = 'pdf-thumbnail';
+                    canvas.title = `Page ${i}`;
+                    
+                    // Set active for first page
+                    if (i === 1) {
+                        canvas.classList.add('active');
+                    }
+                    
+                    // Click event
+                    canvas.onclick = function() {
+                        currentPDFPage = i;
+                        renderPDFPage(i);
+                        // Update active thumbnail
+                        document.querySelectorAll('.pdf-thumbnail').forEach(thumb => {
+                            thumb.classList.remove('active');
+                        });
+                        canvas.classList.add('active');
+                    };
+                    
+                    // Render thumbnail
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    
+                    page.render(renderContext).promise.then(function() {
+                        container.appendChild(canvas);
+                    });
+                });
+            }
+        }
+
+        function toggleThumbnails() {
+            const thumbnails = document.getElementById('pdfThumbnails');
+            thumbnails.style.display = thumbnails.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleDarkMode() {
+            const displayArea = document.getElementById('documentDisplayArea');
+            displayArea.style.filter = displayArea.style.filter === 'invert(1) hue-rotate(180deg)' ? 
+                'none' : 'invert(1) hue-rotate(180deg)';
+        }
+
+        function zoomIn() {
+            scale = Math.min(scale + 0.2, 3);
+            document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
+            if (currentViewingDocument?.type === 'pdf' && pdfDoc) {
+                renderPDFPage(currentPDFPage);
+            } else if (currentViewingDocument?.type === 'image') {
+                const img = document.getElementById('imageDisplay');
+                if (img) img.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            }
+        }
+
+        function zoomOut() {
+            scale = Math.max(scale - 0.2, 0.5);
+            document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
+            if (currentViewingDocument?.type === 'pdf' && pdfDoc) {
+                renderPDFPage(currentPDFPage);
+            } else if (currentViewingDocument?.type === 'image') {
+                const img = document.getElementById('imageDisplay');
+                if (img) img.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            }
+        }
+
+        function resetZoom() {
+            scale = 1.0;
+            document.getElementById('zoomLevel').textContent = '100%';
+            if (currentViewingDocument?.type === 'pdf' && pdfDoc) {
+                renderPDFPage(currentPDFPage);
+            } else if (currentViewingDocument?.type === 'image') {
+                const img = document.getElementById('imageDisplay');
+                if (img) img.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            }
+        }
+
+        function prevPage() {
+            if (!pdfDoc || currentPDFPage <= 1) return;
+            currentPDFPage--;
+            renderPDFPage(currentPDFPage);
+            
+            // Update active thumbnail
+            document.querySelectorAll('.pdf-thumbnail').forEach((thumb, index) => {
+                thumb.classList.remove('active');
+                if (index === currentPDFPage - 1) {
+                    thumb.classList.add('active');
+                }
+            });
+        }
+
+        function nextPage() {
+            if (!pdfDoc || currentPDFPage >= pdfDoc.numPages) return;
+            currentPDFPage++;
+            renderPDFPage(currentPDFPage);
+            
+            // Update active thumbnail
+            document.querySelectorAll('.pdf-thumbnail').forEach((thumb, index) => {
+                thumb.classList.remove('active');
+                if (index === currentPDFPage - 1) {
+                    thumb.classList.add('active');
+                }
+            });
+        }
+
+        function rotateDocument() {
+            rotation = (rotation + 90) % 360;
+            if (currentViewingDocument?.type === 'pdf' && pdfDoc) {
+                renderPDFPage(currentPDFPage);
+            } else if (currentViewingDocument?.type === 'image') {
+                const img = document.getElementById('imageDisplay');
+                if (img) img.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            }
+        }
+
+        function printDocument() {
+            if (currentViewingDocument?.type === 'pdf') {
+                window.open(currentViewingDocument.url, '_blank');
+            } else {
+                window.print();
+            }
+        }
+
+        function toggleFullscreen() {
+            const viewer = document.getElementById('advancedViewer');
+            if (!document.fullscreenElement) {
+                viewer.requestFullscreen().catch(err => {
+                    showNotification('Error enabling fullscreen', 'error');
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function downloadCurrentDocument() {
+            if (!currentViewingDocument || !currentViewingDocument.url) {
+                showNotification('No document to download', 'error');
+                return;
+            }
+            
+            // Update download count
+            currentViewingDocument.downloads = (currentViewingDocument.downloads || 0) + 1;
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.href = currentViewingDocument.url;
+            link.download = currentViewingDocument.title.replace(/[^a-z0-9]/gi, '_') + '.' + currentViewingDocument.type;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Download started', 'success');
+        }
+
+        function closeAdvancedViewer() {
+            document.getElementById('advancedViewer').style.display = 'none';
+            pdfDoc = null;
+            currentPDFPage = 1;
+            scale = 1.0;
+            rotation = 0;
+        }
+
+        // ==================== STUDENT MANAGEMENT ====================
+        function registerStudent() {
+            const name = document.getElementById('regFullName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const university = document.getElementById('regUniversity').value;
+            const course = document.getElementById('regCourse').value.trim();
+            const year = document.getElementById('regYear').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+            
+            // Validation
+            if (!name || !email || !phone || !university || !course || !year) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            if (!agreeTerms) {
+                showNotification('You must agree to the device-locking terms', 'error');
+                return;
+            }
+            
+            // Phone validation
+            if (!phone.match(/^(07|01)\d{8}$/)) {
+                showNotification('Please enter a valid Kenyan phone number', 'error');
+                return;
+            }
+            
+            // Email validation
+            if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Check if student already exists
+            const existingStudent = students.find(s => s.phone === phone || s.email === email);
+            if (existingStudent) {
+                showNotification('Student already registered. Please login.', 'warning');
+                return;
+            }
+            
+            // Create student object with device lock
+            const student = {
+                id: 'STU_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                name: name,
+                email: email,
+                phone: phone,
+                university: university,
+                course: course,
+                year: year,
+                registrationDate: new Date().toISOString(),
+                deviceId: deviceId,
+                lastLogin: new Date().toISOString(),
+                subscription: {
+                    active: false,
+                    startDate: null,
+                    endDate: null,
+                    paymentCode: null,
+                    approved: false,
+                    unlockCode: null,
+                    deviceId: null
+                },
+                documentsAccessed: [],
+                status: 'active'
+            };
+            
+            // Add to students array
+            students.push(student);
+            localStorage.setItem('revisionvault_students', JSON.stringify(students));
+            
+            // Set as current student
+            currentStudent = student;
+            localStorage.setItem('current_student', JSON.stringify(student));
+            
+            // Show success and go to account
+            showNotification('Registration successful! Account is locked to this device.', 'success');
+            showStudentAccount(student);
+        }
+
+        function loginStudent() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            
+            if (!phone) {
+                showNotification('Please enter your phone number', 'error');
+                return;
+            }
+            
+            const student = students.find(s => s.phone === phone);
+            if (!student) {
+                showNotification('Student not found. Please register first.', 'error');
+                return;
+            }
+            
+            // Check device lock
+            if (student.deviceId && student.deviceId !== deviceId) {
+                showNotification('Account is locked to another device!', 'error');
+                return;
+            }
+            
+            // Update device ID if not set
+            if (!student.deviceId) {
+                student.deviceId = deviceId;
+            }
+            
+            // Update last login
+            student.lastLogin = new Date().toISOString();
+            currentStudent = student;
+            localStorage.setItem('current_student', JSON.stringify(student));
+            localStorage.setItem('revisionvault_students', JSON.stringify(students));
+            
+            showStudentAccount(student);
+            showNotification('Login successful!', 'success');
+        }
+
+        function showStudentAccount(student) {
+            // Hide registration form
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'none';
+            
+            // Update account info
+            document.getElementById('accountName').textContent = student.name;
+            document.getElementById('accountEmail').textContent = student.email;
+            document.getElementById('accountPhone').textContent = student.phone;
+            document.getElementById('accountUniversity').textContent = student.university;
+            document.getElementById('accountCourse').textContent = student.course;
+            document.getElementById('accountYear').textContent = 'Year ' + student.year;
+            document.getElementById('currentDeviceId').textContent = deviceId.substring(0, 8);
+            
+            // Show account dashboard
+            document.getElementById('step2').style.display = 'block';
+            
+            // Update subscription status
+            updateSubscriptionStatus();
+            updateAccessStatus();
+        }
+
+        function goToPayment() {
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'block';
+            
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('paymentDate').value = today;
+        }
+
+        function goToAccount() {
+            document.getElementById('step3').style.display = 'none';
+            document.getElementById('step4').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+        }
+
+        function submitPayment() {
+            const paymentCode = document.getElementById('paymentCode').value.trim().toUpperCase();
+            const paymentDate = document.getElementById('paymentDate').value;
+            
+            if (!paymentCode || !paymentDate) {
+                showNotification('Please fill all payment details', 'error');
+                return;
+            }
+            
+            // Validate payment code format
+            if (!paymentCode.match(/^[A-Z0-9]{8,10}$/)) {
+                showNotification('Invalid transaction code format', 'error');
+                return;
+            }
+            
+            // Check if payment code already used
+            const existingPayment = payments.find(p => p.paymentCode === paymentCode);
+            if (existingPayment) {
+                showNotification('This transaction code has already been used', 'error');
+                return;
+            }
+            
+            // Create payment record
+            const payment = {
+                id: 'PAY_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                studentId: currentStudent.id,
+                studentName: currentStudent.name,
+                studentPhone: currentStudent.phone,
+                studentUniversity: currentStudent.university,
+                amount: 67,
+                paymentCode: paymentCode,
+                paymentDate: paymentDate,
+                status: 'pending',
+                submissionDate: new Date().toISOString(),
+                deviceId: deviceId,
+                unlockCode: generateUnlockCode()
+            };
+            
+            // Add to payments
+            payments.push(payment);
+            localStorage.setItem('revisionvault_payments', JSON.stringify(payments));
+            
+            // Update student subscription
+            currentStudent.subscription.paymentCode = paymentCode;
+            currentStudent.submissionDate = new Date().toISOString();
+            updateStudentInStorage(currentStudent);
+            
+            // Show pending approval
+            document.getElementById('step3').style.display = 'none';
+            document.getElementById('step4').style.display = 'block';
+            document.getElementById('pendingApproval').style.display = 'block';
+            document.getElementById('readyForUnlock').style.display = 'none';
+            document.getElementById('accessGranted').style.display = 'none';
+            
+            showNotification('Payment submitted for admin approval', 'success');
+        }
+
+        function generateUnlockCode() {
+            return 'RV' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+
+        function updateStudentInStorage(student) {
+            const index = students.findIndex(s => s.id === student.id);
+            if (index !== -1) {
+                students[index] = student;
+                localStorage.setItem('revisionvault_students', JSON.stringify(students));
+            }
+        }
+
+        function updateSubscriptionStatus() {
+            const subscriptionDiv = document.getElementById('subscriptionStatus');
+            if (!subscriptionDiv || !currentStudent) return;
+            
+            const sub = currentStudent.subscription;
+            
+            if (sub && sub.active) {
+                const endDate = new Date(sub.endDate);
+                const now = new Date();
+                const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+                
+                subscriptionDiv.innerHTML = `
+                    <div style="padding: 15px; background: #d1fae5; border-radius: 8px; display: inline-block;">
+                        <i class="fas fa-unlock" style="color: var(--success);"></i>
+                        <span style="color: var(--success); font-weight: 600;">Subscription Active</span>
+                    </div>
+                    <p style="color: var(--gray); margin-top: 10px;">
+                        Expires in ${daysLeft} days • Device: ${deviceId.substring(0, 8)}
+                    </p>
+                `;
+                
+                document.getElementById('paymentBtn').style.display = 'none';
+            } else {
+                subscriptionDiv.innerHTML = `
+                    <div style="padding: 15px; background: #fee2e2; border-radius: 8px; display: inline-block;">
+                        <i class="fas fa-lock" style="color: var(--danger);"></i>
+                        <span style="color: var(--danger); font-weight: 600;">Not Subscribed</span>
+                    </div>
+                    <p style="color: var(--gray); margin-top: 10px;">
+                        Subscribe to unlock access to all study materials
+                    </p>
+                `;
+                
+                document.getElementById('paymentBtn').style.display = 'inline-block';
+            }
+        }
+
+        function updateAccessStatus() {
+            const statusBar = document.getElementById('accessStatusBar');
+            const statusText = document.getElementById('accessStatusText');
+            const statusDetails = document.getElementById('accessStatusDetails');
+            
+            if (!statusBar || !statusText || !currentStudent) return;
+            
+            const hasAccess = currentStudent.subscription && 
+                            currentStudent.subscription.active && 
+                            currentStudent.subscription.deviceId === deviceId;
+            
+            if (hasAccess) {
+                const endDate = new Date(currentStudent.subscription.endDate);
+                const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+                
+                statusBar.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+                statusBar.style.borderColor = 'var(--success)';
+                statusText.innerHTML = '<i class="fas fa-unlock"></i> Premium Access Active';
+                statusText.style.color = 'var(--success)';
+                statusDetails.textContent = `${daysLeft} days remaining • Device: ${deviceId.substring(0, 8)}`;
+                document.getElementById('subscribeBtnDocs').style.display = 'none';
+            } else {
+                statusBar.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)';
+                statusBar.style.borderColor = 'var(--warning)';
+                statusText.innerHTML = '<i class="fas fa-lock"></i> Access Locked';
+                statusText.style.color = 'var(--danger)';
+                statusDetails.textContent = 'Subscribe to unlock all materials';
+                document.getElementById('subscribeBtnDocs').style.display = 'inline-flex';
+            }
+        }
+
+        function verifyUnlockCode() {
+            const code = document.getElementById('unlockCodeInput').value.trim().toUpperCase();
+            
+            if (!code) {
+                showNotification('Please enter unlock code', 'error');
+                return;
+            }
+            
+            // Find payment with this unlock code
+            const payment = payments.find(p => 
+                p.unlockCode === code && 
+                p.studentId === currentStudent.id && 
+                p.status === 'approved'
+            );
+            
+            if (!payment) {
+                showNotification('Invalid or expired unlock code', 'error');
+                return;
+            }
+            
+            // Activate subscription
+            currentStudent.subscription.active = true;
+            currentStudent.subscription.approved = true;
+            currentStudent.subscription.startDate = new Date().toISOString();
+            currentStudent.subscription.endDate = new Date(Date.now() + 5 * 30 * 24 * 60 * 60 * 1000).toISOString();
+            currentStudent.subscription.unlockCode = code;
+            currentStudent.subscription.deviceId = deviceId;
+            
+            updateStudentInStorage(currentStudent);
+            
+            // Show success
+            document.getElementById('pendingApproval').style.display = 'none';
+            document.getElementById('readyForUnlock').style.display = 'none';
+            document.getElementById('accessGranted').style.display = 'block';
+            
+            // Update subscription info
+            const endDate = new Date(currentStudent.subscription.endDate);
+            document.getElementById('subscriptionExpiry').textContent = endDate.toLocaleDateString();
+            document.getElementById('subscriptionDevice').textContent = deviceId.substring(0, 8);
+            
+            updateAccessStatus();
+            showNotification('Account unlocked! Full access granted.', 'success');
+        }
+
+        function resendWhatsAppCode() {
+            // Find the approved payment
+            const payment = payments.find(p => 
+                p.studentId === currentStudent.id && 
+                p.status === 'approved'
+            );
+            
+            if (!payment) {
+                showNotification('No approved payment found', 'error');
+                return;
+            }
+            
+            const whatsappMessage = `🎉 *PAYMENT APPROVED!* 🎉
+
+Dear ${currentStudent.name},
+
+Your payment has been approved! Here is your unlock code:
+
+🔑 *Unlock Code:* ${payment.unlockCode}
+
+Go to RevisionVault Pro and enter this code to unlock full access to all study materials.
+
+📚 Access: https://walterzauko23.github.io/Revisionvault/
+
+Thank you for subscribing!
+- RevisionVault Pro Team`;
+            
+            const whatsappUrl = `https://wa.me/254${currentStudent.phone.substring(1)}?text=${encodeURIComponent(whatsappMessage)}`;
+            
+            if (confirm('Resend unlock code via WhatsApp?')) {
+                window.open(whatsappUrl, '_blank');
+                showNotification('WhatsApp message ready to send', 'success');
+            }
+        }
+
+        function forceLogout() {
+            if (confirm('Are you sure you want to logout? You will need to login again.')) {
+                currentStudent = null;
+                localStorage.removeItem('current_student');
+                
+                // Hide account sections
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step3').style.display = 'none';
+                document.getElementById('step4').style.display = 'none';
+                
+                // Show registration and login
+                document.getElementById('step1').style.display = 'block';
+                document.getElementById('loginSection').style.display = 'block';
+                
+                updateAccessStatus();
+                showNotification('Logged out successfully', 'info');
+            }
+        }
+
+        // ==================== ADMIN FUNCTIONS ====================
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            const twoFactor = document.getElementById('admin2FA').value;
+            
+            // Simple password check
+            if (password === ADMIN_PASSWORD) {
+                // Success - show dashboard
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                localStorage.setItem('admin_logged_in', 'true');
+                
+                // Load admin data
+                loadAdminData();
+                showNotification('Admin login successful', 'success');
+            } else {
+                showNotification('Invalid admin password', 'error');
+                
+                // Track failed attempts
+                let failedAttempts = parseInt(localStorage.getItem('admin_failed_attempts') || '0');
+                failedAttempts++;
+                localStorage.setItem('admin_failed_attempts', failedAttempts.toString());
+                
+                if (failedAttempts >= 3) {
+                    document.getElementById('adminSecurityAlert').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('adminSecurityAlert').style.display = 'none';
+                    }, 5000);
+                }
+            }
+        }
+
+        function loadAdminData() {
+            // Update stats
+            document.getElementById('totalUsers').textContent = students.length;
+            const activeUsers = students.filter(s => s.status === 'active').length;
+            document.getElementById('activeUsers').textContent = `${activeUsers} active`;
+            
+            const pending = payments.filter(p => p.status === 'pending').length;
+            document.getElementById('pendingApprovals').textContent = pending;
+            const todayApprovals = payments.filter(p => {
+                const today = new Date().toDateString();
+                const paymentDate = new Date(p.submissionDate).toDateString();
+                return p.status === 'pending' && paymentDate === today;
+            }).length;
+            document.getElementById('todayApprovals').textContent = `${todayApprovals} today`;
+            
+            document.getElementById('totalDocuments').textContent = documents.length;
+            const recentDocs = documents.filter(d => {
+                const docDate = new Date(d.uploadDate);
+                const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                return docDate > weekAgo;
+            }).length;
+            document.getElementById('recentDocuments').textContent = `${recentDocs} recent`;
+            
+            const totalRevenue = payments.filter(p => p.status === 'approved').length * 67;
+            document.getElementById('totalRevenue').textContent = 'Ksh ' + totalRevenue;
+            const todayRevenue = payments.filter(p => {
+                const today = new Date().toDateString();
+                const paymentDate = new Date(p.approvalDate || p.submissionDate).toDateString();
+                return p.status === 'approved' && paymentDate === today;
+            }).length * 67;
+            document.getElementById('todayRevenue').textContent = 'Ksh ' + todayRevenue;
+            
+            // Load pending payments
+            loadPendingPayments();
+            
+            // Load all users
+            loadAllUsers();
+            
+            // Load document stats
+            loadDocumentStats();
+            
+            // Load revenue stats
+            loadRevenueStats();
+            
+            // Update sheet info
+            updateSheetInfo();
+        }
+
+        function loadPendingPayments() {
+            const table = document.getElementById('pendingPaymentsTable');
+            const pendingPayments = payments.filter(p => p.status === 'pending');
+            
+            table.innerHTML = '';
+            
+            if (pendingPayments.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray);">
+                            No pending payments
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            pendingPayments.forEach(payment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">
+                        <input type="checkbox" class="approval-checkbox" value="${payment.id}">
+                    </td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${new Date(payment.submissionDate).toLocaleDateString()}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${payment.studentName}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${payment.studentPhone}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${payment.studentUniversity}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border); font-family: monospace;">${payment.paymentCode}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">Ksh ${payment.amount}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border); font-family: monospace; font-size: 12px;" title="${payment.deviceId}">${payment.deviceId ? payment.deviceId.substring(0, 8) : 'N/A'}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">
+                        <button class="btn btn-success" onclick="approvePayment('${payment.id}')" style="padding: 8px 15px; font-size: 12px; margin-right: 5px;">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-danger" onclick="rejectPayment('${payment.id}')" style="padding: 8px 15px; font-size: 12px;">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function toggleSelectAllApprovals() {
+            const selectAll = document.getElementById('selectAllApprovals').checked;
+            document.querySelectorAll('.approval-checkbox').forEach(checkbox => {
+                checkbox.checked = selectAll;
+            });
+        }
+
+        function approveSelectedPayments() {
+            const selectedIds = [];
+            document.querySelectorAll('.approval-checkbox:checked').forEach(checkbox => {
+                selectedIds.push(checkbox.value);
+            });
+            
+            if (selectedIds.length === 0) {
+                showNotification('No payments selected', 'warning');
+                return;
+            }
+            
+            if (confirm(`Approve ${selectedIds.length} selected payments?`)) {
+                selectedIds.forEach(id => approvePayment(id));
+                showNotification(`${selectedIds.length} payments approved`, 'success');
+            }
+        }
+
+        function approveAllPayments() {
+            const pendingPayments = payments.filter(p => p.status === 'pending');
+            if (pendingPayments.length === 0) {
+                showNotification('No pending payments', 'warning');
+                return;
+            }
+            
+            if (confirm(`Approve all ${pendingPayments.length} pending payments?`)) {
+                pendingPayments.forEach(payment => approvePayment(payment.id));
+                showNotification(`All ${pendingPayments.length} payments approved`, 'success');
+            }
+        }
+
+        function approvePayment(paymentId) {
+            const payment = payments.find(p => p.id === paymentId);
+            if (!payment) return;
+            
+            // Update payment status
+            payment.status = 'approved';
+            payment.approvalDate = new Date().toISOString();
+            payment.approvedBy = 'admin';
+            localStorage.setItem('revisionvault_payments', JSON.stringify(payments));
+            
+            // Update student subscription
+            const student = students.find(s => s.id === payment.studentId);
+            if (student) {
+                student.subscription.active = true;
+                student.subscription.approved = true;
+                student.subscription.startDate = new Date().toISOString();
+                student.subscription.endDate = new Date(Date.now() + 5 * 30 * 24 * 60 * 60 * 1000).toISOString();
+                student.subscription.unlockCode = payment.unlockCode;
+                student.subscription.deviceId = payment.deviceId;
+                updateStudentInStorage(student);
+            }
+            
+            // Prepare WhatsApp message
+            const whatsappMessage = `🎉 *PAYMENT APPROVED!* 🎉
+
+Dear ${payment.studentName},
+
+Your payment has been approved! Here is your unlock code:
+
+🔑 *Unlock Code:* ${payment.unlockCode}
+
+Go to RevisionVault Pro and enter this code to unlock full access to all study materials.
+
+📚 Access: https://walterzauko23.github.io/Revisionvault/
+
+Thank you for subscribing!
+- RevisionVault Pro Team`;
+            
+            const whatsappUrl = `https://wa.me/254${payment.studentPhone.substring(1)}?text=${encodeURIComponent(whatsappMessage)}`;
+            
+            // Reload admin data
+            loadAdminData();
+            
+            // Show success with WhatsApp option
+            if (confirm(`Payment approved for ${payment.studentName}! Send WhatsApp message with unlock code?`)) {
+                window.open(whatsappUrl, '_blank');
+            }
+            
+            showNotification(`Payment approved for ${payment.studentName}`, 'success');
+        }
+
+        function rejectSelectedPayments() {
+            const selectedIds = [];
+            document.querySelectorAll('.approval-checkbox:checked').forEach(checkbox => {
+                selectedIds.push(checkbox.value);
+            });
+            
+            if (selectedIds.length === 0) {
+                showNotification('No payments selected', 'warning');
+                return;
+            }
+            
+            if (confirm(`Reject ${selectedIds.length} selected payments?`)) {
+                selectedIds.forEach(id => rejectPayment(id));
+                showNotification(`${selectedIds.length} payments rejected`, 'success');
+            }
+        }
+
+        function rejectPayment(paymentId) {
+            const payment = payments.find(p => p.id === paymentId);
+            if (!payment) return;
+            
+            payment.status = 'rejected';
+            payment.rejectionDate = new Date().toISOString();
+            payment.rejectedBy = 'admin';
+            localStorage.setItem('revisionvault_payments', JSON.stringify(payments));
+            
+            // Reload admin data
+            loadAdminData();
+            showNotification(`Payment rejected for ${payment.studentName}`, 'warning');
+        }
+
+        function sendWhatsAppToSelected() {
+            const selectedIds = [];
+            document.querySelectorAll('.approval-checkbox:checked').forEach(checkbox => {
+                selectedIds.push(checkbox.value);
+            });
+            
+            if (selectedIds.length === 0) {
+                showNotification('No payments selected', 'warning');
+                return;
+            }
+            
+            // For now, just send to first selected
+            const paymentId = selectedIds[0];
+            const payment = payments.find(p => p.id === paymentId);
+            
+            if (payment && payment.status === 'approved') {
+                const whatsappMessage = `🎉 *PAYMENT APPROVED!* 🎉
+
+Dear ${payment.studentName},
+
+Your payment has been approved! Here is your unlock code:
+
+🔑 *Unlock Code:* ${payment.unlockCode}
+
+Go to RevisionVault Pro and enter this code to unlock full access to all study materials.
+
+📚 Access: https://walterzauko23.github.io/Revisionvault/
+
+Thank you for subscribing!
+- RevisionVault Pro Team`;
+                
+                const whatsappUrl = `https://wa.me/254${payment.studentPhone.substring(1)}?text=${encodeURIComponent(whatsappMessage)}`;
+                window.open(whatsappUrl, '_blank');
+            } else {
+                showNotification('Selected payment is not approved yet', 'error');
+            }
+        }
+
+        function loadAllUsers() {
+            const table = document.getElementById('allUsersTable');
+            
+            table.innerHTML = '';
+            
+            if (students.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray);">
+                            No registered users
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            students.forEach(student => {
+                const hasSubscription = student.subscription && student.subscription.active;
+                const status = hasSubscription ? 
+                    `<span style="color: var(--success);">Active</span>` : 
+                    `<span style="color: var(--danger);">Inactive</span>`;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">
+                        <input type="checkbox" class="user-checkbox" value="${student.id}">
+                    </td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${student.name}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${student.email}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${student.phone}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${student.university}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${status}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border); font-family: monospace; font-size: 12px;" title="${student.deviceId}">${student.deviceId ? student.deviceId.substring(0, 8) : 'N/A'}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">${student.lastLogin ? new Date(student.lastLogin).toLocaleDateString() : 'Never'}</td>
+                    <td style="padding: 15px; border-bottom: 1px solid var(--border);">
+                        <button class="btn btn-primary" onclick="viewStudentDetails('${student.id}')" style="padding: 8px 15px; font-size: 12px; margin-right: 5px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteUser('${student.id}')" style="padding: 8px 15px; font-size: 12px;">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function toggleSelectAllUsers() {
+            const selectAll = document.getElementById('selectAllUsers').checked;
+            document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+                checkbox.checked = selectAll;
+            });
+        }
+
+        function searchUsers() {
+            const searchTerm = document.getElementById('searchUsers').value.toLowerCase();
+            const rows = document.querySelectorAll('#allUsersTable tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function deleteSelectedUsers() {
+            const selectedIds = [];
+            document.querySelectorAll('.user-checkbox:checked').forEach(checkbox => {
+                selectedIds.push(checkbox.value);
+            });
+            
+            if (selectedIds.length === 0) {
+                showNotification('No users selected', 'warning');
+                return;
+            }
+            
+            if (confirm(`Delete ${selectedIds.length} selected users? This cannot be undone!`)) {
+                selectedIds.forEach(id => deleteUser(id, false));
+                showNotification(`${selectedIds.length} users deleted`, 'success');
+                loadAllUsers();
+            }
+        }
+
+        function deleteUser(userId, showNotification = true) {
+            if (confirm('Are you sure you want to delete this user? This cannot be undone!')) {
+                // Remove from students array
+                students = students.filter(s => s.id !== userId);
+                
+                // Remove user's payments
+                payments = payments.filter(p => p.studentId !== userId);
+                
+                // Update storage
+                localStorage.setItem('revisionvault_students', JSON.stringify(students));
+                localStorage.setItem('revisionvault_payments', JSON.stringify(payments));
+                
+                // If current student is deleted, logout
+                if (currentStudent && currentStudent.id === userId) {
+                    forceLogout();
+                }
+                
+                if (showNotification) {
+                    showNotification('User deleted successfully', 'success');
+                    loadAllUsers();
+                }
+            }
+        }
+
+        function logoutSelectedUsers() {
+            const selectedIds = [];
+            document.querySelectorAll('.user-checkbox:checked').forEach(checkbox => {
+                selectedIds.push(checkbox.value);
+            });
+            
+            if (selectedIds.length === 0) {
+                showNotification('No users selected', 'warning');
+                return;
+            }
+            
+            if (confirm(`Force logout ${selectedIds.length} selected users?`)) {
+                selectedIds.forEach(id => {
+                    const student = students.find(s => s.id === id);
+                    if (student) {
+                        // Clear device ID to force re-login
+                        student.deviceId = null;
+                        updateStudentInStorage(student);
+                    }
+                });
+                showNotification(`${selectedIds.length} users logged out`, 'success');
+                loadAllUsers();
+            }
+        }
+
+        function viewStudentDetails(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const details = `
+                Student Details:
+                ---------------
+                ID: ${student.id}
+                Name: ${student.name}
+                Email: ${student.email}
+                Phone: ${student.phone}
+                University: ${student.university}
+                Course: ${student.course}
+                Year: ${student.year}
+                Device ID: ${student.deviceId || 'Not set'}
+                
+                Subscription: ${student.subscription?.active ? 'ACTIVE' : 'INACTIVE'}
+                ${student.subscription?.active ? `
+                Start Date: ${new Date(student.subscription.startDate).toLocaleDateString()}
+                End Date: ${new Date(student.subscription.endDate).toLocaleDateString()}
+                Unlock Code: ${student.subscription.unlockCode}
+                Device Lock: ${student.subscription.deviceId || 'Not locked'}
+                ` : ''}
+                
+                Registration Date: ${new Date(student.registrationDate).toLocaleDateString()}
+                Last Login: ${student.lastLogin ? new Date(student.lastLogin).toLocaleDateString() : 'Never'}
+                Documents Accessed: ${student.documentsAccessed?.length || 0}
+                Status: ${student.status || 'active'}
+            `;
+            
+            alert(details);
+        }
+
+        function exportUsers() {
+            const csvContent = "data:text/csv;charset=utf-8," +
+                ["Name,Email,Phone,University,Course,Year,Status,Device ID,Registration Date"]
+                .concat(students.map(s => 
+                    `"${s.name}","${s.email}","${s.phone}","${s.university}","${s.course}","${s.year}","${s.status}","${s.deviceId || ''}","${s.registrationDate}"`
+                ))
+                .join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "revisionvault_users.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Users exported to CSV', 'success');
+        }
+
+        function loadDocumentStats() {
+            const totalViews = documents.reduce((sum, doc) => sum + (doc.views || 0), 0);
+            const totalDownloads = documents.reduce((sum, doc) => sum + (doc.downloads || 0), 0);
+            
+            document.getElementById('totalDocumentsCount').textContent = documents.length;
+            document.getElementById('totalViews').textContent = totalViews;
+            document.getElementById('totalDownloads').textContent = totalDownloads;
+            
+            // Load top documents
+            const topDocs = [...documents]
+                .sort((a, b) => (b.views || 0) - (a.views || 0))
+                .slice(0, 10);
+            
+            const table = document.getElementById('topDocumentsTable');
+            table.innerHTML = '';
+            
+            topDocs.forEach(doc => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${doc.title}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${doc.university}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${doc.views || 0}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${doc.downloads || 0}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${doc.uploadDate ? new Date(doc.uploadDate).toLocaleDateString() : 'N/A'}</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function loadRevenueStats() {
+            const approvedPayments = payments.filter(p => p.status === 'approved');
+            const totalRevenue = approvedPayments.length * 67;
+            
+            // Monthly revenue
+            const thisMonth = new Date().getMonth();
+            const thisYear = new Date().getFullYear();
+            const monthlyRevenue = approvedPayments
+                .filter(p => {
+                    const date = new Date(p.approvalDate || p.submissionDate);
+                    return date.getMonth() === thisMonth && date.getFullYear() === thisYear;
+                })
+                .length * 67;
+            
+            // Daily revenue
+            const today = new Date().toDateString();
+            const dailyRevenue = approvedPayments
+                .filter(p => new Date(p.approvalDate || p.submissionDate).toDateString() === today)
+                .length * 67;
+            
+            document.getElementById('totalRevenueAmount').textContent = 'Ksh ' + totalRevenue;
+            document.getElementById('monthlyRevenue').textContent = 'Ksh ' + monthlyRevenue;
+            document.getElementById('dailyRevenue').textContent = 'Ksh ' + dailyRevenue;
+            
+            // Load recent transactions
+            const recentTransactions = [...approvedPayments]
+                .sort((a, b) => new Date(b.approvalDate || b.submissionDate) - new Date(a.approvalDate || a.submissionDate))
+                .slice(0, 10);
+            
+            const table = document.getElementById('revenueTable');
+            table.innerHTML = '';
+            
+            if (recentTransactions.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--gray);">
+                            No transactions found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            recentTransactions.forEach(payment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${new Date(payment.approvalDate || payment.submissionDate).toLocaleDateString()}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${payment.studentName}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">Ksh ${payment.amount}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">
+                        <span style="color: var(--success);">Approved</span>
+                    </td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${payment.approvedBy || 'System'}</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function updateSheetInfo() {
+            if (document.getElementById('sheetDocumentCount')) {
+                document.getElementById('sheetDocumentCount').textContent = `${documents.length} documents`;
+            }
+            if (document.getElementById('sheetLastUpdated')) {
+                document.getElementById('sheetLastUpdated').textContent = lastSheetUpdate ? 
+                    new Date(lastSheetUpdate).toLocaleString() : 'Never';
+            }
+            if (document.getElementById('sheetStatusText')) {
+                document.getElementById('sheetStatusText').innerHTML = sheetConnected ? 
+                    '<span style="color: var(--success);">Connected</span>' : 
+                    '<span style="color: var(--warning);">Disconnected (using cached data)</span>';
+            }
+        }
+
+        function showSecuritySettings() {
+            const newPassword = prompt('Enter new admin password (leave blank to keep current):');
+            if (newPassword !== null && newPassword.trim() !== '') {
+                adminPassword = newPassword.trim();
+                showNotification('Admin password updated', 'success');
+            }
+        }
+
+        function adminLogout() {
+            localStorage.removeItem('admin_logged_in');
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminDashboard').style.display = 'none';
+            showNotification('Admin logged out', 'info');
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? 'var(--success)' : 
+                           type === 'error' ? 'var(--danger)' : 
+                           type === 'warning' ? 'var(--warning)' : 'var(--info)'};
+                color: white;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow-lg);
+                z-index: 10001;
+                animation: fadeIn 0.3s ease-out;
+                max-width: 300px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            `;
+            
+            const icon = type === 'success' ? 'fa-check-circle' :
+                        type === 'error' ? 'fa-exclamation-circle' :
+                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            notification.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'fadeIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const tabContent = document.getElementById(tabName);
+            if (tabContent) {
+                tabContent.classList.add('active');
+                tabContent.style.display = 'block';
+            }
+            
+            // Activate clicked tab
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+            
+            // Load content based on tab
+            switch(tabName) {
+                case 'documents':
+                    loadDocuments();
+                    updateAccessStatus();
+                    break;
+                case 'sheet-manager':
+                    updateSheetManager();
+                    break;
+                case 'admin':
+                    // Check admin login
+                    const isAdminLoggedIn = localStorage.getItem('admin_logged_in') === 'true';
+                    if (!isAdminLoggedIn) {
+                        document.getElementById('adminLogin').style.display = 'block';
+                        document.getElementById('adminDashboard').style.display = 'none';
+                    } else {
+                        document.getElementById('adminLogin').style.display = 'none';
+                        document.getElementById('adminDashboard').style.display = 'block';
+                        loadAdminData();
+                    }
+                    break;
+                case 'settings':
+                    document.getElementById('appVersionDate').textContent = new Date().toLocaleDateString();
+                    break;
+            }
+        }
+
+        function switchAdminTab(tabName) {
+            // Hide all admin tabs
+            document.querySelectorAll('.admin-tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Show selected tab
+            const tabId = 'admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab';
+            const tabElement = document.getElementById(tabId);
+            if (tabElement) {
+                tabElement.style.display = 'block';
+            }
+            
+            // Load data if needed
+            switch(tabName) {
+                case 'sheet-info':
+                    updateSheetInfo();
+                    break;
+                case 'documents':
+                    loadDocumentStats();
+                    break;
+                case 'revenue':
+                    loadRevenueStats();
+                    break;
+            }
+        }
+
+        function updateSheetManager() {
+            // Update document count
+            if (document.getElementById('docCountBadge')) {
+                document.getElementById('docCountBadge').textContent = `${documents.length} documents`;
+            }
+            
+            // Update preview table
+            const previewTable = document.getElementById('sheetDocumentsPreview');
+            if (!previewTable) return;
+            
+            previewTable.innerHTML = '';
+            
+            if (documents.length === 0) {
+                previewTable.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray);">
+                            <i class="fas fa-file-alt" style="font-size: 48px; margin-bottom: 15px; display: block; color: #e5e7eb;"></i>
+                            No documents found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Show first 15 documents
+            const previewDocs = documents.slice(0, 15);
+            
+            previewDocs.forEach(doc => {
+                const row = document.createElement('tr');
+                row.className = 'fade-in';
+                row.innerHTML = `
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${doc.title}">${doc.title}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${doc.unitCode || 'N/A'}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${doc.university}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border); text-transform: uppercase;">${doc.type}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border); max-width: 150px; overflow: hidden; text-overflow: ellipsis;">
+                        <a href="${doc.url}" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 12px;" title="${doc.url}">
+                            <i class="fas fa-external-link-alt"></i> Link
+                        </a>
+                    </td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">
+                        <button class="btn btn-primary" onclick="openAdvancedViewer('${doc.id}')" style="padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                previewTable.appendChild(row);
+            });
+            
+            if (documents.length > 15) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="6" style="padding: 15px; text-align: center; color: var(--gray); font-style: italic;">
+                        ... and ${documents.length - 15} more documents
+                    </td>
+                `;
+                previewTable.appendChild(row);
+            }
+        }
+
+        function addDocumentToSheet() {
+            const title = document.getElementById('sheetDocTitle').value.trim();
+            const unitCode = document.getElementById('sheetDocUnitCode').value.trim().toUpperCase();
+            const university = document.getElementById('sheetDocUniversity').value;
+            const docType = document.getElementById('sheetDocType').value;
+            const url = document.getElementById('sheetDocUrl').value.trim();
+            
+            if (!title || !unitCode || !university || !docType || !url) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            // Create CSV row
+            const csvRow = `"${title}","${unitCode}","${university}","${docType}","","","${url}",""`;
+            
+            // Show instructions
+            const instructions = `📋 Copy this CSV row and paste into your Google Sheet:\n\n${csvRow}\n\n1. Open your Google Sheet\n2. Add this row at the bottom\n3. Save and refresh the app`;
+            
+            if (confirm(instructions + "\n\nClick OK to copy to clipboard.")) {
+                copyToClipboard();
+            }
+        }
+
+        function copyToClipboard() {
+            const title = document.getElementById('sheetDocTitle').value.trim() || "Document Title";
+            const unitCode = document.getElementById('sheetDocUnitCode').value.trim().toUpperCase() || "UNIT001";
+            const university = document.getElementById('sheetDocUniversity').value || "University of Nairobi";
+            const docType = document.getElementById('sheetDocType').value || "pdf";
+            const url = document.getElementById('sheetDocUrl').value.trim() || "https://example.com/document.pdf";
+            
+            const csvRow = `"${title}","${unitCode}","${university}","${docType}","","","${url}",""`;
+            
+            navigator.clipboard.writeText(csvRow).then(() => {
+                const copySuccess = document.getElementById('copySuccess');
+                if (copySuccess) {
+                    copySuccess.style.display = 'block';
+                    setTimeout(() => {
+                        copySuccess.style.display = 'none';
+                    }, 3000);
+                }
+                showNotification('CSV copied to clipboard', 'success');
+            }).catch(err => {
+                showNotification('Failed to copy to clipboard', 'error');
+            });
+        }
+
+        function exportUserData() {
+            if (!currentStudent) {
+                showNotification('No user data to export', 'error');
+                return;
+            }
+            
+            const data = {
+                student: currentStudent,
+                documentsAccessed: currentStudent.documentsAccessed || [],
+                subscription: currentStudent.subscription || {}
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `revisionvault_data_${currentStudent.name}_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Data exported successfully', 'success');
+        }
+
+        function clearLocalData() {
+            if (confirm('Clear all cached data? This will not delete your account.')) {
+                localStorage.removeItem('cached_documents');
+                localStorage.removeItem('cached_documents_timestamp');
+                showNotification('Cache cleared', 'success');
+                refreshSheetData();
+            }
+        }
+
+        function refreshAllData() {
+            refreshSheetData();
+            showNotification('Refreshing all data...', 'info');
+        }
+
+        function deleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This cannot be undone!')) {
+                if (currentStudent) {
+                    // Remove from students array
+                    students = students.filter(s => s.id !== currentStudent.id);
+                    localStorage.setItem('revisionvault_students', JSON.stringify(students));
+                    
+                    // Remove user's payments
+                    payments = payments.filter(p => p.studentId !== currentStudent.id);
+                    localStorage.setItem('revisionvault_payments', JSON.stringify(payments));
+                    
+                    // Logout
+                    forceLogout();
+                    showNotification('Account deleted successfully', 'success');
+                }
+            }
+        }
+
+        // ==================== HELPER FUNCTIONS ====================
+        function loadImageDocument(url) {
+            document.getElementById('imageViewer').style.display = 'block';
+            const img = document.getElementById('imageDisplay');
+            img.src = url;
+            img.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+        }
+
+        function loadOfficeDocument(url) {
+            document.getElementById('officeViewer').style.display = 'block';
+            document.getElementById('officeViewer').src = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
+        }
+
+        function loadGenericDocument(url) {
+            document.getElementById('fallbackViewer').style.display = 'block';
+        }
+
+        // ==================== INITIALIZATION ====================
+        async function initializeApp() {
+            console.log('Initializing RevisionVault Pro...');
+            
+            // Check device ID
+            deviceId = generateDeviceId();
+            checkDeviceLock();
+            
+            // Load existing data
+            try {
+                students = JSON.parse(localStorage.getItem('revisionvault_students')) || [];
+                payments = JSON.parse(localStorage.getItem('revisionvault_payments')) || [];
+                
+                // Load current student
+                const savedStudent = localStorage.getItem('current_student');
+                if (savedStudent) {
+                    currentStudent = JSON.parse(savedStudent);
+                    
+                    // Check device lock
+                    if (currentStudent.deviceId && currentStudent.deviceId !== deviceId) {
+                        showNotification('Account is locked to another device! Please login again.', 'error');
+                        currentStudent = null;
+                        localStorage.removeItem('current_student');
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+                students = [];
+                payments = [];
+                currentStudent = null;
+            }
+            
+            // Load documents from Google Sheet
+            await loadDocumentsFromGoogleSheet();
+            
+            // Hide loading screen
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+                // Show student account if logged in
+                if (currentStudent) {
+                    showStudentAccount(currentStudent);
+                }
+                
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Update UI based on current tab
+                const activeTab = document.querySelector('.tab.active');
+                if (activeTab && activeTab.onclick) {
+                    const match = activeTab.onclick.toString().match(/switchTab\('([^']+)'\)/);
+                    if (match && match[1]) {
+                        switchTab(match[1], false);
+                    }
+                }
+                
+                showNotification('RevisionVault Pro loaded successfully!', 'success');
+            }, 1500);
+        }
+
+        function setupEventListeners() {
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Viewer shortcuts
+                if (document.getElementById('advancedViewer').style.display === 'flex') {
+                    switch(e.key) {
+                        case 'Escape':
+                            closeAdvancedViewer();
+                            break;
+                        case 'ArrowLeft':
+                            prevPage();
+                            break;
+                        case 'ArrowRight':
+                            nextPage();
+                            break;
+                        case '+':
+                        case '=':
+                            if (e.ctrlKey) {
+                                e.preventDefault();
+                                zoomIn();
+                            }
+                            break;
+                        case '-':
+                            if (e.ctrlKey) {
+                                e.preventDefault();
+                                zoomOut();
+                            }
+                            break;
+                        case '0':
+                            if (e.ctrlKey) {
+                                e.preventDefault();
+                                resetZoom();
+                            }
+                            break;
+                    }
+                }
+            });
+            
+            // Auto-refresh documents every 10 minutes
+            setInterval(() => {
+                if (document.getElementById('documents').classList.contains('active') || 
+                    document.getElementById('sheet-manager').classList.contains('active')) {
+                    refreshSheetData();
+                }
+            }, 10 * 60 * 1000);
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
