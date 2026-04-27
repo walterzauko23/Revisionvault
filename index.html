@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RevisionVault Pro – Complete Study Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
+    <!-- NO Paystack script here – we use our own Vercel backend -->
+    
+    <style>
+        /* ===== FULL CSS – identical to your original, preserved ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        :root { --primary: #1a2980; --secondary: #26d0ce; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --light: #f8fafc; --dark: #1e293b; --radius: 16px; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; transition: background 0.3s; }
+        body.dark-mode { background: #0f172a; }
+        body.dark-mode .main-container { background: #1e293b; color: #e2e8f0; }
+        body.dark-mode .sidebar-left, body.dark-mode .sidebar-right, body.dark-mode .footer-credit { background: #0f172a; color: #cbd5e1; border-color: #334155; }
+        body.dark-mode .material-card, body.dark-mode .plan-card, body.dark-mode .account-card, body.dark-mode .settings-card { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+        body.dark-mode .university-chip { background: #334155; color: #e2e8f0; }
+        body.dark-mode .university-chip.active { background: var(--secondary); color: #0f172a; }
+        body.dark-mode .email-input, body.dark-mode .filter-select { background: #334155; color: white; border-color: #475569; }
+        
+        .onboarding-overlay, .login-overlay, .terms-overlay, .settings-modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:3000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(8px); }
+        .onboarding-card, .login-card, .terms-card, .settings-modal-card { background:white; max-width:500px; width:90%; border-radius:32px; padding:30px; text-align:center; animation:fadeInUp 0.4s ease; max-height:80vh; overflow-y:auto; }
+        body.dark-mode .onboarding-card, body.dark-mode .login-card, body.dark-mode .terms-card, body.dark-mode .settings-modal-card { background: #1e293b; color: #e2e8f0; }
+        @keyframes fadeInUp { from{opacity:0; transform:translateY(30px);} to{opacity:1; transform:translateY(0);} }
+        .signin-btn, .login-btn { background:linear-gradient(135deg,#4285f4,#34a853); color:white; border:none; border-radius:50px; padding:14px 24px; width:100%; font-weight:700; cursor:pointer; margin:10px 0; display:flex; align-items:center; justify-content:center; gap:12px; }
+        .email-input { width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:12px; margin:10px 0; font-size:14px; }
+        .toggle-link { color: var(--primary); cursor: pointer; text-decoration: underline; margin: 10px 0; display: inline-block; }
+        .header-container { position:fixed; top:0; left:0; right:0; z-index:1000; background:linear-gradient(135deg, var(--primary), var(--secondary)); padding:12px 20px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+        .header-content { max-width:1400px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; }
+        .logo { display:flex; align-items:center; gap:12px; }
+        .logo-icon { background:rgba(255,255,255,0.9); width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:20px; }
+        .logo-text h1 { font-size:20px; color:white; }
+        .logo-text p { font-size:10px; color: #ffd966; margin-top: 2px; }
+        .search-container { flex:1; max-width:400px; position:relative; }
+        .search-box { width:100%; padding:10px 20px 10px 45px; border:none; border-radius:50px; background:rgba(255,255,255,0.2); color:white; font-size:14px; }
+        .search-box::placeholder { color:rgba(255,255,255,0.8); }
+        .search-icon { position:absolute; left:18px; top:50%; transform:translateY(-50%); color:white; }
+        .user-info { background:rgba(255,255,255,0.2); border-radius:40px; padding:8px 16px; display:flex; align-items:center; gap:10px; color:white; cursor:pointer; }
+        .main-container { margin-top:85px; max-width:1400px; margin-left:auto; margin-right:auto; background:white; border-radius:var(--radius); overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.2); min-height:calc(100vh - 100px); }
+        .main-layout { display:grid; grid-template-columns:260px 1fr 300px; min-height:600px; }
+        .sidebar-left { background:var(--light); padding:20px; border-right:1px solid #e2e8f0; overflow-y:auto; max-height:calc(100vh - 110px); }
+        .main-content { padding:25px; background:white; overflow-y:auto; height:calc(100vh - 110px); }
+        .sidebar-right { background:var(--light); padding:20px; border-left:1px solid #e2e8f0; }
+        .materials-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:20px; margin-top:20px; }
+        .material-card { background:white; border-radius:var(--radius); border:2px solid #e2e8f0; transition:0.2s; cursor:pointer; }
+        .material-card:hover { transform:translateY(-4px); box-shadow:0 4px 12px rgba(0,0,0,0.08); border-color:var(--primary); }
+        .material-image { height:130px; background:linear-gradient(135deg, var(--primary), var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:48px; color:rgba(255,255,255,0.2); border-radius:12px 12px 0 0; }
+        .material-content { padding:18px; }
+        .material-title { font-weight:800; font-size:16px; margin-bottom:6px; }
+        .material-meta { display:flex; gap:8px; margin-bottom:12px; font-size:12px; flex-wrap:wrap; }
+        .material-code { background:#e0f2fe; padding:4px 10px; border-radius:20px; font-weight:700; }
+        .action-btn { background:var(--primary); color:white; border:none; padding:10px; border-radius:10px; font-weight:700; width:100%; cursor:pointer; transition:0.2s; }
+        .action-btn.locked { background:#cbd5e1; cursor:not-allowed; }
+        .university-chip { display:inline-block; background:#f1f5f9; padding:8px 16px; border-radius:30px; font-size:13px; margin:4px; cursor:pointer; transition:0.2s; }
+        .university-chip.active, .university-chip:hover { background:var(--primary); color:white; }
+        .bottom-nav { position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:rgba(255,255,255,0.96); border-radius:50px; padding:8px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; box-shadow:0 15px 40px rgba(0,0,0,0.2); z-index:1000; backdrop-filter:blur(10px); }
+        .nav-btn { background:none; border:none; padding:8px 14px; border-radius:40px; font-weight:600; color:#64748b; cursor:pointer; font-size:14px; }
+        .nav-btn.active { background:linear-gradient(135deg, var(--primary), var(--secondary)); color:white; }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+        .plan-card { background:white; border-radius:24px; padding:25px; border:2px solid #e2e8f0; text-align:center; margin-bottom:20px; transition:0.2s; cursor:pointer; }
+        .plan-card:hover { border-color:var(--primary); transform:translateY(-3px); }
+        .plan-price { font-size:36px; font-weight:800; color:var(--primary); margin:12px 0; }
+        .pay-btn { background:linear-gradient(135deg,#25d366,#128C7E); color:white; border:none; padding:14px; border-radius:40px; font-weight:bold; width:100%; font-size:16px; cursor:pointer; transition:0.2s; }
+        .pay-btn:disabled { opacity:0.6; cursor:not-allowed; }
+        .access-banner { background:#fef3c7; border-radius:16px; padding:18px; margin-bottom:25px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; }
+        .access-granted { background:#d1fae5; border-left:5px solid var(--success); }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:2000; }
+        .modal.active { display:block; }
+        .pdf-viewer-frame { width:100%; height:100%; border:none; }
+        .modal-header { background:rgba(0,0,0,0.9); padding:12px 20px; color:white; position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; z-index:10; }
+        .filter-select { padding:10px 16px; border-radius:30px; border:2px solid #e2e8f0; background:white; cursor:pointer; font-weight:500; min-width:220px; }
+        @media (max-width:1000px) { .main-layout { grid-template-columns:1fr; } .sidebar-left, .sidebar-right { display:none; } .bottom-nav { min-width:90%; } }
+        .notification { position:fixed; top:100px; right:20px; background:white; padding:14px 18px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.15); display:none; z-index:2100; border-left:5px solid var(--success); max-width:320px; }
+        .admin-list { border:2px solid #e2e8f0; border-radius:12px; padding:15px; max-height:400px; overflow-y:auto; margin-top:15px; }
+        .search-results-info { margin-bottom:15px; padding:10px; background:#e0f2fe; border-radius:12px; display:none; }
+        .payment-loading { display:inline-block; width:20px; height:20px; border:2px solid white; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:8px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .empty-state { text-align:center; padding:60px; color:#64748b; }
+        .request-btn { background:var(--warning); margin-top:10px; }
+        .footer-credit { background: #f1f5f9; border-top: 2px solid #e2e8f0; padding: 16px 24px; text-align: center; font-size: 13px; color: #334155; margin-top: 20px; }
+        .owner-badge { background: #f59e0b; color: #1e293b; font-size: 10px; padding: 2px 8px; border-radius: 30px; margin-left: 8px; vertical-align: middle; }
+        .account-card, .settings-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 25px; }
+        .account-info-row, .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eef2f6; flex-wrap: wrap; gap: 10px; }
+        .settings-row:last-child { border-bottom: none; }
+        .edit-icon { cursor: pointer; color: var(--primary); font-size: 14px; }
+        .logout-btn { background: #ef4444; margin-top: 20px; }
+        .terms-link { color: var(--primary); cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; }
+        .toggle-switch { position: relative; display: inline-block; width: 52px; height: 26px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--secondary); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .contact-link { color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 5px; display: inline-flex; align-items: center; gap: 6px; }
+        .social-icons { display: flex; gap: 20px; justify-content: center; margin-top: 15px; }
+        .social-icons a { color: var(--primary); font-size: 28px; transition: 0.2s; }
+        .social-icons a:hover { transform: scale(1.1); }
+        .json-upload-zone { border: 3px dashed #7c3aed; border-radius: 15px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(124, 58, 237, 0.05); margin: 20px 0; }
+        .json-upload-zone:hover { background: rgba(124, 58, 237, 0.1); border-color: #6d28d9; }
+        .json-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; }
+        .json-stat-item { background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e2e8f0; }
+        body.dark-mode .json-stat-item { background: #1e293b; border-color: #334155; }
+        .admin-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .admin-section { display: none; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 13px; margin: 10px 0; overflow-x: auto; }
+        .copy-btn { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="header-container">
+    <div class="header-content">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="logo-text">
+                <h1>RevisionVault Pro <span class="owner-badge">Walter Zauko</span></h1>
+                <p><i class="fas fa-crown"></i> Owned & operated by Walter Zauko</p>
+            </div>
+        </div>
+        <div class="search-container"><i class="fas fa-search search-icon"></i><input type="text" id="globalSearchInput" class="search-box" placeholder="Search by Unit Code e.g., AGRO222"></div>
+        <div id="userInfoDiv" class="user-info" onclick="if(!currentUser) showSignupModal(); else showTab('account');"><i class="fas fa-user"></i> <span id="userNameDisplay">Guest</span></div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="main-layout">
+        <aside class="sidebar-left">
+            <div style="font-weight:700; margin-bottom:15px;"><i class="fas fa-university"></i> Kenyan Universities & Colleges</div>
+            <input type="text" id="uniSearchBox" class="search-box" placeholder="🔍 Filter institution..." style="background:white; color:black; border:1px solid #ddd;">
+            <div id="universityChipsList" style="max-height:350px; overflow-y:auto; margin-top:10px;"></div>
+            <div style="margin-top: 20px; background: #e0f2fe; border-radius: 16px; padding: 12px; text-align: center;">
+                <i class="fas fa-user-tie"></i> <strong>Walter Zauko</strong><br>
+                <small>📧 walterzauko@gmail.com</small><br>
+                <small>⚡ Founder & Owner</small>
+            </div>
+            <button class="action-btn" style="margin-top:20px; background:#7c3aed;" onclick="showTab('subscribe')"><i class="fas fa-credit-card"></i> Get Subscription</button>
+        </aside>
+        <main class="main-content">
+            <!-- HOME TAB -->
+            <div id="home" class="tab-content active">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:20px;">
+                    <h1 style="color:var(--primary);">📚 Study Materials</h1>
+                    <select id="universityFilterMain" class="filter-select" onchange="filterMaterialsByUniversity()"><option value="all">📖 All Institutions</option></select>
+                </div>
+                <div id="searchResultsInfo" class="search-results-info"></div>
+                <div id="accessBanner" class="access-banner"><div><i class="fas fa-lock"></i> <strong>Access Locked</strong><br>Subscribe to open documents</div><button class="action-btn" style="width:auto; padding:8px 18px;" onclick="showTab('subscribe')">Subscribe Now</button></div>
+                <div id="materialsGrid" class="materials-grid"></div>
+            </div>
+
+            <!-- SUBSCRIBE TAB (Daraja M-Pesa integrated) -->
+            <div id="subscribe" class="tab-content">
+                <h1 style="color:var(--primary);">🚀 Activate Full Access</h1>
+                <p style="margin-bottom:25px;">Pay securely via M-Pesa. Instant activation!</p>
+                <div style="max-width:550px; margin:0 auto;">
+                    <!-- Plan 2 Months: Ksh 60 -->
+                    <div class="plan-card">
+                        <i class="fas fa-gem" style="font-size:38px; color:var(--primary);"></i>
+                        <h2>2 Months Access</h2>
+                        <div class="plan-price">Ksh 60</div>
+                        <input type="tel" id="mpesaPhone" class="email-input" placeholder="M-Pesa number (2547XXXXXXXX)" style="width:100%; margin-bottom:10px;">
+                        <button class="pay-btn" onclick="initiateDarajaPayment(60, '2 Months')">
+                            💰 Pay Ksh 60 via M-Pesa
+                        </button>
+                    </div>
+                    <!-- Plan 4 Months: Ksh 100 -->
+                    <div class="plan-card">
+                        <i class="fas fa-crown" style="font-size:38px; color:#f59e0b;"></i>
+                        <h2>4 Months Access</h2>
+                        <div class="plan-price">Ksh 100</div>
+                        <button class="pay-btn" onclick="initiateDarajaPayment(100, '4 Months')">
+                            👑 Pay Ksh 100 via M-Pesa
+                        </button>
+                    </div>
+                    <div style="background:#e3f2fd; border-radius:16px; padding:20px; margin-top:20px; text-align:center;">
+                        <i class="fab fa-whatsapp" style="color:#25d366; font-size:28px;"></i>
+                        <p>Support: <strong>0765 098 865</strong> | Email: <strong>walterzauko@gmail.com</strong></p>
+                        <p style="font-size:12px; margin-top:10px;">Payment is processed via M-Pesa. Access unlocks automatically after payment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCOUNT TAB -->
+            <div id="account" class="tab-content">
+                <h1 style="color:var(--primary);"><i class="fas fa-user-circle"></i> My Account</h1>
+                <div id="accountDetailsContainer" class="account-card">
+                    <div class="account-info-row"><strong>Name:</strong> <span id="accName">-</span> <i class="fas fa-edit edit-icon" onclick="editAccountField('name')"></i></div>
+                    <div class="account-info-row"><strong>Email:</strong> <span id="accEmail">-</span></div>
+                    <div class="account-info-row"><strong>Phone:</strong> <span id="accPhone">-</span> <i class="fas fa-edit edit-icon" onclick="editAccountField('phone')"></i></div>
+                    <div class="account-info-row"><strong>Member since:</strong> <span id="accRegDate">-</span></div>
+                </div>
+                <div class="account-card">
+                    <h3><i class="fas fa-ticket-alt"></i> Subscription Status</h3>
+                    <div id="subscriptionDetails" style="margin-top: 15px;">
+                        <p><strong>Status:</strong> <span id="subStatus">Inactive</span></p>
+                        <p><strong>Expiry Date:</strong> <span id="subExpiry">-</span></p>
+                        <p><strong>Plan:</strong> <span id="subPlan">-</span></p>
+                        <button class="action-btn" style="margin-top: 15px; background: var(--secondary);" onclick="showTab('subscribe')">Upgrade / Renew</button>
+                    </div>
+                </div>
+                <button class="action-btn logout-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+
+            <!-- ADMIN TAB -->
+            <div id="admin" class="tab-content">
+                <h1 style="color:var(--primary);">Admin Panel</h1>
+                <input type="password" id="adminPass" placeholder="Admin Password" style="padding:12px; border-radius:10px; border:2px solid #e2e8f0; width:100%; margin:15px 0;">
+                <button class="action-btn" onclick="adminLoginFn()" style="width:auto; padding:10px 25px;">Login</button>
+                <div id="adminPanel" style="display:none; margin-top:20px;">
+                    <div class="admin-tabs">
+                        <button class="action-btn" onclick="showAdminSection('materials')">Manage Materials</button>
+                        <button class="action-btn" onclick="showAdminSection('uploads')">User Uploads</button>
+                        <button class="action-btn" onclick="showAdminSection('jsonUpload')">JSON Bulk Upload</button>
+                        <button class="action-btn" onclick="adminLogoutFn()" style="background:#ef4444;">Logout</button>
+                    </div>
+                    <div id="materialsSection" class="admin-section"><h3>Manage Study Materials</h3><button class="action-btn" onclick="addMaterialAdmin()" style="background:#10b981;">+ Add New</button><div id="adminMaterialsList" class="admin-list"></div></div>
+                    <div id="uploadsSection" class="admin-section"><h3>Pending User Uploads</h3><div id="pendingUploadsList" class="admin-list"></div></div>
+                    <div id="jsonUploadSection" class="admin-section">
+                        <h3>📤 JSON Bulk Upload</h3>
+                        <div style="background:#f0f9ff; border-radius:10px; padding:15px; margin-bottom:20px;">
+                            <p>Upload a JSON file with an array of documents. Each document must have: Title, "Unit Code", University, Subject, Year, Description, URL (Google Drive preview).</p>
+                            <div class="code-block">[{"Title":"Sample","Unit Code":"CODE123","University":"Egerton University","Subject":"Agronomy","Year":"2","Description":"notes","URL":"https://drive.google.com/file/d/.../preview"}]</div>
+                            <button class="copy-btn" onclick="copyJSONTemplate()">Copy Template</button>
+                        </div>
+                        <div class="json-upload-zone" id="jsonUploadZone" onclick="document.getElementById('jsonFileInput').click()">
+                            <div style="font-size:60px; color:#7c3aed;"><i class="fas fa-file-upload"></i></div>
+                            <h3>Drop JSON File Here</h3>
+                            <p>or click to select</p>
+                            <input type="file" id="jsonFileInput" accept=".json" style="display:none" onchange="handleJSONFileSelect(event)">
+                            <button class="action-btn" style="width:auto; margin-top:15px;" onclick="event.stopPropagation(); document.getElementById('jsonFileInput').click();">Select File</button>
+                        </div>
+                        <div id="jsonFileInfo" style="display:none; background:#e9d5ff; border-radius:10px; padding:15px; margin-top:10px;"></div>
+                        <button id="uploadJSONBtn" class="action-btn" style="background:#7c3aed; margin-top:10px;" onclick="uploadJSONDocuments()" disabled>Upload & Process JSON</button>
+                        <div id="jsonPreviewSection" style="display:none; margin-top:20px;"><h4>Preview</h4><div id="jsonPreview"></div><div id="jsonStats"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS TAB -->
+            <div id="settings" class="tab-content">
+                <h1 style="color:var(--primary);"><i class="fas fa-sliders-h"></i> Settings</h1>
+                <div class="settings-card">
+                    <div class="settings-row"><span><i class="fas fa-bell"></i> Enable Push Notification</span><label class="toggle-switch"><input type="checkbox" id="pushToggle" onchange="togglePushNotifications(this.checked)"><span class="slider"></span></label></div>
+                    <div class="settings-row"><span><i class="fas fa-trash-alt"></i> Clear Cache</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="clearAppCache()">Clear</button></div>
+                    <div class="settings-row"><span><i class="fas fa-moon"></i> Theme Mode</span><select id="themeSelect" onchange="setTheme(this.value)" style="padding:5px 10px; border-radius:20px;"><option value="light">Light</option><option value="dark">Dark</option></select></div>
+                    <div class="settings-row"><span><i class="fas fa-th-large"></i> More App</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showMoreApps()">Explore</button></div>
+                    <div class="settings-row"><span><i class="fas fa-star"></i> Rate App</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="rateApp()">Rate Now</button></div>
+                    <div class="settings-row"><span><i class="fas fa-share-alt"></i> Share App</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="shareApp()">Share</button></div>
+                    <div class="settings-row"><span><i class="fas fa-info-circle"></i> About Us</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showAboutModal()">View</button></div>
+                    <div class="settings-row"><span><i class="fas fa-envelope"></i> Contact Us</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showContactModal()">Contact</button></div>
+                    <div class="settings-row"><span><i class="fas fa-user-slash"></i> Account Delete Instructions</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showDeleteInstructions()">View</button></div>
+                    <div class="settings-row"><span><i class="fas fa-lock"></i> Privacy Policy</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showTermsModal()">View</button></div>
+                    <div class="settings-row"><span><i class="fas fa-file-contract"></i> Terms of Use</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showTermsModal()">View</button></div>
+                    <div class="settings-row"><span><i class="fas fa-question-circle"></i> FAQ</span><button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showFAQModal()">View</button></div>
+                </div>
+                <div class="settings-card">
+                    <h3>Developer & Support Contacts</h3>
+                    <p><i class="fas fa-envelope"></i> Developer: <a href="mailto:walterzauko@gmail.com" class="contact-link">walterzauko@gmail.com</a></p>
+                    <p><i class="fas fa-headset"></i> Support Email: <a href="mailto:revisionvaultke@gmail.com" class="contact-link">revisionvaultke@gmail.com</a></p>
+                    <p><i class="fas fa-phone-alt"></i> Developer Phone: <a href="tel:+254795577064" class="contact-link">0795577064</a></p>
+                    <p><i class="fab fa-whatsapp"></i> Support WhatsApp: <a href="https://wa.me/254765098865" target="_blank" class="contact-link">0765 098 865</a></p>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/profile.php?id=61562906268005" target="_blank"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/lunavibe23?igsh=OHFkOWN6ZDE4Z2Z4" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <aside class="sidebar-right">
+            <div><i class="fas fa-chart-line"></i> Quick Stats</div>
+            <p>📄 Total Materials: <span id="totalDocsCount">0</span></p>
+            <p>🏛️ Institutions: <span id="uniCount">0</span></p>
+            <div style="background:linear-gradient(135deg,#1a2980,#26d0ce); padding:20px; border-radius:20px; color:white; margin-top:20px; text-align:center;"><i class="fas fa-bolt"></i> Pay & Unlock instantly<br>M‑Pesa via Daraja</div>
+            <div style="margin-top:25px;"><div><i class="fas fa-upload"></i> Contribute</div><button class="action-btn" style="background:#10b981;" onclick="openUploadForm()"><i class="fas fa-cloud-upload-alt"></i> Upload Material</button><button class="action-btn" style="background:#f59e0b; margin-top:10px;" onclick="openRequestForm()"><i class="fas fa-question-circle"></i> Request Material</button></div>
+            <hr style="margin: 20px 0;">
+            <div style="font-size: 12px; text-align: center;"><i class="far fa-copyright"></i> 2026 Walter Zauko — All rights reserved.<br><span class="terms-link" onclick="showTermsModal()">Terms & Privacy Policy</span></div>
+        </aside>
+    </div>
+    <div class="footer-credit">
+        <i class="fas fa-crown"></i> RevisionVault Pro — Owned & Operated by <strong>Walter Zauko</strong> | 📧 walterzauko@gmail.com | 📅 Copyright © 2026 Walter Zauko. Empowering Kenyan Students.
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <button class="nav-btn active" onclick="showTab('home')"><i class="fas fa-home"></i><span> Home</span></button>
+    <button class="nav-btn" onclick="showTab('subscribe')"><i class="fas fa-credit-card"></i><span> Subscribe</span></button>
+    <button class="nav-btn" onclick="showTab('account')"><i class="fas fa-user"></i><span> Account</span></button>
+    <button class="nav-btn" onclick="showTab('admin')"><i class="fas fa-shield-alt"></i><span> Admin</span></button>
+    <button class="nav-btn" onclick="showTab('settings')"><i class="fas fa-cog"></i><span> Settings</span></button>
+</div>
+
+<!-- MODALS (unchanged) -->
+<div id="loginModal" class="login-overlay" style="display:none;"><div class="login-card"><i class="fas fa-graduation-cap" style="font-size:50px; color:var(--primary);"></i><h2>Login to RevisionVault Pro</h2><input type="email" id="loginEmail" class="email-input" placeholder="Email Address"><input type="password" id="loginPassword" class="email-input" placeholder="Password"><button class="login-btn" onclick="loginUser()"><i class="fas fa-sign-in-alt"></i> Login</button><div class="toggle-link" onclick="toggleAuthModal('signup')">Don't have an account? Sign up</div><div class="toggle-link" onclick="forgotPassword()">Forgot password?</div></div></div>
+<div id="signupModal" class="login-overlay" style="display:none;"><div class="login-card"><i class="fas fa-user-plus" style="font-size:50px; color:var(--primary);"></i><h2>Create Account</h2><input type="text" id="signupName" class="email-input" placeholder="Full Name"><input type="email" id="signupEmail" class="email-input" placeholder="Email Address"><input type="tel" id="signupPhone" class="email-input" placeholder="Phone Number (07XXXXXXXX)"><input type="password" id="signupPassword" class="email-input" placeholder="Password (min 6 chars)"><button class="login-btn" onclick="registerUser()"><i class="fas fa-user-check"></i> Sign Up</button><div class="toggle-link" onclick="toggleAuthModal('login')">Already have an account? Login</div><div class="terms-link" onclick="showTermsModal()">By signing up, you agree to our Terms & Privacy</div></div></div>
+<div id="termsModal" class="terms-overlay" style="display:none;"><div class="terms-card"><h2><i class="fas fa-file-contract"></i> Terms & Privacy Policy</h2><div style="text-align:left; margin-top:20px;"><h3>1. Acceptance of Terms</h3><p>By using RevisionVault Pro, you agree to these terms. The app is owned and operated by Walter Zauko.</p><h3>2. Payments & Refunds</h3><p>All payments are processed via M-Pesa (Daraja API). Subscriptions are non-refundable after activation.</p><h3>3. User Data</h3><p>We collect your name, email, phone number, and payment history for account management. Your data is stored securely via Firebase.</p><h3>4. Content Ownership</h3><p>All study materials are for personal use only. Redistribution is prohibited.</p><h3>5. Push Notifications</h3><p>With your permission, we send notifications for approval of uploads and subscription expiry reminders.</p><h3>6. Contact</h3><p>For any issues: <strong>walterzauko@gmail.com</strong> or WhatsApp 0765 098 865.</p><h3>7. Changes to Terms</h3><p>We may update these terms. Continued use constitutes acceptance.</p><p style="margin-top:20px;"><strong>Last updated: April 2026</strong></p></div><button class="action-btn" onclick="closeTermsModal()" style="margin-top:20px;">Close</button></div></div>
+<div id="uploadModal" class="modal"><div class="modal-header"><h3>Upload Study Material</h3><button onclick="closeUploadModal()">✖</button></div><div style="margin-top:70px; padding:25px; background:white; height:100%; overflow-y:auto;"><input type="text" id="uploadTitle" placeholder="Document Title" class="email-input"><input type="text" id="uploadUnitCode" placeholder="Unit Code (e.g., AGRO222)" class="email-input"><select id="uploadUniversity" class="email-input"></select><input type="text" id="uploadSubject" placeholder="Subject" class="email-input"><select id="uploadYear" class="email-input"><option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option></select><textarea id="uploadDescription" placeholder="Description" class="email-input" rows="3"></textarea><input type="url" id="uploadURL" placeholder="Google Drive Preview URL (must end with /preview)" class="email-input"><button class="action-btn" onclick="submitUpload()"><i class="fas fa-upload"></i> Submit for Review</button></div></div>
+<div id="requestModal" class="modal"><div class="modal-header"><h3>Request Study Material</h3><button onclick="closeRequestModal()">✖</button></div><div style="margin-top:70px; padding:25px; background:white;"><input type="text" id="requestUnitCode" placeholder="Unit Code (e.g., AGRO222)" class="email-input"><select id="requestUniversity" class="email-input"></select><input type="text" id="requestSubject" placeholder="Subject (optional)" class="email-input"><textarea id="requestDetails" placeholder="Additional details" class="email-input" rows="3"></textarea><button class="action-btn" onclick="submitRequest()"><i class="fas fa-paper-plane"></i> Send Request</button></div></div>
+<div class="modal" id="pdfModal"><div class="modal-header"><h3>Document Viewer</h3><button onclick="closeModal()">✖</button></div><iframe id="pdfFrame" class="pdf-viewer-frame" style="margin-top:55px;"></iframe></div>
+<div class="notification" id="notificationMsg"></div>
+
+<div id="aboutModal" class="settings-modal-overlay" style="display:none;"><div class="settings-modal-card"><h2>About RevisionVault Pro</h2><p>Version 2.0<br>Owned by Walter Zauko<br>Helping Kenyan students access quality revision materials since 2025.<br>📍 Nairobi, Kenya</p><button class="action-btn" onclick="closeModalById('aboutModal')">Close</button></div></div>
+<div id="contactModal" class="settings-modal-overlay" style="display:none;"><div class="settings-modal-card"><h2>Contact Us</h2><p>📧 Email: <a href="mailto:walterzauko@gmail.com">walterzauko@gmail.com</a><br>📞 Phone: <a href="tel:+254795577064">0795577064</a><br>💬 WhatsApp: <a href="https://wa.me/254765098865">0765 098 865</a><br>🌐 Facebook & Instagram links above.</p><button class="action-btn" onclick="closeModalById('contactModal')">Close</button></div></div>
+<div id="deleteInstructionsModal" class="settings-modal-overlay" style="display:none;"><div class="settings-modal-card"><h2>Account Deletion Instructions</h2><p>To delete your account and all associated data:<br>1. Send an email to <strong>walterzauko@gmail.com</strong> from your registered email.<br>2. Subject: "DELETE MY ACCOUNT"<br>3. Include your full name and phone number.<br>We will process deletion within 7 days. Your data will be permanently removed.</p><button class="action-btn" onclick="closeModalById('deleteInstructionsModal')">Close</button></div></div>
+<div id="faqModal" class="settings-modal-overlay" style="display:none;"><div class="settings-modal-card"><h2>Frequently Asked Questions</h2><p><strong>Q:</strong> How do I get access?<br><strong>A:</strong> Subscribe via M-Pesa. Ksh 60 for 2 months, Ksh 100 for 4 months.<br><br><strong>Q:</strong> How do I upload materials?<br><strong>A:</strong> Click "Upload Material" in the sidebar, fill the form, and admin will approve.<br><br><strong>Q:</strong> Push notifications not working?<br><strong>A:</strong> Enable them in Settings and grant browser permission.<br><br><strong>Q:</strong> Can I get a refund?<br><strong>A:</strong> Subscriptions are non-refundable as stated in Terms.</p><button class="action-btn" onclick="closeModalById('faqModal')">Close</button></div></div>
+
+<script>
+    // ==================== FIREBASE CONFIG ====================
+    const firebaseConfig = { apiKey: "AIzaSyDX8T_hYJvyUq4QSAZTtCDAk_NlqZ8NVxE", authDomain: "revisionvault-pro-83002.firebaseapp.com", databaseURL: "https://revisionvault-pro-83002-default-rtdb.firebaseio.com", projectId: "revisionvault-pro-83002", storageBucket: "revisionvault-pro-83002.firebasestorage.app", messagingSenderId: "669675132541", appId: "1:669675132541:web:706cf06dc79eb5f36fc314" };
+    const fbApp = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const documentsRef = database.ref('documents');
+    const usersRef = database.ref('approvedUsers');
+    const requestsRef = database.ref('materialRequests');
+    const userUploadsRef = database.ref('userUploads');
+
+    // ==================== COMPLETE LIST OF KENYAN INSTITUTIONS (94) ====================
+    const ALL_INSTITUTIONS = [
+        "University of Nairobi", "Kenyatta University", "Moi University", "Egerton University",
+        "Jomo Kenyatta University of Agriculture and Technology (JKUAT)", "Maseno University", "Masinde Muliro University of Science and Technology",
+        "Dedan Kimathi University of Technology", "Technical University of Kenya", "Technical University of Mombasa",
+        "Murang'a University of Technology", "Meru University of Science and Technology", "Kirinyaga University", "Laikipia University",
+        "University of Eldoret", "Chuka University", "Karatina University", "Rongo University", "Kisii University",
+        "South Eastern Kenya University", "Pwani University", "Co-operative University of Kenya", "Multimedia University of Kenya",
+        "University of Embu", "Machakos University", "Jaramogi Oginga Odinga University of Science and Technology",
+        "Kibabii University", "Tharaka University", "Turkana University College", "Alupe University", "Kaimosi Friends University College",
+        "Taita Taveta University", "Garissa University College", "Maasai Mara University", "Kabarak University", "Strathmore University",
+        "Mount Kenya University", "Africa Nazarene University", "United States International University Africa (USIU)", "Zetech University",
+        "KCA University", "Riara University", "Daystar University", "Catholic University of Eastern Africa", "Pan Africa Christian University",
+        "St. Paul's University", "Adventist University of Africa", "Scott Christian University", "Great Lakes University of Kisumu",
+        "Kenya Methodist University (KeMU)", "Kiriri Women's University of Science and Technology", "Management University of Africa",
+        "Presbyterian University of East Africa", "The East African University", "University of Eastern Africa, Baraton", "Gretsa University",
+        "Genco University", "International Leadership University", "Africa International University", "Aga Khan University",
+        "University of Kabianga", "Kenya Highlands University", "Uzima University College", "St. Augustine University of Tanzania (Kenya Campus)",
+        "Kenya Polytechnic University College", "Nairobi Technical Training Institute", "Railway Training Institute", "Kisumu National Polytechnic",
+        "Eldoret National Polytechnic", "Mombasa Technical Training Institute", "Nyeri National Polytechnic", "Kabete National Polytechnic",
+        "Thika Technical Training Institute", "Meru National Polytechnic", "Machakos Technical Institute", "Nakuru Technical Institute",
+        "Bondo Technical Training Institute", "Mathenge Technical Training Institute", "Rift Valley Technical Training Institute",
+        "Kitale National Polytechnic", "Kwale Technical Training Institute", "Sigalagala National Polytechnic", "Mawego Technical Training Institute",
+        "Kisii National Polytechnic", "Masinga Technical Training Institute", "Mai Mahiu Technical Training Institute", "Wote Technical Training Institute",
+        "Njoro Technical Training Institute", "Lodwar Technical Training Institute", "Garissa Technical Training Institute", "Isiolo Technical Training Institute",
+        "Moyale Technical Training Institute", "Marsabit Technical Training Institute", "Samburu Technical Training Institute"
+    ];
+
+    let currentUser = null;
+    let allDocuments = [];
+    let selectedUniversityFilter = "all";
+    let currentSearchQuery = "";
+    let pendingJSON = null;
+    let paymentListenerRef = null;
+
+    const INITIAL_DOCS = [
+        { Title: "Plant Breeding Notes", "Unit Code": "AGRO222", University: "Egerton University", Subject: "Agronomy", Year: "2", URL: "https://drive.google.com/file/d/17CG_rb_ecvnkLfjTzNC31u55pBR_RW70/preview", Description: "Complete lecture notes" },
+        { Title: "Production Economics", "Unit Code": "AGEC241", University: "Egerton University", Subject: "Economics", Year: "2", URL: "https://drive.google.com/file/d/1uSBqGCfeWPr-upLjKOu-cCkwQUVW7GOU/preview", Description: "Production economics notes" },
+        { Title: "Integral Calculus", "Unit Code": "MATH212", University: "University of Nairobi", Subject: "Mathematics", Year: "2", URL: "https://drive.google.com/file/d/1LZ5P_t9qRlxZq2AyAI8JoG-bZAdS6G_c/preview", Description: "Calculus exam paper" },
+        { Title: "Cell Biology", "Unit Code": "ZOOL232", University: "Kenyatta University", Subject: "Biology", Year: "2", URL: "https://drive.google.com/file/d/1LlFPeHK2DjZBhYh8C0LP9DZMX-etSZd7/preview", Description: "Cell biology notes" },
+        { Title: "Environmental Science", "Unit Code": "ENSC104", University: "University of Eldoret", Subject: "Environmental", Year: "2", URL: "https://drive.google.com/file/d/1Rd_mPqrUik3mh9LX6GQEgD5XOjDfw1gB/preview", Description: "Environmental science notes" }
+    ];
+
+    // ==================== UTILITIES ====================
+    function showNotification(title, msg, type='success') { let n=document.getElementById('notificationMsg'); n.innerHTML=`<strong>${title}</strong><br>${msg}`; n.style.display='block'; n.style.borderLeftColor=type==='error'?'#ef4444':'#10b981'; setTimeout(()=>n.style.display='none',5000); }
+    function sendBrowserNotification(title, body) { if (!("Notification" in window)) return; if (Notification.permission === "granted") new Notification(title, { body }); else if (Notification.permission !== "denied" && document.getElementById('pushToggle')?.checked) Notification.requestPermission().then(perm => { if (perm === "granted") new Notification(title, { body }); }); }
+    function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g,function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    // ==================== REAL-TIME PAYMENT LISTENER ====================
+    function startPaymentListener(userId) {
+        if (paymentListenerRef) paymentListenerRef.off();
+        const subRef = database.ref(`approvedUsers/${userId}/subscription/active`);
+        paymentListenerRef = subRef.on('value', (snapshot) => {
+            const isActive = snapshot.val();
+            if (isActive === true) {
+                showNotification("Payment Confirmed!", "Your access has been unlocked. Enjoy the materials!", "success");
+                database.ref(`approvedUsers/${userId}`).once('value', (snap) => {
+                    if (snap.exists()) {
+                        currentUser = snap.val();
+                        localStorage.setItem('revision_user', JSON.stringify(currentUser));
+                        updateAccountUI();
+                        filterAndRenderMaterials();
+                        showTab('home');
+                    }
+                });
+            }
+        });
+    }
+
+    // ==================== DOCUMENTS & FILTERING ====================
+    function loadDocuments() { documentsRef.once('value').then(snap=>{ if(snap.val() && Object.values(snap.val()).length>0) allDocuments=Object.values(snap.val()); else { allDocuments=INITIAL_DOCS; allDocuments.forEach(d=>documentsRef.push(d)); } renderUniversityFilters(); filterAndRenderMaterials(); document.getElementById('totalDocsCount').innerText=allDocuments.length; document.getElementById('uniCount').innerText=new Set(allDocuments.map(d=>d.University)).size; }).catch(()=>{ allDocuments=INITIAL_DOCS; renderUniversityFilters(); filterAndRenderMaterials(); }); }
+    function renderUniversityFilters() {
+        let unisWithMaterials = new Set(allDocuments.map(d=>d.University));
+        let chipsDiv = document.getElementById('universityChipsList');
+        let mainFilter = document.getElementById('universityFilterMain');
+        if(chipsDiv){ chipsDiv.innerHTML = ALL_INSTITUTIONS.map(u=>`<div class="university-chip ${selectedUniversityFilter===u?'active':''}" onclick="filterByUniversity('${u.replace(/'/g,"\\'")}')">${u} ${!unisWithMaterials.has(u) ? '📌' : ''}</div>`).join(''); }
+        if(mainFilter){ mainFilter.innerHTML = '<option value="all">📖 All Institutions</option>' + ALL_INSTITUTIONS.map(u=>`<option value="${u}" ${selectedUniversityFilter===u?'selected':''}>${u}</option>`).join(''); }
+        let uniSelect = document.getElementById('uploadUniversity'); if(uniSelect) uniSelect.innerHTML = ALL_INSTITUTIONS.map(u=>`<option value="${u}">${u}</option>`).join('');
+        let reqUniSelect = document.getElementById('requestUniversity'); if(reqUniSelect) reqUniSelect.innerHTML = ALL_INSTITUTIONS.map(u=>`<option value="${u}">${u}</option>`).join('');
+        const searchBox = document.getElementById('uniSearchBox'); if(searchBox) searchBox.oninput = function(){ let q = this.value.toLowerCase(); let filtered = ALL_INSTITUTIONS.filter(u=>u.toLowerCase().includes(q)); chipsDiv.innerHTML = filtered.map(u=>`<div class="university-chip ${selectedUniversityFilter===u?'active':''}" onclick="filterByUniversity('${u.replace(/'/g,"\\'")}')">${u} ${!unisWithMaterials.has(u) ? '📌' : ''}</div>`).join(''); };
+    }
+    function filterByUniversity(uni) { selectedUniversityFilter = uni; renderUniversityFilters(); filterAndRenderMaterials(); }
+    function filterMaterialsByUniversity() { let val = document.getElementById('universityFilterMain').value; selectedUniversityFilter = val; renderUniversityFilters(); filterAndRenderMaterials(); }
+    function searchByUnitCode() { currentSearchQuery = document.getElementById('globalSearchInput').value.trim().toUpperCase(); filterAndRenderMaterials(); }
+    function filterAndRenderMaterials() {
+        let filtered = allDocuments;
+        if(selectedUniversityFilter !== "all") filtered = filtered.filter(d=>d.University === selectedUniversityFilter);
+        if(currentSearchQuery) filtered = filtered.filter(d=> (d["Unit Code"] && d["Unit Code"].toUpperCase().includes(currentSearchQuery)) || (d.Title && d.Title.toUpperCase().includes(currentSearchQuery)));
+        let hasActiveSub = currentUser && currentUser.subscription && currentUser.subscription.active && new Date(currentUser.subscription.endDate) > new Date();
+        let grid = document.getElementById('materialsGrid');
+        let searchInfo = document.getElementById('searchResultsInfo');
+        if(currentSearchQuery) { searchInfo.style.display='block'; searchInfo.innerHTML=`<i class="fas fa-search"></i> Results for "<strong>${currentSearchQuery}</strong>": ${filtered.length} found.`; } else searchInfo.style.display='none';
+        if(filtered.length === 0){ grid.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open" style="font-size:48px; margin-bottom:15px;"></i><br>No materials for ${selectedUniversityFilter==='all'?'this filter':selectedUniversityFilter}.<br><button class="action-btn request-btn" onclick="openRequestFormForCurrent()">➕ Request this material</button></div>`; return; }
+        grid.innerHTML = filtered.map(doc=>`<div class="material-card"><div class="material-image"><i class="fas fa-file-pdf"></i></div><div class="material-content"><h3 class="material-title">${escapeHtml(doc.Title)}</h3><div class="material-meta"><span class="material-code">${doc["Unit Code"]||'N/A'}</span><span>Year ${doc.Year||'N/A'}</span></div><p style="font-size:13px; color:#475569; margin-bottom:12px;">${escapeHtml(doc.Description||'')}</p><button class="action-btn ${!hasActiveSub?'locked':''}" onclick="openDocument('${doc.URL}','${escapeHtml(doc.Title)}')">${hasActiveSub?'<i class="fas fa-eye"></i> View Document':'<i class="fas fa-lock"></i> Subscribe to Unlock'}</button></div></div>`).join('');
+        let bannerDiv = document.getElementById('accessBanner');
+        if(hasActiveSub && currentUser.subscription.endDate){ let expiry=new Date(currentUser.subscription.endDate).toLocaleDateString(); bannerDiv.innerHTML=`<div><i class="fas fa-unlock-alt"></i> <strong>Access Active</strong><br>Expires: ${expiry}</div><button class="action-btn" style="width:auto; background:#10b981;" onclick="showTab('subscribe')">Extend</button>`; bannerDiv.classList.add('access-granted'); }
+        else { bannerDiv.innerHTML=`<div><i class="fas fa-lock"></i> <strong>Access Locked</strong><br>Subscribe to open documents</div><button class="action-btn" style="width:auto;" onclick="showTab('subscribe')">Subscribe Now</button>`; bannerDiv.classList.remove('access-granted'); }
+    }
+    function openDocument(url,title){ if(!currentUser||!currentUser.subscription||!currentUser.subscription.active||new Date(currentUser.subscription.endDate)<=new Date()){ showNotification("Access Denied","Subscribe to view","error"); showTab('subscribe'); return; } if(!url){ showNotification("Error","No URL","error"); return; } document.getElementById('pdfFrame').src=url; document.getElementById('pdfModal').classList.add('active'); }
+
+    // ==================== AUTH ====================
+    async function registerUser() { let name = document.getElementById('signupName').value.trim(); let email = document.getElementById('signupEmail').value.trim(); let phoneRaw = document.getElementById('signupPhone').value.trim(); let password = document.getElementById('signupPassword').value; if(!name||!email||!phoneRaw||!password){ showNotification("Error","All fields required","error"); return; } if(password.length < 6){ showNotification("Error","Password min 6 characters","error"); return; } let phone = phoneRaw.replace(/^0+/,'').replace(/^\+/,''); if(!phone.startsWith('254')) phone='254'+phone.replace(/^07/,'7'); if(phone.length!==12||!phone.startsWith('254')){ showNotification("Error","Valid Kenyan phone (07XXXXXXXX)","error"); return; } let hashedPw = sha256(password); let userId = Date.now().toString(); let newUser = { id:userId, name, email, phone, password: hashedPw, accountStatus:'inactive', registrationDate:new Date().toISOString(), subscription:{ active:false, endDate:null, plan:null } }; usersRef.child(userId).set(newUser).then(()=>{ currentUser = newUser; delete currentUser.password; localStorage.setItem('revision_user', JSON.stringify(currentUser)); closeAuthModals(); document.getElementById('userNameDisplay').innerText=name.split(' ')[0]; showNotification("Welcome!",`Account created, ${name}!`,"success"); startPaymentListener(userId); filterAndRenderMaterials(); updateAccountUI(); requestNotificationPermission(); }).catch(()=>showNotification("Error","Could not create account","error")); }
+    async function loginUser() { let email = document.getElementById('loginEmail').value.trim(); let password = document.getElementById('loginPassword').value; if(!email||!password){ showNotification("Error","Email and password required","error"); return; } let hashed = sha256(password); let snapshot = await usersRef.once('value'); if(!snapshot.val()){ showNotification("Error","No users found","error"); return; } let found = null; for(let key in snapshot.val()){ let u = snapshot.val()[key]; if(u.email === email && u.password === hashed){ found = u; break; } } if(found){ currentUser = found; delete currentUser.password; localStorage.setItem('revision_user', JSON.stringify(currentUser)); closeAuthModals(); document.getElementById('userNameDisplay').innerText=currentUser.name.split(' ')[0]; showNotification("Logged in",`Welcome back ${currentUser.name}`,"success"); startPaymentListener(currentUser.id); filterAndRenderMaterials(); updateAccountUI(); requestNotificationPermission(); } else { showNotification("Login failed","Invalid email or password","error"); } }
+    function forgotPassword() { let email = prompt("Enter your registered email address:"); if(email){ showNotification("Password reset","A reset link has been sent to your email (demo)"); sendBrowserNotification("Password Reset", `A reset link was sent to ${email}`); } }
+    function logoutUser() { if(paymentListenerRef) paymentListenerRef.off(); currentUser = null; localStorage.removeItem('revision_user'); document.getElementById('userNameDisplay').innerText = 'Guest'; showNotification("Logged out", "You have been logged out"); filterAndRenderMaterials(); showTab('home'); showSignupModal(); }
+    function requestNotificationPermission() { if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") Notification.requestPermission(); }
+    function updateAccountUI() { if(!currentUser) return; document.getElementById('accName').innerText = currentUser.name; document.getElementById('accEmail').innerText = currentUser.email; document.getElementById('accPhone').innerText = currentUser.phone; document.getElementById('accRegDate').innerText = currentUser.registrationDate ? new Date(currentUser.registrationDate).toLocaleDateString() : '-'; let sub = currentUser.subscription; let active = sub && sub.active && sub.endDate && new Date(sub.endDate) > new Date(); document.getElementById('subStatus').innerHTML = active ? '<span style="color:#10b981;">Active ✅</span>' : '<span style="color:#ef4444;">Inactive ❌</span>'; document.getElementById('subExpiry').innerText = (sub && sub.endDate && active) ? new Date(sub.endDate).toLocaleDateString() : '-'; document.getElementById('subPlan').innerText = (sub && sub.plan) ? sub.plan : '-'; }
+    function editAccountField(field) { if(!currentUser){ showNotification("Error","Login required","error"); return; } let newVal = prompt(`Enter new ${field}:`, currentUser[field]); if(newVal && newVal.trim() !== "") { if(field === 'phone') { let phone = newVal.replace(/^0+/,'').replace(/^\+/,''); if(!phone.startsWith('254')) phone='254'+phone.replace(/^07/,'7'); if(phone.length!==12 || !phone.startsWith('254')){ showNotification("Error","Invalid phone number","error"); return; } newVal = phone; } currentUser[field] = newVal; usersRef.child(currentUser.id).update({ [field]: newVal }).then(()=>{ localStorage.setItem('revision_user', JSON.stringify(currentUser)); updateAccountUI(); showNotification("Updated", `${field} changed successfully`); }).catch(()=>showNotification("Error","Update failed","error")); } }
+
+    // ==================== UPLOADS & REQUESTS ====================
+    function loadPendingUploads() { userUploadsRef.once('value').then(snap=>{ let container = document.getElementById('pendingUploadsList'); if(!snap.val()){ container.innerHTML='<p>No pending uploads</p>'; return; } let uploads = Object.entries(snap.val()).filter(([id,up]) => up.status === 'pending'); if(uploads.length === 0){ container.innerHTML='<p>No pending uploads</p>'; return; } container.innerHTML = uploads.map(([id,up])=>`<div style="border:1px solid #e2e8f0; margin:8px; padding:12px; border-radius:8px;"><div><strong>${up.title}</strong><br>${up.unitCode} | ${up.university}<br>Uploaded by: ${up.uploader}<br>${up.description||''}</div><button class="action-btn" style="background:#10b981; width:auto; padding:5px 12px; margin-top:8px;" onclick="approveUpload('${id}')">Approve</button><button class="action-btn" style="background:#ef4444; width:auto; padding:5px 12px; margin-top:8px;" onclick="rejectUpload('${id}')">Reject</button></div>`).join(''); }); }
+    function approveUpload(uploadId) { userUploadsRef.child(uploadId).once('value').then(snap=>{ let up = snap.val(); if(up){ let newDoc = { Title: up.title, "Unit Code": up.unitCode, University: up.university, Subject: up.subject, Year: up.year, URL: up.url, Description: up.description, addedByAdmin: false }; documentsRef.push(newDoc).then(()=>{ userUploadsRef.child(uploadId).remove(); loadDocuments(); loadPendingUploads(); showNotification("Approved","Material added to library"); if(up.userId){ usersRef.child(up.userId).once('value').then(userSnap=>{ let user = userSnap.val(); if(user && user.email){ sendBrowserNotification("Material Approved", `Your upload "${up.title}" has been approved and is now live!`); } }); } }); } }); }
+    function rejectUpload(uploadId) { userUploadsRef.child(uploadId).once('value').then(snap=>{ let up = snap.val(); userUploadsRef.child(uploadId).remove(); loadPendingUploads(); showNotification("Rejected","Upload has been rejected"); if(up && up.userId){ usersRef.child(up.userId).once('value').then(userSnap=>{ let user = userSnap.val(); if(user && user.email){ sendBrowserNotification("Material Rejected", `Your upload "${up.title}" was not approved. Please check guidelines.`); } }); } }); }
+    function submitUpload(){ if(!currentUser){ showNotification("Error","Please login first","error"); return; } let upload = { title: document.getElementById('uploadTitle').value, unitCode: document.getElementById('uploadUnitCode').value, university: document.getElementById('uploadUniversity').value, subject: document.getElementById('uploadSubject').value, year: document.getElementById('uploadYear').value, description: document.getElementById('uploadDescription').value, url: document.getElementById('uploadURL').value, uploader: currentUser.name, userId: currentUser.id, status: 'pending', date: new Date().toISOString() }; if(!upload.title||!upload.url){ showNotification("Error","Title and URL required","error"); return; } userUploadsRef.push(upload); showNotification("Submitted","Your material is pending admin approval","success"); closeUploadModal(); document.getElementById('uploadTitle').value=''; document.getElementById('uploadURL').value=''; }
+    function openUploadForm(){ document.getElementById('uploadModal').classList.add('active'); }
+    function closeUploadModal(){ document.getElementById('uploadModal').classList.remove('active'); }
+    function openRequestForm(){ document.getElementById('requestModal').classList.add('active'); }
+    function closeRequestModal(){ document.getElementById('requestModal').classList.remove('active'); }
+    function openRequestFormForCurrent(){ let uni = selectedUniversityFilter !== "all" ? selectedUniversityFilter : ""; let code = currentSearchQuery || ""; if(uni) document.getElementById('requestUniversity').value = uni; if(code) document.getElementById('requestUnitCode').value = code; openRequestForm(); }
+    function submitRequest(){ if(!currentUser){ showNotification("Error","Please login first","error"); return; } let req={ unitCode:document.getElementById('requestUnitCode').value, university:document.getElementById('requestUniversity').value, subject:document.getElementById('requestSubject').value, details:document.getElementById('requestDetails').value, userId:currentUser.id, userName:currentUser.name, date:new Date().toISOString(), status:'pending' }; if(!req.unitCode||!req.university){ showNotification("Error","Unit Code and University required","error"); return; } requestsRef.push(req); showNotification("Request sent","Admin will review","success"); closeRequestModal(); document.getElementById('requestUnitCode').value=''; document.getElementById('requestDetails').value=''; }
+
+    // ==================== ADMIN (unchanged) ====================
+    function adminLoginFn(){ let pwd=document.getElementById('adminPass').value; if(pwd==="walter.zauko23"){ document.getElementById('adminPanel').style.display='block'; loadAdminMaterials(); loadPendingUploads(); showAdminSection('materials'); } else showNotification("Wrong password","Access denied","error"); }
+    function adminLogoutFn(){ document.getElementById('adminPanel').style.display='none'; document.getElementById('adminPass').value=''; }
+    function showAdminSection(section){ document.querySelectorAll('.admin-section').forEach(s=>s.style.display='none'); document.getElementById(section+'Section').style.display='block'; }
+    function loadAdminMaterials(){ let container=document.getElementById('adminMaterialsList'); if(!container) return; container.innerHTML=allDocuments.map((doc,idx)=>`<div style="border:1px solid #e2e8f0; margin:8px; padding:12px; border-radius:8px;"><div><strong>${doc.Title}</strong><br><small>${doc["Unit Code"]} | ${doc.University}</small></div><button class="action-btn" style="background:#ef4444; width:auto; padding:5px 12px; margin-top:8px;" onclick="deleteMaterialAdmin(${idx})">Delete</button></div>`).join(''); }
+    function deleteMaterialAdmin(idx){ if(confirm('Delete?')){ allDocuments.splice(idx,1); documentsRef.set(allDocuments); loadDocuments(); loadAdminMaterials(); filterAndRenderMaterials(); } }
+    function addMaterialAdmin(){ let title=prompt("Document Title:"); if(!title) return; let code=prompt("Unit Code:"); let uni=prompt("University/College:"); let url=prompt("Google Drive Preview URL:"); if(url){ let newDoc={ Title:title, "Unit Code":code||"N/A", University:uni||"General", URL:url, Year:"1", Description:"Added by admin", Subject:"General" }; allDocuments.push(newDoc); documentsRef.push(newDoc); loadDocuments(); loadAdminMaterials(); filterAndRenderMaterials(); showNotification("Added","Material added","success"); } }
+
+    // ==================== JSON BULK UPLOAD (unchanged) ====================
+    function copyJSONTemplate() { const template = `[{"Title": "Plant Breeding notes","Unit Code": "AGRO222","University": "Egerton University","Subject": "Agronomy","Year": "2","Description": "lecture notes on plant Breeding","URL": "https://drive.google.com/file/d/.../preview"}]`; navigator.clipboard.writeText(template); showNotification("Copied", "JSON template copied", "success"); }
+    function handleJSONFileSelect(event) { const file = event.target.files[0]; if (!file) return; if (!file.name.endsWith('.json')) { showNotification("Invalid File", "Please select a JSON file", "error"); return; } const fileInfo = document.getElementById('jsonFileInfo'); const uploadBtn = document.getElementById('uploadJSONBtn'); const previewSection = document.getElementById('jsonPreviewSection'); if(fileInfo) fileInfo.innerHTML = `<div><strong>${file.name}</strong> (${(file.size/1024).toFixed(2)} KB) <button class="copy-btn" onclick="clearJSONFile()">Remove</button></div>`; if(fileInfo) fileInfo.style.display = 'block'; if(uploadBtn) uploadBtn.disabled = false; const reader = new FileReader(); reader.onload = function(e) { try { const jsonData = JSON.parse(e.target.result); if (!Array.isArray(jsonData)) throw new Error("JSON must be an array"); const previewContainer = document.getElementById('jsonPreview'); const statsContainer = document.getElementById('jsonStats'); if(previewContainer) previewContainer.innerHTML = jsonData.slice(0,3).map(doc => `<div style="border:1px solid #e2e8f0; padding:8px; margin-bottom:8px;"><strong>${doc.Title || 'No title'}</strong><br>${doc["Unit Code"] || ''} | ${doc.University || ''}</div>`).join(''); if(statsContainer) statsContainer.innerHTML = `<div class="json-stats-grid"><div class="json-stat-item"><div class="json-stat-number">${jsonData.length}</div><div>Documents</div></div><div class="json-stat-item"><div class="json-stat-number">${new Set(jsonData.map(d=>d.University)).size}</div><div>Institutions</div></div></div>`; if(previewSection) previewSection.style.display = 'block'; pendingJSON = jsonData; } catch(err) { showNotification("Invalid JSON", err.message, "error"); clearJSONFile(); } }; reader.readAsText(file); }
+    function clearJSONFile() { document.getElementById('jsonFileInput').value = ''; document.getElementById('jsonFileInfo').style.display = 'none'; document.getElementById('uploadJSONBtn').disabled = true; document.getElementById('jsonPreviewSection').style.display = 'none'; pendingJSON = null; }
+    async function uploadJSONDocuments() { if (!pendingJSON || !Array.isArray(pendingJSON)) { showNotification("Error", "No valid JSON loaded", "error"); return; } let added = 0; for (let doc of pendingJSON) { const newDoc = { Title: doc.Title || "Untitled", "Unit Code": doc["Unit Code"] || "N/A", University: doc.University || "General", Subject: doc.Subject || "General", Year: doc.Year || "1", Description: doc.Description || "", URL: doc.URL || "", Trending: false, Recent: true }; if (newDoc.URL && newDoc.URL.includes("/preview")) { allDocuments.push(newDoc); await documentsRef.push(newDoc); added++; } } if (added > 0) { loadDocuments(); filterAndRenderMaterials(); showNotification("Bulk Upload", `${added} documents added successfully`, "success"); } else { showNotification("No valid documents", "Check URL format (must include /preview)", "error"); } clearJSONFile(); }
+
+    // ==================== DARAJA PAYMENT FUNCTION (replaces Paystack) ====================
+    async function initiateDarajaPayment(amount, planName) {
+        if (!currentUser) {
+            showNotification("Login Required", "Please create an account or login first.", "error");
+            showSignupModal();
+            return;
+        }
+
+        const phoneInput = document.getElementById('mpesaPhone').value.trim();
+        if (!phoneInput.match(/^2547\d{8}$/)) {
+            showNotification("Invalid Number", "Enter format 2547XXXXXXXX", "error");
+            return;
+        }
+
+        const payBtn = event.target;
+        payBtn.disabled = true;
+        payBtn.innerHTML = '<span class="payment-loading"></span> Sending...';
+
+        try {
+            const response = await fetch('https://revisionvault-daraja-backend.vercel.app/api/stkpush', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phoneNumber: phoneInput,
+                    amount: amount,
+                    planName: planName,
+                    userId: currentUser.id
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                showNotification("Check your phone", "Enter M-Pesa PIN to complete payment.", "success");
+            } else {
+                showNotification("Error", data.error || "Payment failed", "error");
+            }
+        } catch (err) {
+            showNotification("Network Error", "Could not connect to payment server.", "error");
+        } finally {
+            payBtn.disabled = false;
+            payBtn.innerHTML = planName.includes('2') ? '💰 Pay Ksh 60 via M-Pesa' : '👑 Pay Ksh 100 via M-Pesa';
+        }
+    }
+
+    // ==================== SETTINGS & UI HELPERS ====================
+    function togglePushNotifications(enabled) { if(enabled && Notification.permission !== "granted") { Notification.requestPermission().then(perm => { if(perm !== "granted") document.getElementById('pushToggle').checked = false; }); } localStorage.setItem('pushEnabled', enabled); showNotification("Push Notifications", enabled ? "Enabled" : "Disabled"); }
+    function clearAppCache() { localStorage.clear(); showNotification("Cache Cleared", "App data cleared. Reloading..."); setTimeout(()=> location.reload(), 1500); }
+    function setTheme(theme) { if(theme === 'dark') document.body.classList.add('dark-mode'); else document.body.classList.remove('dark-mode'); localStorage.setItem('appTheme', theme); }
+    function showMoreApps() { showNotification("More Apps", "More apps from Walter Zauko coming soon!"); }
+    function rateApp() { showNotification("Rate App", "Thank you! You can rate us on Play Store or App Store."); }
+    function shareApp() { if(navigator.share) navigator.share({ title: 'RevisionVault Pro', text: 'Check out this awesome study app!', url: window.location.href }); else showNotification("Share", "Click the browser share button."); }
+    function showAboutModal() { document.getElementById('aboutModal').style.display='flex'; }
+    function showContactModal() { document.getElementById('contactModal').style.display='flex'; }
+    function showDeleteInstructions() { document.getElementById('deleteInstructionsModal').style.display='flex'; }
+    function showFAQModal() { document.getElementById('faqModal').style.display='flex'; }
+    function closeModalById(id) { document.getElementById(id).style.display='none'; }
+    function showLoginModal() { document.getElementById('loginModal').style.display='flex'; document.getElementById('signupModal').style.display='none'; }
+    function showSignupModal() { document.getElementById('signupModal').style.display='flex'; document.getElementById('loginModal').style.display='none'; }
+    function closeAuthModals() { document.getElementById('loginModal').style.display='none'; document.getElementById('signupModal').style.display='none'; }
+    function toggleAuthModal(type) { if(type==='login') showLoginModal(); else showSignupModal(); }
+    function showTermsModal() { document.getElementById('termsModal').style.display='flex'; }
+    function closeTermsModal() { document.getElementById('termsModal').style.display='none'; }
+    function showTab(tabId){ document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); document.querySelectorAll('.nav-btn').forEach((btn,i)=>{ btn.classList.remove('active'); if((tabId==='home'&&i===0)||(tabId==='subscribe'&&i===1)||(tabId==='account'&&i===2)||(tabId==='admin'&&i===3)||(tabId==='settings'&&i===4)) btn.classList.add('active'); }); if(tabId === 'account') updateAccountUI(); }
+    function closeModal(){ document.getElementById('pdfModal').classList.remove('active'); document.getElementById('pdfFrame').src=''; }
+    function checkExistingSession(){ let saved=localStorage.getItem('revision_user'); if(saved){ currentUser=JSON.parse(saved); if(currentUser.subscription && currentUser.subscription.endDate && new Date(currentUser.subscription.endDate) < new Date()) currentUser.subscription.active=false; document.getElementById('userNameDisplay').innerText=currentUser.name?currentUser.name.split(' ')[0]:'User'; startPaymentListener(currentUser.id); filterAndRenderMaterials(); updateAccountUI(); requestNotificationPermission(); } else { showSignupModal(); } }
+
+    // ==================== INIT ====================
+    const savedTheme = localStorage.getItem('appTheme'); if(savedTheme === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeSelect').value = 'dark'; }
+    const pushPref = localStorage.getItem('pushEnabled'); if(pushPref === 'true' && document.getElementById('pushToggle')) document.getElementById('pushToggle').checked = true;
+    setInterval(()=>{ if(currentUser && currentUser.subscription && currentUser.subscription.endDate){ let expiryDate = new Date(currentUser.subscription.endDate); let now = new Date(); let daysLeft = Math.ceil((expiryDate - now) / (1000*60*60*24)); if(daysLeft === 3 && !localStorage.getItem('reminder_sent_'+currentUser.id)){ sendBrowserNotification("Subscription Expiring Soon", `Your access expires in 3 days. Renew now to continue.`); localStorage.setItem('reminder_sent_'+currentUser.id, 'true'); } } }, 3600000);
+    document.addEventListener("DOMContentLoaded", async () => { loadDocuments(); await checkExistingSession(); document.getElementById('globalSearchInput').addEventListener('input', searchByUnitCode); });
+
+    // Expose globals
+    window.filterByUniversity=filterByUniversity; window.filterMaterialsByUniversity=filterMaterialsByUniversity; window.openDocument=openDocument; window.showTab=showTab; window.closeModal=closeModal; window.closeUploadModal=closeUploadModal; window.openUploadForm=openUploadForm; window.submitUpload=submitUpload; window.adminLoginFn=adminLoginFn; window.adminLogoutFn=adminLogoutFn; window.deleteMaterialAdmin=deleteMaterialAdmin; window.addMaterialAdmin=addMaterialAdmin; window.openRequestForm=openRequestForm; window.closeRequestModal=closeRequestModal; window.submitRequest=submitRequest; window.openRequestFormForCurrent=openRequestFormForCurrent; window.editAccountField=editAccountField; window.logoutUser=logoutUser; window.rateApp=rateApp; window.approveUpload=approveUpload; window.rejectUpload=rejectUpload; window.showLoginModal=showLoginModal; window.showSignupModal=showSignupModal; window.closeAuthModals=closeAuthModals; window.showTermsModal=showTermsModal; window.closeTermsModal=closeTermsModal; window.loginUser=loginUser; window.registerUser=registerUser; window.forgotPassword=forgotPassword; window.togglePushNotifications=togglePushNotifications; window.clearAppCache=clearAppCache; window.setTheme=setTheme; window.showMoreApps=showMoreApps; window.shareApp=shareApp; window.showAboutModal=showAboutModal; window.showContactModal=showContactModal; window.showDeleteInstructions=showDeleteInstructions; window.showFAQModal=showFAQModal; window.closeModalById=closeModalById; window.showAdminSection=showAdminSection; window.handleJSONFileSelect=handleJSONFileSelect; window.uploadJSONDocuments=uploadJSONDocuments; window.copyJSONTemplate=copyJSONTemplate; window.clearJSONFile=clearJSONFile;
+    window.initiateDarajaPayment = initiateDarajaPayment;  // new global
+</script>
+</body>
+</html>
