@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RevisionVault Pro – Complete Study Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        :root { --primary: #1a2980; --secondary: #26d0ce; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --light: #f8fafc; --dark: #1e293b; --radius: 16px; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; transition: background 0.3s; }
+        body.dark-mode { background: #0f172a; }
+        body.dark-mode .main-container { background: #1e293b; color: #e2e8f0; }
+        body.dark-mode .sidebar-left, body.dark-mode .sidebar-right, body.dark-mode .footer-credit { background: #0f172a; color: #cbd5e1; border-color: #334155; }
+        body.dark-mode .material-card, body.dark-mode .plan-card, body.dark-mode .account-card, body.dark-mode .settings-card { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+        body.dark-mode .university-chip { background: #334155; color: #e2e8f0; }
+        body.dark-mode .university-chip.active { background: var(--secondary); color: #0f172a; }
+        body.dark-mode .email-input, body.dark-mode .filter-select { background: #334155; color: white; border-color: #475569; }
+        
+        .onboarding-overlay, .login-overlay, .terms-overlay, .settings-modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:3000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(8px); }
+        .onboarding-card, .login-card, .terms-card, .settings-modal-card { background:white; max-width:500px; width:90%; border-radius:32px; padding:30px; text-align:center; animation:fadeInUp 0.4s ease; max-height:80vh; overflow-y:auto; }
+        body.dark-mode .onboarding-card, body.dark-mode .login-card, body.dark-mode .terms-card, body.dark-mode .settings-modal-card { background: #1e293b; color: #e2e8f0; }
+        @keyframes fadeInUp { from{opacity:0; transform:translateY(30px);} to{opacity:1; transform:translateY(0);} }
+        .signin-btn, .login-btn { background:linear-gradient(135deg,#4285f4,#34a853); color:white; border:none; border-radius:50px; padding:14px 24px; width:100%; font-weight:700; cursor:pointer; margin:10px 0; display:flex; align-items:center; justify-content:center; gap:12px; }
+        .email-input { width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:12px; margin:10px 0; font-size:14px; }
+        .toggle-link { color: var(--primary); cursor: pointer; text-decoration: underline; margin: 10px 0; display: inline-block; }
+        .header-container { position:fixed; top:0; left:0; right:0; z-index:1000; background:linear-gradient(135deg, var(--primary), var(--secondary)); padding:12px 20px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+        .header-content { max-width:1400px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; }
+        .logo { display:flex; align-items:center; gap:12px; }
+        .logo-icon { background:rgba(255,255,255,0.9); width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:20px; }
+        .logo-text h1 { font-size:20px; color:white; }
+        .logo-text p { font-size:10px; color: #ffd966; margin-top: 2px; }
+        .search-container { flex:1; max-width:400px; position:relative; }
+        .search-box { width:100%; padding:10px 20px 10px 45px; border:none; border-radius:50px; background:rgba(255,255,255,0.2); color:white; font-size:14px; }
+        .search-box::placeholder { color:rgba(255,255,255,0.8); }
+        .search-icon { position:absolute; left:18px; top:50%; transform:translateY(-50%); color:white; }
+        .user-info { background:rgba(255,255,255,0.2); border-radius:40px; padding:8px 16px; display:flex; align-items:center; gap:10px; color:white; cursor:pointer; }
+        .main-container { margin-top:85px; max-width:1400px; margin-left:auto; margin-right:auto; background:white; border-radius:var(--radius); overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.2); min-height:calc(100vh - 100px); }
+        .main-layout { display:grid; grid-template-columns:260px 1fr 300px; min-height:600px; }
+        .sidebar-left { background:var(--light); padding:20px; border-right:1px solid #e2e8f0; overflow-y:auto; max-height:calc(100vh - 110px); }
+        .main-content { padding:25px; background:white; overflow-y:auto; height:calc(100vh - 110px); }
+        .sidebar-right { background:var(--light); padding:20px; border-left:1px solid #e2e8f0; }
+        .materials-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:20px; margin-top:20px; }
+        .material-card { background:white; border-radius:var(--radius); border:2px solid #e2e8f0; transition:0.2s; cursor:pointer; overflow:hidden; }
+        .material-card:hover { transform:translateY(-4px); box-shadow:0 4px 12px rgba(0,0,0,0.08); border-color:var(--primary); }
+        .material-image { height:130px; background:linear-gradient(135deg, var(--primary), var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:48px; color:rgba(255,255,255,0.2); border-radius:12px 12px 0 0; }
+        .material-content { padding:18px; }
+        .material-title { font-weight:800; font-size:16px; margin-bottom:6px; }
+        .material-meta { display:flex; gap:8px; margin-bottom:12px; font-size:12px; flex-wrap:wrap; }
+        .material-code { background:#e0f2fe; padding:4px 10px; border-radius:20px; font-weight:700; }
+        .action-btn { background:var(--primary); color:white; border:none; padding:10px; border-radius:10px; font-weight:700; width:100%; cursor:pointer; transition:0.2s; }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .action-btn.locked { background:#cbd5e1; cursor:not-allowed; }
+        .action-btn.locked:hover { transform: none; opacity: 1; }
+        .university-chip { display:inline-block; background:#f1f5f9; padding:8px 16px; border-radius:30px; font-size:13px; margin:4px; cursor:pointer; transition:0.2s; }
+        .university-chip.active, .university-chip:hover { background:var(--primary); color:white; }
+        .bottom-nav { position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:rgba(255,255,255,0.96); border-radius:50px; padding:8px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; box-shadow:0 15px 40px rgba(0,0,0,0.2); z-index:1000; backdrop-filter:blur(10px); }
+        .nav-btn { background:none; border:none; padding:8px 14px; border-radius:40px; font-weight:600; color:#64748b; cursor:pointer; font-size:14px; transition: 0.2s; }
+        .nav-btn:hover { background: #f1f5f9; }
+        .nav-btn.active { background:linear-gradient(135deg, var(--primary), var(--secondary)); color:white; }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; animation: fadeInUp 0.3s ease; }
+        .plan-card { background:white; border-radius:24px; padding:25px; border:2px solid #e2e8f0; text-align:center; margin-bottom:20px; transition:0.2s; cursor:pointer; }
+        .plan-card:hover { border-color:var(--primary); transform:translateY(-3px); }
+        .plan-price { font-size:36px; font-weight:800; color:var(--primary); margin:12px 0; }
+        .pay-btn { background:linear-gradient(135deg,#25d366,#128C7E); color:white; border:none; padding:14px; border-radius:40px; font-weight:bold; width:100%; font-size:16px; cursor:pointer; transition:0.2s; }
+        .pay-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .pay-btn:disabled { opacity:0.6; cursor:not-allowed; transform: none; }
+        .access-banner { background:#fef3c7; border-radius:16px; padding:18px; margin-bottom:25px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; }
+        .access-granted { background:#d1fae5; border-left:5px solid var(--success); }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:2000; }
+        .modal.active { display:block; }
+        .pdf-viewer-wrapper { position:absolute; top:55px; left:0; right:0; bottom:0; overflow:hidden; }
+        .pdf-viewer-frame { width:100%; height:100%; border:none; display:block; }
+        .modal-header { background:#1a1a1a; padding:14px 20px; color:white; position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; z-index:2010; height:55px; }
+        .modal-header h3 { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+        .modal-header button { background: rgba(255,255,255,0.15); border: none; color: white; font-size: 20px; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: 0.2s; }
+        .modal-header button:hover { background: rgba(255,255,255,0.25); }
+        .filter-select { padding:10px 16px; border-radius:30px; border:2px solid #e2e8f0; background:white; cursor:pointer; font-weight:500; min-width:220px; }
+        @media (max-width:1000px) { 
+            .main-layout { grid-template-columns:1fr; } 
+            .sidebar-left, .sidebar-right { display:none; } 
+            .bottom-nav { min-width:90%; }
+            .header-content { justify-content: center; }
+        }
+        .notification { position:fixed; top:100px; right:20px; background:white; padding:14px 18px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.15); display:none; z-index:2100; border-left:5px solid var(--success); max-width:320px; animation: slideInRight 0.3s ease; }
+        @keyframes slideInRight { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .admin-list { border:2px solid #e2e8f0; border-radius:12px; padding:15px; max-height:400px; overflow-y:auto; margin-top:15px; }
+        .admin-list-item { border:1px solid #e2e8f0; margin:8px 0; padding:12px; border-radius:8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .admin-list-item:hover { background: #f8fafc; }
+        body.dark-mode .admin-list-item:hover { background: #334155; }
+        .search-results-info { margin-bottom:15px; padding:10px; background:#e0f2fe; border-radius:12px; display:none; }
+        .payment-loading { display:inline-block; width:20px; height:20px; border:2px solid white; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:8px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .empty-state { text-align:center; padding:60px; color:#64748b; }
+        .request-btn { background:var(--warning); margin-top:10px; }
+        .footer-credit { background: #f1f5f9; border-top: 2px solid #e2e8f0; padding: 16px 24px; text-align: center; font-size: 13px; color: #334155; margin-top: 20px; }
+        .account-card, .settings-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 25px; }
+        .account-info-row, .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eef2f6; flex-wrap: wrap; gap: 10px; }
+        .settings-row:last-child { border-bottom: none; }
+        .edit-icon { cursor: pointer; color: var(--primary); font-size: 14px; }
+        .edit-icon:hover { color: var(--secondary); }
+        .logout-btn { background: #ef4444; margin-top: 20px; }
+        .logout-btn:hover { background: #dc2626; }
+        .terms-link { color: var(--primary); cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; }
+        .toggle-switch { position: relative; display: inline-block; width: 52px; height: 26px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--secondary); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .contact-link { color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 5px; display: inline-flex; align-items: center; gap: 6px; }
+        .contact-link:hover { color: var(--secondary); }
+        .social-icons { display: flex; gap: 20px; justify-content: center; margin-top: 15px; }
+        .social-icons a { color: var(--primary); font-size: 28px; transition: 0.2s; }
+        .social-icons a:hover { transform: scale(1.1); color: var(--secondary); }
+        .json-upload-zone { border: 3px dashed #7c3aed; border-radius: 15px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(124, 58, 237, 0.05); margin: 20px 0; }
+        .json-upload-zone:hover { background: rgba(124, 58, 237, 0.1); border-color: #6d28d9; }
+        .json-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0; }
+        .json-stat-item { background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e2e8f0; }
+        body.dark-mode .json-stat-item { background: #1e293b; border-color: #334155; }
+        .admin-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .admin-tabs .action-btn { width: auto; padding: 8px 16px; font-size: 13px; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; animation: fadeInUp 0.3s ease; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 13px; margin: 10px 0; overflow-x: auto; }
+        .copy-btn { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-top: 5px; }
+        .copy-btn:hover { background: #2563eb; }
+        .verification-status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .verification-pending { background: #fef3c7; color: #92400e; }
+        .verification-approved { background: #d1fae5; color: #065f46; }
+        .verification-rejected { background: #fee2e2; color: #991b1b; }
+        .delete-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.2s; }
+        .delete-btn:hover { background: #dc2626; }
+        .approve-btn { background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.2s; }
+        .approve-btn:hover { background: #059669; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .section-title { color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        body.dark-mode .section-title { color: #e2e8f0; }
+    </style>
+</head>
+<body>
+
+<div class="header-container">
+    <div class="header-content">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="logo-text">
+                <h1>RevisionVault Pro</h1>
+                <p><i class="fas fa-book-open"></i> Your Complete Study Hub</p>
+            </div>
+        </div>
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="globalSearchInput" class="search-box" placeholder="Search by Unit Code e.g., AGRO222">
+        </div>
+        <div id="userInfoDiv" class="user-info" onclick="if(!currentUser) showSignupModal(); else showTab('account');">
+            <i class="fas fa-user"></i> 
+            <span id="userNameDisplay">Guest</span>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="main-layout">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar-left">
+            <div style="font-weight:700; margin-bottom:15px; color: var(--primary);">
+                <i class="fas fa-university"></i> Kenyan Universities & Colleges
+            </div>
+            <input type="text" id="uniSearchBox" class="search-box" placeholder="🔍 Filter institution..." style="background:white; color:black; border:1px solid #ddd;">
+            <div id="universityChipsList" style="max-height:350px; overflow-y:auto; margin-top:10px;"></div>
+            <div style="margin-top: 20px; background: linear-gradient(135deg, #e0f2fe, #f0f9ff); border-radius: 16px; padding: 15px; text-align: center; border: 1px solid #bae6fd;">
+                <i class="fas fa-user-tie" style="font-size: 24px; color: var(--primary);"></i><br>
+                <strong style="color: var(--primary);">W.Z.Aziavula</strong><br>
+                <small style="color: #475569;">📧 wzauko@gmail.com</small><br>
+                <small style="color: #475569;">⚡ Founder & Developer</small>
+            </div>
+            <button class="action-btn" style="margin-top:20px; background:#7c3aed;" onclick="showTab('subscribe')">
+                <i class="fas fa-credit-card"></i> Get Subscription
+            </button>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- HOME TAB -->
+            <div id="home" class="tab-content active">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:20px;">
+                    <h1 class="section-title"><i class="fas fa-book"></i> Study Materials</h1>
+                    <select id="universityFilterMain" class="filter-select" onchange="filterMaterialsByUniversity()">
+                        <option value="all">📖 All Institutions</option>
+                    </select>
+                </div>
+                <div id="searchResultsInfo" class="search-results-info"></div>
+                <div id="accessBanner" class="access-banner">
+                    <div>
+                        <i class="fas fa-lock"></i> <strong>Access Locked</strong><br>
+                        Subscribe to open documents
+                    </div>
+                    <button class="action-btn" style="width:auto; padding:8px 18px;" onclick="showTab('subscribe')">
+                        Subscribe Now
+                    </button>
+                </div>
+                <div id="materialsGrid" class="materials-grid"></div>
+            </div>
+
+            <!-- SUBSCRIBE TAB -->
+            <div id="subscribe" class="tab-content">
+                <h1 class="section-title"><i class="fas fa-rocket"></i> Activate Full Access</h1>
+                <p style="margin-bottom:15px; color: #64748b;">Pay via M‑Pesa Till, then enter the transaction code below.</p>
+
+                <div style="max-width:550px; margin:0 auto;">
+                    <div style="background: #e3f2fd; border-radius: 16px; padding: 20px; margin-bottom: 25px; text-align:center; border: 2px solid #bbdefb;">
+                        <i class="fas fa-store-alt" style="font-size: 28px; color: #1a2980;"></i>
+                        <h3 style="color: var(--primary);">M‑Pesa Till Number</h3>
+                        <div style="font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: 3px;">5574313</div>
+                        <p style="font-size: 14px; margin-top: 8px; color: #475569;">Pay to <strong>W.Z.AZIAVULA</strong></p>
+                    </div>
+
+                    <div class="plan-card">
+                        <i class="fas fa-gem" style="font-size:38px; color:var(--primary);"></i>
+                        <h2>2 Months Access</h2>
+                        <div class="plan-price">Ksh 60</div>
+                    </div>
+                    <div class="plan-card">
+                        <i class="fas fa-crown" style="font-size:38px; color:#f59e0b;"></i>
+                        <h2>4 Months Access</h2>
+                        <div class="plan-price">Ksh 100</div>
+                    </div>
+
+                    <select id="mpesaPlanSelect" class="email-input" style="max-width: 100%;">
+                        <option value="2 Months|60">2 Months - Ksh 60</option>
+                        <option value="4 Months|100">4 Months - Ksh 100</option>
+                    </select>
+
+                    <p style="margin: 12px 0; font-size: 14px; color: #475569;">After paying, enter the <strong>transaction code</strong> from your M‑Pesa message:</p>
+                    <input type="text" id="transactionCodeInput" class="email-input" placeholder="e.g. UFIFC8MT0R" style="text-transform: uppercase;">
+
+                    <button class="pay-btn" onclick="submitTransactionCode()">
+                        <i class="fas fa-paper-plane"></i> Submit Code for Verification
+                    </button>
+                    <div style="margin-top: 15px; font-size: 13px; color: #475569;">
+                        <i class="fas fa-info-circle"></i> Your subscription will be activated within a few minutes after the admin verifies the payment.
+                    </div>
+
+                    <div id="userVerificationsStatus" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <!-- ACCOUNT TAB -->
+            <div id="account" class="tab-content">
+                <h1 class="section-title"><i class="fas fa-user-circle"></i> My Account</h1>
+                <div id="accountDetailsContainer" class="account-card">
+                    <div class="account-info-row">
+                        <strong><i class="fas fa-user"></i> Name:</strong> 
+                        <span id="accName">-</span> 
+                        <i class="fas fa-edit edit-icon" onclick="editAccountField('name')" title="Edit Name"></i>
+                    </div>
+                    <div class="account-info-row">
+                        <strong><i class="fas fa-envelope"></i> Email:</strong> 
+                        <span id="accEmail">-</span>
+                    </div>
+                    <div class="account-info-row">
+                        <strong><i class="fas fa-phone"></i> Phone:</strong> 
+                        <span id="accPhone">-</span> 
+                        <i class="fas fa-edit edit-icon" onclick="editAccountField('phone')" title="Edit Phone"></i>
+                    </div>
+                    <div class="account-info-row">
+                        <strong><i class="fas fa-calendar"></i> Member since:</strong> 
+                        <span id="accRegDate">-</span>
+                    </div>
+                </div>
+                <div class="account-card">
+                    <h3 style="color: var(--primary);"><i class="fas fa-ticket-alt"></i> Subscription Status</h3>
+                    <div id="subscriptionDetails" style="margin-top: 15px;">
+                        <p><strong>Status:</strong> <span id="subStatus">Inactive</span></p>
+                        <p><strong>Expiry Date:</strong> <span id="subExpiry">-</span></p>
+                        <p><strong>Plan:</strong> <span id="subPlan">-</span></p>
+                        <button class="action-btn" style="margin-top: 15px; background: var(--secondary);" onclick="showTab('subscribe')">
+                            <i class="fas fa-sync-alt"></i> Upgrade / Renew
+                        </button>
+                    </div>
+                </div>
+                <button class="action-btn logout-btn" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+
+            <!-- ADMIN TAB -->
+            <div id="admin" class="tab-content">
+                <h1 class="section-title"><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+                <input type="password" id="adminPass" placeholder="Enter Admin Password" style="padding:12px; border-radius:10px; border:2px solid #e2e8f0; width:100%; max-width: 400px; margin:15px 0;">
+                <button class="action-btn" onclick="adminLoginFn()" style="width:auto; padding:10px 25px;">
+                    <i class="fas fa-lock-open"></i> Login
+                </button>
+                <div id="adminPanel" style="display:none; margin-top:20px;">
+                    <div class="admin-tabs">
+                        <button class="action-btn" onclick="showAdminSection('materials')" style="background: #3b82f6;">
+                            <i class="fas fa-book"></i> Manage Materials
+                        </button>
+                        <button class="action-btn" onclick="showAdminSection('uploads')" style="background: #10b981;">
+                            <i class="fas fa-cloud-upload-alt"></i> User Uploads
+                        </button>
+                        <button class="action-btn" onclick="showAdminSection('jsonUpload')" style="background: #7c3aed;">
+                            <i class="fas fa-file-upload"></i> JSON Bulk Upload
+                        </button>
+                        <button class="action-btn" onclick="showAdminSection('payments')" style="background: #f59e0b;">
+                            <i class="fas fa-money-bill-wave"></i> Payment Verifications
+                        </button>
+                        <button class="action-btn" onclick="adminLogoutFn()" style="background:#ef4444;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                    
+                    <div id="materialsSection" class="admin-section active">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-list"></i> Manage Study Materials 
+                            <span style="font-size: 14px; color: #64748b;">(Total: <span id="adminTotalDocs">0</span>)</span>
+                        </h3>
+                        <button class="action-btn" onclick="addMaterialAdmin()" style="background:#10b981; width: auto; padding: 10px 20px; margin-bottom: 15px;">
+                            <i class="fas fa-plus"></i> Add New Material
+                        </button>
+                        <div id="adminMaterialsList" class="admin-list">
+                            <p style="text-align: center; color: #64748b;">Loading materials...</p>
+                        </div>
+                    </div>
+                    
+                    <div id="uploadsSection" class="admin-section">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-clock"></i> Pending User Uploads
+                        </h3>
+                        <div id="pendingUploadsList" class="admin-list">
+                            <p style="text-align: center; color: #64748b;">Loading uploads...</p>
+                        </div>
+                    </div>
+                    
+                    <div id="jsonUploadSection" class="admin-section">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-file-code"></i> JSON Bulk Upload
+                        </h3>
+                        <div style="background:#f0f9ff; border-radius:10px; padding:15px; margin-bottom:20px; border: 1px solid #bae6fd;">
+                            <p style="margin-bottom: 10px;">Upload a JSON file with an array of documents. Each document must have: <strong>Title, Unit Code, University, Subject, Year, Description, URL</strong> (Google Drive preview).</p>
+                            <div class="code-block">[{"Title":"Sample Notes","Unit Code":"CODE123","University":"Egerton University","Subject":"Agronomy","Year":"2","Description":"Complete lecture notes","URL":"https://drive.google.com/file/d/.../preview"}]</div>
+                            <button class="copy-btn" onclick="copyJSONTemplate()">
+                                <i class="fas fa-copy"></i> Copy Template
+                            </button>
+                        </div>
+                        <div class="json-upload-zone" id="jsonUploadZone" onclick="document.getElementById('jsonFileInput').click()">
+                            <div style="font-size:60px; color:#7c3aed;"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <h3>Drop JSON File Here</h3>
+                            <p>or click to select</p>
+                            <input type="file" id="jsonFileInput" accept=".json" style="display:none" onchange="handleJSONFileSelect(event)">
+                            <button class="action-btn" style="width:auto; margin-top:15px; background: #7c3aed;" onclick="event.stopPropagation(); document.getElementById('jsonFileInput').click();">
+                                <i class="fas fa-folder-open"></i> Select File
+                            </button>
+                        </div>
+                        <div id="jsonFileInfo" style="display:none; background:#e9d5ff; border-radius:10px; padding:15px; margin-top:10px; border: 1px solid #c4b5fd;"></div>
+                        <button id="uploadJSONBtn" class="action-btn" style="background:#7c3aed; margin-top:10px; width: auto; padding: 12px 24px;" onclick="uploadJSONDocuments()" disabled>
+                            <i class="fas fa-upload"></i> Upload & Process JSON
+                        </button>
+                        <div id="jsonPreviewSection" style="display:none; margin-top:20px;">
+                            <h4 style="color: var(--primary);">Preview</h4>
+                            <div id="jsonPreview"></div>
+                            <div id="jsonStats"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="paymentsSection" class="admin-section">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-money-check-alt"></i> Payment Verifications
+                        </h3>
+                        <div id="pendingPaymentsList" class="admin-list">
+                            <p style="text-align: center; color: #64748b;">Loading verifications...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS TAB -->
+            <div id="settings" class="tab-content">
+                <h1 class="section-title"><i class="fas fa-sliders-h"></i> Settings</h1>
+                <div class="settings-card">
+                    <div class="settings-row">
+                        <span><i class="fas fa-bell"></i> Enable Push Notifications</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="pushToggle" onchange="togglePushNotifications(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-trash-alt"></i> Clear Cache</span>
+                        <button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="clearAppCache()">
+                            Clear
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-moon"></i> Theme Mode</span>
+                        <select id="themeSelect" onchange="setTheme(this.value)" style="padding:8px 12px; border-radius:20px; border: 1px solid #e2e8f0;">
+                            <option value="light">☀️ Light</option>
+                            <option value="dark">🌙 Dark</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-star"></i> Rate App</span>
+                        <button class="action-btn" style="width:auto; padding:5px 12px; background:#f59e0b;" onclick="rateApp()">
+                            Rate Now
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-share-alt"></i> Share App</span>
+                        <button class="action-btn" style="width:auto; padding:5px 12px; background:#3b82f6;" onclick="shareApp()">
+                            Share
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-info-circle"></i> About Us</span>
+                        <button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showAboutModal()">
+                            View
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-envelope"></i> Contact Us</span>
+                        <button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showContactModal()">
+                            Contact
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-user-slash"></i> Account Delete Instructions</span>
+                        <button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showDeleteInstructions()">
+                            View
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-lock"></i> Privacy Policy</span>
+                        <button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showTermsModal()">
+                            View
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-file-contract"></i> Terms of Use</span>
+                        <button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showTermsModal()">
+                            View
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span><i class="fas fa-question-circle"></i> FAQ</span>
+                        <button class="action-btn" style="width:auto; padding:5px 12px; background:#64748b;" onclick="showFAQModal()">
+                            View
+                        </button>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <h3 style="color: var(--primary);"><i class="fas fa-headset"></i> Developer & Support Contacts</h3>
+                    <p style="margin: 10px 0;"><i class="fas fa-envelope"></i> Developer: <a href="mailto:wzauko@gmail.com" class="contact-link">wzauko@gmail.com</a></p>
+                    <p style="margin: 10px 0;"><i class="fas fa-envelope"></i> Support Email: <a href="mailto:revisionvaultpro.support@gmail.com" class="contact-link">revisionvaultpro.support@gmail.com</a></p>
+                    <p style="margin: 10px 0;"><i class="fas fa-phone-alt"></i> Developer Phone: <a href="tel:+254765098865" class="contact-link">0765098865</a></p>
+                    <p style="margin: 10px 0;"><i class="fab fa-whatsapp"></i> Support WhatsApp: <a href="https://wa.me/254765098865" target="_blank" class="contact-link">0765 098 865</a></p>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/profile.php?id=61562906268005" target="_blank" title="Facebook">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://www.instagram.com/lunavibe23?igsh=OHFkOWN6ZDE4Z2Z4" target="_blank" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- RIGHT SIDEBAR -->
+        <aside class="sidebar-right">
+            <div style="font-weight: 700; color: var(--primary); margin-bottom: 15px;">
+                <i class="fas fa-chart-line"></i> Quick Stats
+            </div>
+            <div style="background: #f0f9ff; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                <p style="margin: 8px 0;">📄 Total Materials: <strong id="totalDocsCount">0</strong></p>
+                <p style="margin: 8px 0;">🏛️ Institutions: <strong id="uniCount">0</strong></p>
+            </div>
+            <div style="background:linear-gradient(135deg,#1a2980,#26d0ce); padding:20px; border-radius:20px; color:white; margin-top:20px; text-align:center;">
+                <i class="fas fa-bolt" style="font-size: 24px;"></i><br>
+                <strong>Pay via Till 5574313</strong><br>
+                <small>Enter code to unlock instantly</small>
+            </div>
+            <div style="margin-top:25px;">
+                <div style="font-weight: 700; color: var(--primary); margin-bottom: 10px;">
+                    <i class="fas fa-upload"></i> Contribute
+                </div>
+                <button class="action-btn" style="background:#10b981; margin-bottom: 8px;" onclick="openUploadForm()">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload Material
+                </button>
+                <button class="action-btn" style="background:#f59e0b;" onclick="openRequestForm()">
+                    <i class="fas fa-question-circle"></i> Request Material
+                </button>
+            </div>
+            <hr style="margin: 20px 0; border-color: #e2e8f0;">
+            <div style="font-size: 12px; text-align: center; color: #64748b;">
+                <i class="far fa-copyright"></i> 2026 W.Z.Aziavula — All rights reserved.<br>
+                <span class="terms-link" onclick="showTermsModal()">Terms & Privacy Policy</span>
+            </div>
+        </aside>
+    </div>
+    <div class="footer-credit">
+        <i class="fas fa-crown" style="color: #f59e0b;"></i> 
+        RevisionVault Pro — Developed by <strong>W.Z.Aziavula</strong> | 
+        📧 wzauko@gmail.com | 
+        📅 Copyright © 2026. Empowering Kenyan Students.
+    </div>
+</div>
+
+<!-- BOTTOM NAVIGATION -->
+<div class="bottom-nav">
+    <button class="nav-btn active" onclick="showTab('home')"><i class="fas fa-home"></i><span> Home</span></button>
+    <button class="nav-btn" onclick="showTab('subscribe')"><i class="fas fa-credit-card"></i><span> Subscribe</span></button>
+    <button class="nav-btn" onclick="showTab('account')"><i class="fas fa-user"></i><span> Account</span></button>
+    <button class="nav-btn" onclick="showTab('admin')"><i class="fas fa-shield-alt"></i><span> Admin</span></button>
+    <button class="nav-btn" onclick="showTab('settings')"><i class="fas fa-cog"></i><span> Settings</span></button>
+</div>
+
+<!-- MODALS -->
+<div id="loginModal" class="login-overlay" style="display:none;">
+    <div class="login-card">
+        <i class="fas fa-graduation-cap" style="font-size:50px; color:var(--primary);"></i>
+        <h2>Login to RevisionVault Pro</h2>
+        <input type="email" id="loginEmail" class="email-input" placeholder="Email Address">
+        <input type="password" id="loginPassword" class="email-input" placeholder="Password">
+        <button class="login-btn" onclick="loginUser()">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+        <div class="toggle-link" onclick="toggleAuthModal('signup')">Don't have an account? Sign up</div>
+        <div class="toggle-link" onclick="forgotPassword()">Forgot password?</div>
+    </div>
+</div>
+
+<div id="signupModal" class="login-overlay" style="display:none;">
+    <div class="login-card">
+        <i class="fas fa-user-plus" style="font-size:50px; color:var(--primary);"></i>
+        <h2>Create Account</h2>
+        <input type="text" id="signupName" class="email-input" placeholder="Full Name">
+        <input type="email" id="signupEmail" class="email-input" placeholder="Email Address">
+        <input type="tel" id="signupPhone" class="email-input" placeholder="Phone Number (07XXXXXXXX)">
+        <input type="password" id="signupPassword" class="email-input" placeholder="Password (min 6 chars)">
+        <button class="login-btn" onclick="registerUser()">
+            <i class="fas fa-user-check"></i> Sign Up
+        </button>
+        <div class="toggle-link" onclick="toggleAuthModal('login')">Already have an account? Login</div>
+        <div class="terms-link" onclick="showTermsModal()">By signing up, you agree to our Terms & Privacy</div>
+    </div>
+</div>
+
+<div id="termsModal" class="terms-overlay" style="display:none;">
+    <div class="terms-card">
+        <h2 style="color: var(--primary);"><i class="fas fa-file-contract"></i> Terms & Privacy Policy</h2>
+        <div style="text-align:left; margin-top:20px;">
+            <h3>1. Acceptance of Terms</h3>
+            <p>By using RevisionVault Pro, you agree to these terms. The app is developed and maintained by W.Z.Aziavula.</p>
+            <h3>2. Payments & Refunds</h3>
+            <p>All payments are made to Till Number 5574313. Subscriptions are activated after manual verification of the transaction code. Payments are non-refundable after activation.</p>
+            <h3>3. User Data</h3>
+            <p>We collect your name, email, phone number, and payment history for account management. Your data is stored securely via Firebase.</p>
+            <h3>4. Content Ownership</h3>
+            <p>All study materials are for personal use only. Redistribution is prohibited.</p>
+            <h3>5. Push Notifications</h3>
+            <p>With your permission, we send notifications for approval of uploads and subscription expiry reminders.</p>
+            <h3>6. Contact</h3>
+            <p>For any issues: <strong>revisionvaultpro.support@gmail.com</strong> or WhatsApp 0765 098 865.</p>
+            <h3>7. Changes to Terms</h3>
+            <p>We may update these terms. Continued use constitutes acceptance.</p>
+            <p style="margin-top:20px;"><strong>Last updated: January 2026</strong></p>
+        </div>
+        <button class="action-btn" onclick="closeTermsModal()" style="margin-top:20px; width: auto; padding: 10px 30px;">Close</button>
+    </div>
+</div>
+
+<div id="uploadModal" class="modal">
+    <div class="modal-header">
+        <h3><i class="fas fa-upload"></i> Upload Study Material</h3>
+        <button onclick="closeUploadModal()">✖</button>
+    </div>
+    <div style="margin-top:70px; padding:25px; background:white; height:calc(100% - 70px); overflow-y:auto;">
+        <input type="text" id="uploadTitle" placeholder="Document Title" class="email-input">
+        <input type="text" id="uploadUnitCode" placeholder="Unit Code (e.g., AGRO222)" class="email-input">
+        <select id="uploadUniversity" class="email-input"></select>
+        <input type="text" id="uploadSubject" placeholder="Subject" class="email-input">
+        <select id="uploadYear" class="email-input">
+            <option>Year 1</option>
+            <option>Year 2</option>
+            <option>Year 3</option>
+            <option>Year 4</option>
+        </select>
+        <textarea id="uploadDescription" placeholder="Description" class="email-input" rows="3"></textarea>
+        <input type="url" id="uploadURL" placeholder="Google Drive Preview URL (must end with /preview)" class="email-input">
+        <button class="action-btn" onclick="submitUpload()" style="background: #10b981;">
+            <i class="fas fa-upload"></i> Submit for Review
+        </button>
+    </div>
+</div>
+
+<div id="requestModal" class="modal">
+    <div class="modal-header">
+        <h3><i class="fas fa-question-circle"></i> Request Study Material</h3>
+        <button onclick="closeRequestModal()">✖</button>
+    </div>
+    <div style="margin-top:70px; padding:25px; background:white;">
+        <input type="text" id="requestUnitCode" placeholder="Unit Code (e.g., AGRO222)" class="email-input">
+        <select id="requestUniversity" class="email-input"></select>
+        <input type="text" id="requestSubject" placeholder="Subject (optional)" class="email-input">
+        <textarea id="requestDetails" placeholder="Additional details" class="email-input" rows="3"></textarea>
+        <button class="action-btn" onclick="submitRequest()" style="background: #f59e0b;">
+            <i class="fas fa-paper-plane"></i> Send Request
+        </button>
+    </div>
+</div>
+
+<!-- PDF VIEWER MODAL - NO POP-OUT BUTTON -->
+<div class="modal" id="pdfModal">
+    <div class="modal-header">
+        <h3><i class="fas fa-file-pdf"></i> <span id="pdfTitle">Document Viewer</span></h3>
+        <button onclick="closeModal()" title="Close Viewer">✖</button>
+    </div>
+    <div class="pdf-viewer-wrapper">
+        <iframe id="pdfFrame" 
+                class="pdf-viewer-frame" 
+                allow="fullscreen"
+                loading="eager">
+        </iframe>
+    </div>
+</div>
+
+<div class="notification" id="notificationMsg"></div>
+
+<div id="aboutModal" class="settings-modal-overlay" style="display:none;">
+    <div class="settings-modal-card">
+        <h2 style="color: var(--primary);">About RevisionVault Pro</h2>
+        <p>Version 2.0<br>
+        Developed by W.Z.Aziavula<br>
+        Helping Kenyan students access quality revision materials since 2025.<br>
+        📍 Nairobi, Kenya</p>
+        <button class="action-btn" onclick="closeModalById('aboutModal')" style="width: auto; padding: 10px 30px;">Close</button>
+    </div>
+</div>
+
+<div id="contactModal" class="settings-modal-overlay" style="display:none;">
+    <div class="settings-modal-card">
+        <h2 style="color: var(--primary);">Contact Us</h2>
+        <p>📧 Email: <a href="mailto:revisionvaultpro.support@gmail.com">revisionvaultpro.support@gmail.com</a><br>
+        📞 Phone: <a href="tel:+254765098865">0765098865</a><br>
+        💬 WhatsApp: <a href="https://wa.me/254765098865">0765 098 865</a><br>
+        🌐 Follow us on Facebook & Instagram (links in Settings).</p>
+        <button class="action-btn" onclick="closeModalById('contactModal')" style="width: auto; padding: 10px 30px;">Close</button>
+    </div>
+</div>
+
+<div id="deleteInstructionsModal" class="settings-modal-overlay" style="display:none;">
+    <div class="settings-modal-card">
+        <h2 style="color: var(--primary);">Account Deletion Instructions</h2>
+        <p>To delete your account and all associated data:<br>
+        1. Send an email to <strong>wzauko@gmail.com</strong> from your registered email.<br>
+        2. Subject: "DELETE MY ACCOUNT"<br>
+        3. Include your full name and phone number.<br>
+        We will process deletion within 7 days. Your data will be permanently removed.</p>
+        <button class="action-btn" onclick="closeModalById('deleteInstructionsModal')" style="width: auto; padding: 10px 30px;">Close</button>
+    </div>
+</div>
+
+<div id="faqModal" class="settings-modal-overlay" style="display:none;">
+    <div class="settings-modal-card">
+        <h2 style="color: var(--primary);">Frequently Asked Questions</h2>
+        <p><strong>Q:</strong> How do I get access?<br>
+        <strong>A:</strong> Pay via M‑Pesa Till 5574313, then enter the transaction code you receive in the Subscribe tab. Admin will verify and activate your account.<br><br>
+        <strong>Q:</strong> How long does verification take?<br>
+        <strong>A:</strong> Usually within a few minutes to a few hours. You'll see the status in your Account tab.<br><br>
+        <strong>Q:</strong> Can I get a refund?<br>
+        <strong>A:</strong> Subscriptions are non-refundable once activated, as stated in our Terms.</p>
+        <button class="action-btn" onclick="closeModalById('faqModal')" style="width: auto; padding: 10px 30px;">Close</button>
+    </div>
+</div>
+
+<script>
+    // ==================== FIREBASE CONFIGURATION ====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDX8T_hYJvyUq4QSAZTtCDAk_NlqZ8NVxE",
+        authDomain: "revisionvault-pro-83002.firebaseapp.com",
+        databaseURL: "https://revisionvault-pro-83002-default-rtdb.firebaseio.com",
+        projectId: "revisionvault-pro-83002",
+        storageBucket: "revisionvault-pro-83002.firebasestorage.app",
+        messagingSenderId: "669675132541",
+        appId: "1:669675132541:web:706cf06dc79eb5f36fc314"
+    };
+    
+    const fbApp = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const documentsRef = database.ref('documents');
+    const usersRef = database.ref('approvedUsers');
+    const requestsRef = database.ref('materialRequests');
+    const userUploadsRef = database.ref('userUploads');
+    const paymentVerificationsRef = database.ref('paymentVerifications');
+
+    // ==================== KENYAN INSTITUTIONS LIST ====================
+    const ALL_INSTITUTIONS = [
+        "University of Nairobi", "Kenyatta University", "Moi University", "Egerton University",
+        "Jomo Kenyatta University of Agriculture and Technology (JKUAT)", "Maseno University",
+        "Masinde Muliro University of Science and Technology", "Dedan Kimathi University of Technology",
+        "Technical University of Kenya", "Technical University of Mombasa", "Murang'a University of Technology",
+        "Meru University of Science and Technology", "Kirinyaga University", "Laikipia University",
+        "University of Eldoret", "Chuka University", "Karatina University", "Rongo University",
+        "Kisii University", "South Eastern Kenya University", "Pwani University",
+        "Co-operative University of Kenya", "Multimedia University of Kenya", "University of Embu",
+        "Machakos University", "Jaramogi Oginga Odinga University of Science and Technology",
+        "Kibabii University", "Tharaka University", "Turkana University College", "Alupe University",
+        "Kaimosi Friends University College", "Taita Taveta University", "Garissa University College",
+        "Maasai Mara University", "Kabarak University", "Strathmore University", "Mount Kenya University",
+        "Africa Nazarene University", "United States International University Africa (USIU)",
+        "Zetech University", "KCA University", "Riara University", "Daystar University",
+        "Catholic University of Eastern Africa", "Pan Africa Christian University", "St. Paul's University",
+        "Adventist University of Africa", "Scott Christian University", "Great Lakes University of Kisumu",
+        "Kenya Methodist University (KeMU)", "Kiriri Women's University of Science and Technology",
+        "Management University of Africa", "Presbyterian University of East Africa",
+        "The East African University", "University of Eastern Africa, Baraton", "Gretsa University",
+        "Genco University", "International Leadership University", "Africa International University",
+        "Aga Khan University", "University of Kabianga", "Kenya Highlands University",
+        "Uzima University College", "St. Augustine University of Tanzania (Kenya Campus)",
+        "Kenya Polytechnic University College", "Nairobi Technical Training Institute",
+        "Railway Training Institute", "Kisumu National Polytechnic", "Eldoret National Polytechnic",
+        "Mombasa Technical Training Institute", "Nyeri National Polytechnic", "Kabete National Polytechnic",
+        "Thika Technical Training Institute", "Meru National Polytechnic", "Machakos Technical Institute",
+        "Nakuru Technical Institute", "Bondo Technical Training Institute", "Mathenge Technical Training Institute",
+        "Rift Valley Technical Training Institute", "Kitale National Polytechnic", "Kwale Technical Training Institute",
+        "Sigalagala National Polytechnic", "Mawego Technical Training Institute", "Kisii National Polytechnic",
+        "Masinga Technical Training Institute", "Mai Mahiu Technical Training Institute",
+        "Wote Technical Training Institute", "Njoro Technical Training Institute", "Lodwar Technical Training Institute",
+        "Garissa Technical Training Institute", "Isiolo Technical Training Institute",
+        "Moyale Technical Training Institute", "Marsabit Technical Training Institute",
+        "Samburu Technical Training Institute"
+    ];
+
+    // ==================== GLOBAL STATE ====================
+    let currentUser = null;
+    let allDocuments = [];
+    let selectedUniversityFilter = "all";
+    let currentSearchQuery = "";
+    let pendingJSON = null;
+    let adminDocumentsCache = {};
+
+    // ==================== INITIAL DOCUMENTS ====================
+    const INITIAL_DOCS = [
+        {
+            Title: "Plant Breeding Notes",
+            "Unit Code": "AGRO222",
+            University: "Egerton University",
+            Subject: "Agronomy",
+            Year: "2",
+            URL: "https://drive.google.com/file/d/17CG_rb_ecvnkLfjTzNC31u55pBR_RW70/preview",
+            Description: "Complete lecture notes on plant breeding techniques and principles"
+        },
+        {
+            Title: "Production Economics",
+            "Unit Code": "AGEC241",
+            University: "Egerton University",
+            Subject: "Economics",
+            Year: "2",
+            URL: "https://drive.google.com/file/d/1uSBqGCfeWPr-upLjKOu-cCkwQUVW7GOU/preview",
+            Description: "Comprehensive production economics notes for agricultural students"
+        },
+        {
+            Title: "Integral Calculus",
+            "Unit Code": "MATH212",
+            University: "University of Nairobi",
+            Subject: "Mathematics",
+            Year: "2",
+            URL: "https://drive.google.com/file/d/1LZ5P_t9qRlxZq2AyAI8JoG-bZAdS6G_c/preview",
+            Description: "Calculus exam paper with solutions"
+        },
+        {
+            Title: "Cell Biology",
+            "Unit Code": "ZOOL232",
+            University: "Kenyatta University",
+            Subject: "Biology",
+            Year: "2",
+            URL: "https://drive.google.com/file/d/1LlFPeHK2DjZBhYh8C0LP9DZMX-etSZd7/preview",
+            Description: "Detailed cell biology notes covering all major topics"
+        },
+        {
+            Title: "Environmental Science",
+            "Unit Code": "ENSC104",
+            University: "University of Eldoret",
+            Subject: "Environmental",
+            Year: "2",
+            URL: "https://drive.google.com/file/d/1Rd_mPqrUik3mh9LX6GQEgD5XOjDfw1gB/preview",
+            Description: "Environmental science comprehensive study guide"
+        }
+    ];
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function showNotification(title, msg, type = 'success') {
+        const n = document.getElementById('notificationMsg');
+        n.innerHTML = `<strong>${escapeHtml(title)}</strong><br>${escapeHtml(msg)}`;
+        n.style.display = 'block';
+        n.style.borderLeftColor = type === 'error' ? '#ef4444' : '#10b981';
+        n.style.animation = 'none';
+        n.offsetHeight;
+        n.style.animation = 'slideInRight 0.3s ease';
+        setTimeout(() => { n.style.display = 'none'; }, 5000);
+    }
+
+    function sendBrowserNotification(title, body) {
+        if (!("Notification" in window)) return;
+        if (Notification.permission === "granted") {
+            new Notification(title, { body, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎓</text></svg>' });
+        } else if (Notification.permission !== "denied" && document.getElementById('pushToggle')?.checked) {
+            Notification.requestPermission().then(perm => {
+                if (perm === "granted") new Notification(title, { body });
+            });
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        return new Date(dateString).toLocaleDateString('en-KE', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    // ==================== DOCUMENT VIEWER - NO POP-OUT ====================
+    function openDocument(url, title) {
+        // Check subscription access
+        if (!currentUser || 
+            !currentUser.subscription || 
+            !currentUser.subscription.active || 
+            !currentUser.subscription.endDate || 
+            new Date(currentUser.subscription.endDate) <= new Date()) {
+            showNotification("Access Denied", "Please subscribe to view documents", "error");
+            showTab('subscribe');
+            return;
+        }
+        
+        if (!url) {
+            showNotification("Error", "No document URL available", "error");
+            return;
+        }
+        
+        const pdfFrame = document.getElementById('pdfFrame');
+        const pdfTitle = document.getElementById('pdfTitle');
+        const modal = document.getElementById('pdfModal');
+        
+        // Update title
+        pdfTitle.textContent = title || 'Document Viewer';
+        
+        // Convert Google Drive URL to embed format that hides pop-out button
+        let embedUrl = url;
+        if (embedUrl.includes('drive.google.com/file/d/')) {
+            // Extract file ID from URL
+            const match = embedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) {
+                const fileId = match[1];
+                // Use embed format which doesn't have pop-out button
+                embedUrl = `https://drive.google.com/file/d/${fileId}/preview?usp=embed_googleplus`;
+            }
+        }
+        
+        // Set iframe source
+        pdfFrame.src = embedUrl;
+        
+        // Show modal
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        const pdfFrame = document.getElementById('pdfFrame');
+        const modal = document.getElementById('pdfModal');
+        
+        // Clear the iframe
+        pdfFrame.src = 'about:blank';
+        
+        // Hide modal
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // ==================== DOCUMENTS MANAGEMENT ====================
+    function loadDocuments() {
+        documentsRef.once('value').then(snap => {
+            if (snap.val() && Object.keys(snap.val()).length > 0) {
+                allDocuments = Object.values(snap.val());
+                adminDocumentsCache = {};
+                Object.entries(snap.val()).forEach(([key, value]) => {
+                    adminDocumentsCache[key] = value;
+                });
+            } else {
+                allDocuments = [...INITIAL_DOCS];
+                const promises = INITIAL_DOCS.map(doc => documentsRef.push(doc));
+                Promise.all(promises).then(() => {
+                    documentsRef.once('value').then(newSnap => {
+                        if (newSnap.val()) {
+                            allDocuments = Object.values(newSnap.val());
+                            adminDocumentsCache = {};
+                            Object.entries(newSnap.val()).forEach(([key, value]) => {
+                                adminDocumentsCache[key] = value;
+                            });
+                        }
+                        renderUniversityFilters();
+                        filterAndRenderMaterials();
+                        updateStats();
+                    });
+                });
+            }
+            renderUniversityFilters();
+            filterAndRenderMaterials();
+            updateStats();
+        }).catch(err => {
+            console.error("Error loading documents:", err);
+            allDocuments = [...INITIAL_DOCS];
+            renderUniversityFilters();
+            filterAndRenderMaterials();
+            updateStats();
+        });
+    }
+
+    function updateStats() {
+        document.getElementById('totalDocsCount').innerText = allDocuments.length;
+        document.getElementById('uniCount').innerText = new Set(allDocuments.map(d => d.University)).size;
+        const adminTotal = document.getElementById('adminTotalDocs');
+        if (adminTotal) adminTotal.innerText = allDocuments.length;
+    }
+
+    function renderUniversityFilters() {
+        const unisWithMaterials = new Set(allDocuments.map(d => d.University));
+        const chipsDiv = document.getElementById('universityChipsList');
+        const mainFilter = document.getElementById('universityFilterMain');
+        
+        if (chipsDiv) {
+            const allChip = `<div class="university-chip ${selectedUniversityFilter === 'all' ? 'active' : ''}" 
+                                onclick="filterByUniversity('all')">
+                                🌍 All Institutions
+                            </div>`;
+            const uniChips = ALL_INSTITUTIONS.map(u => {
+                const hasMaterial = unisWithMaterials.has(u);
+                return `<div class="university-chip ${selectedUniversityFilter === u ? 'active' : ''}" 
+                            onclick="filterByUniversity('${u.replace(/'/g, "\\'")}')">
+                            ${u} ${hasMaterial ? '✅' : '📌'}
+                        </div>`;
+            }).join('');
+            chipsDiv.innerHTML = allChip + uniChips;
+        }
+        
+        if (mainFilter) {
+            mainFilter.innerHTML = '<option value="all">📖 All Institutions</option>' +
+                ALL_INSTITUTIONS.map(u => `<option value="${u}" ${selectedUniversityFilter === u ? 'selected' : ''}>${u}</option>`).join('');
+        }
+        
+        const uniSelect = document.getElementById('uploadUniversity');
+        if (uniSelect) {
+            uniSelect.innerHTML = ALL_INSTITUTIONS.map(u => `<option value="${u}">${u}</option>`).join('');
+        }
+        
+        const reqUniSelect = document.getElementById('requestUniversity');
+        if (reqUniSelect) {
+            reqUniSelect.innerHTML = ALL_INSTITUTIONS.map(u => `<option value="${u}">${u}</option>`).join('');
+        }
+        
+        const searchBox = document.getElementById('uniSearchBox');
+        if (searchBox) {
+            searchBox.oninput = function() {
+                const q = this.value.toLowerCase();
+                const filtered = ALL_INSTITUTIONS.filter(u => u.toLowerCase().includes(q));
+                if (chipsDiv) {
+                    chipsDiv.innerHTML = `<div class="university-chip ${selectedUniversityFilter === 'all' ? 'active' : ''}" 
+                                            onclick="filterByUniversity('all')">
+                                            🌍 All Institutions
+                                        </div>` +
+                        filtered.map(u => {
+                            const hasMaterial = unisWithMaterials.has(u);
+                            return `<div class="university-chip ${selectedUniversityFilter === u ? 'active' : ''}" 
+                                        onclick="filterByUniversity('${u.replace(/'/g, "\\'")}')">
+                                        ${u} ${hasMaterial ? '✅' : '📌'}
+                                    </div>`;
+                        }).join('');
+                }
+            };
+        }
+    }
+
+    function filterByUniversity(uni) {
+        if (uni === 'all') {
+            selectedUniversityFilter = 'all';
+            document.getElementById('universityFilterMain').value = 'all';
+        } else {
+            selectedUniversityFilter = uni;
+            document.getElementById('universityFilterMain').value = uni;
+        }
+        renderUniversityFilters();
+        filterAndRenderMaterials();
+    }
+
+    function filterMaterialsByUniversity() {
+        const val = document.getElementById('universityFilterMain').value;
+        selectedUniversityFilter = val;
+        renderUniversityFilters();
+        filterAndRenderMaterials();
+    }
+
+    function searchByUnitCode() {
+        currentSearchQuery = document.getElementById('globalSearchInput').value.trim().toUpperCase();
+        filterAndRenderMaterials();
+    }
+
+    function filterAndRenderMaterials() {
+        let filtered = [...allDocuments];
+        
+        if (selectedUniversityFilter !== "all") {
+            filtered = filtered.filter(d => d.University === selectedUniversityFilter);
+        }
+        
+        if (currentSearchQuery) {
+            filtered = filtered.filter(d =>
+                (d["Unit Code"] && d["Unit Code"].toUpperCase().includes(currentSearchQuery)) ||
+                (d.Title && d.Title.toUpperCase().includes(currentSearchQuery))
+            );
+        }
+        
+        const hasActiveSub = currentUser && 
+                            currentUser.subscription && 
+                            currentUser.subscription.active && 
+                            currentUser.subscription.endDate && 
+                            new Date(currentUser.subscription.endDate) > new Date();
+        
+        const grid = document.getElementById('materialsGrid');
+        const searchInfo = document.getElementById('searchResultsInfo');
+        
+        if (currentSearchQuery) {
+            searchInfo.style.display = 'block';
+            searchInfo.innerHTML = `<i class="fas fa-search"></i> Results for "<strong>${escapeHtml(currentSearchQuery)}</strong>": <strong>${filtered.length}</strong> material(s) found.`;
+        } else {
+            searchInfo.style.display = 'none';
+        }
+        
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-folder-open" style="font-size:48px; margin-bottom:15px; display:block;"></i>
+                    <p>No materials found for ${selectedUniversityFilter === 'all' ? 'this filter' : escapeHtml(selectedUniversityFilter)}.</p>
+                    <button class="action-btn request-btn" style="width: auto; padding: 10px 20px;" onclick="openRequestFormForCurrent()">
+                        <i class="fas fa-plus"></i> Request this material
+                    </button>
+                </div>`;
+            return;
+        }
+        
+        grid.innerHTML = filtered.map(doc => `
+            <div class="material-card">
+                <div class="material-image">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="material-content">
+                    <h3 class="material-title">${escapeHtml(doc.Title)}</h3>
+                    <div class="material-meta">
+                        <span class="material-code">${escapeHtml(doc["Unit Code"] || 'N/A')}</span>
+                        <span>📚 Year ${escapeHtml(doc.Year || 'N/A')}</span>
+                        <span>🏛️ ${escapeHtml(doc.University || 'N/A')}</span>
+                    </div>
+                    <p style="font-size:13px; color:#475569; margin-bottom:12px;">${escapeHtml(doc.Description || 'No description available')}</p>
+                    <button class="action-btn ${!hasActiveSub ? 'locked' : ''}" 
+                            onclick="${hasActiveSub ? `openDocument('${escapeHtml(doc.URL)}','${escapeHtml(doc.Title)}')` : 'showTab(\'subscribe\')'}">
+                        ${hasActiveSub ? '<i class="fas fa-eye"></i> View Document' : '<i class="fas fa-lock"></i> Subscribe to Unlock'}
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        
+        const bannerDiv = document.getElementById('accessBanner');
+        if (hasActiveSub && currentUser.subscription.endDate) {
+            const expiry = formatDate(currentUser.subscription.endDate);
+            const daysLeft = Math.ceil((new Date(currentUser.subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24));
+            bannerDiv.innerHTML = `
+                <div>
+                    <i class="fas fa-unlock-alt"></i> 
+                    <strong>Access Active</strong><br>
+                    Expires: ${expiry} (${daysLeft} days left)
+                </div>
+                <button class="action-btn" style="width:auto; padding:8px 18px; background:#10b981;" onclick="showTab('subscribe')">
+                    <i class="fas fa-sync-alt"></i> Extend
+                </button>`;
+            bannerDiv.classList.add('access-granted');
+        } else {
+            bannerDiv.innerHTML = `
+                <div>
+                    <i class="fas fa-lock"></i> 
+                    <strong>Access Locked</strong><br>
+                    Subscribe to open documents
+                </div>
+                <button class="action-btn" style="width:auto; padding:8px 18px;" onclick="showTab('subscribe')">
+                    Subscribe Now
+                </button>`;
+            bannerDiv.classList.remove('access-granted');
+        }
+    }
+
+    // ==================== AUTHENTICATION ====================
+    async function registerUser() {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const phoneRaw = document.getElementById('signupPhone').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        
+        if (!name || !email || !phoneRaw || !password) {
+            showNotification("Error", "All fields are required", "error");
+            return;
+        }
+        
+        if (password.length < 6) {
+            showNotification("Error", "Password must be at least 6 characters", "error");
+            return;
+        }
+        
+        let phone = phoneRaw.replace(/^0+/, '').replace(/^\+/, '');
+        if (!phone.startsWith('254')) {
+            phone = '254' + phone.replace(/^07/, '7');
+        }
+        
+        if (phone.length !== 12 || !phone.startsWith('254')) {
+            showNotification("Error", "Please enter a valid Kenyan phone number (07XXXXXXXX)", "error");
+            return;
+        }
+        
+        const hashedPw = sha256(password);
+        const userId = Date.now().toString();
+        
+        const newUser = {
+            id: userId,
+            name,
+            email,
+            phone,
+            password: hashedPw,
+            accountStatus: 'inactive',
+            registrationDate: new Date().toISOString(),
+            subscription: {
+                active: false,
+                endDate: null,
+                plan: null
+            }
+        };
+        
+        try {
+            await usersRef.child(userId).set(newUser);
+            currentUser = { ...newUser };
+            delete currentUser.password;
+            
+            localStorage.setItem('revision_user', JSON.stringify(currentUser));
+            closeAuthModals();
+            document.getElementById('userNameDisplay').innerText = name.split(' ')[0];
+            
+            showNotification("Welcome!", `Account created successfully, ${name}!`, "success");
+            filterAndRenderMaterials();
+            updateAccountUI();
+            loadUserVerifications();
+            requestNotificationPermission();
+            showTab('home');
+        } catch (err) {
+            showNotification("Error", "Could not create account. Please try again.", "error");
+            console.error("Registration error:", err);
+        }
+    }
+
+    async function loginUser() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!email || !password) {
+            showNotification("Error", "Email and password are required", "error");
+            return;
+        }
+        
+        const hashed = sha256(password);
+        
+        try {
+            const snapshot = await usersRef.once('value');
+            if (!snapshot.val()) {
+                showNotification("Error", "No users found. Please sign up first.", "error");
+                return;
+            }
+            
+            let found = null;
+            for (let key in snapshot.val()) {
+                const u = snapshot.val()[key];
+                if (u.email === email && u.password === hashed) {
+                    found = { ...u, id: key };
+                    break;
+                }
+            }
+            
+            if (found) {
+                currentUser = found;
+                delete currentUser.password;
+                
+                if (currentUser.subscription && 
+                    currentUser.subscription.endDate && 
+                    new Date(currentUser.subscription.endDate) < new Date()) {
+                    currentUser.subscription.active = false;
+                }
+                
+                localStorage.setItem('revision_user', JSON.stringify(currentUser));
+                closeAuthModals();
+                document.getElementById('userNameDisplay').innerText = currentUser.name.split(' ')[0];
+                
+                showNotification("Logged in", `Welcome back, ${currentUser.name}!`, "success");
+                filterAndRenderMaterials();
+                updateAccountUI();
+                loadUserVerifications();
+                requestNotificationPermission();
+                showTab('home');
+            } else {
+                showNotification("Login failed", "Invalid email or password", "error");
+            }
+        } catch (err) {
+            showNotification("Error", "Login failed. Please try again.", "error");
+            console.error("Login error:", err);
+        }
+    }
+
+    function logoutUser() {
+        currentUser = null;
+        localStorage.removeItem('revision_user');
+        document.getElementById('userNameDisplay').innerText = 'Guest';
+        showNotification("Logged out", "You have been logged out successfully");
+        filterAndRenderMaterials();
+        updateAccountUI();
+        showTab('home');
+        showSignupModal();
+    }
+
+    function requestNotificationPermission() {
+        if ("Notification" in window && 
+            Notification.permission !== "granted" && 
+            Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+    }
+
+    function updateAccountUI() {
+        if (!currentUser) {
+            document.getElementById('accName').innerText = '-';
+            document.getElementById('accEmail').innerText = '-';
+            document.getElementById('accPhone').innerText = '-';
+            document.getElementById('accRegDate').innerText = '-';
+            document.getElementById('subStatus').innerHTML = '<span style="color:#ef4444;">Inactive ❌</span>';
+            document.getElementById('subExpiry').innerText = '-';
+            document.getElementById('subPlan').innerText = '-';
+            return;
+        }
+        
+        document.getElementById('accName').innerText = currentUser.name || '-';
+        document.getElementById('accEmail').innerText = currentUser.email || '-';
+        document.getElementById('accPhone').innerText = currentUser.phone || '-';
+        document.getElementById('accRegDate').innerText = currentUser.registrationDate ? 
+            formatDate(currentUser.registrationDate) : '-';
+        
+        const sub = currentUser.subscription;
+        const active = sub && sub.active && sub.endDate && new Date(sub.endDate) > new Date();
+        
+        document.getElementById('subStatus').innerHTML = active ? 
+            '<span style="color:#10b981;">Active ✅</span>' : 
+            '<span style="color:#ef4444;">Inactive ❌</span>';
+        
+        document.getElementById('subExpiry').innerText = (sub && sub.endDate && active) ? 
+            formatDate(sub.endDate) : '-';
+        
+        document.getElementById('subPlan').innerText = (sub && sub.plan) ? sub.plan : '-';
+    }
+
+    function editAccountField(field) {
+        if (!currentUser) {
+            showNotification("Error", "Please login first", "error");
+            return;
+        }
+        
+        const newVal = prompt(`Enter new ${field}:`, currentUser[field] || '');
+        if (newVal && newVal.trim() !== "" && newVal.trim() !== currentUser[field]) {
+            let finalVal = newVal.trim();
+            
+            if (field === 'phone') {
+                let phone = finalVal.replace(/^0+/, '').replace(/^\+/, '');
+                if (!phone.startsWith('254')) {
+                    phone = '254' + phone.replace(/^07/, '7');
+                }
+                if (phone.length !== 12 || !phone.startsWith('254')) {
+                    showNotification("Error", "Invalid phone number format", "error");
+                    return;
+                }
+                finalVal = phone;
+            }
+            
+            currentUser[field] = finalVal;
+            
+            usersRef.child(currentUser.id).update({ [field]: finalVal })
+                .then(() => {
+                    localStorage.setItem('revision_user', JSON.stringify(currentUser));
+                    updateAccountUI();
+                    showNotification("Updated", `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
+                })
+                .catch(() => {
+                    showNotification("Error", "Update failed. Please try again.", "error");
+                });
+        }
+    }
+
+    function forgotPassword() {
+        const email = prompt("Enter your registered email address:");
+        if (email) {
+            showNotification("Password Reset", "A reset link has been sent to your email (demo mode)");
+            sendBrowserNotification("Password Reset", `A reset link was sent to ${email}`);
+        }
+    }
+
+    // ==================== UPLOADS & REQUESTS ====================
+    function openUploadForm() {
+        if (!currentUser) {
+            showNotification("Login Required", "Please login to upload materials", "error");
+            showSignupModal();
+            return;
+        }
+        document.getElementById('uploadModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeUploadModal() {
+        document.getElementById('uploadModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function submitUpload() {
+        if (!currentUser) {
+            showNotification("Login Required", "Please login to upload", "error");
+            return;
+        }
+        
+        const title = document.getElementById('uploadTitle').value.trim();
+        const unitCode = document.getElementById('uploadUnitCode').value.trim();
+        const university = document.getElementById('uploadUniversity').value;
+        const subject = document.getElementById('uploadSubject').value.trim();
+        const year = document.getElementById('uploadYear').value;
+        const description = document.getElementById('uploadDescription').value.trim();
+        const url = document.getElementById('uploadURL').value.trim();
+        
+        if (!title || !unitCode || !url) {
+            showNotification("Error", "Title, Unit Code, and URL are required", "error");
+            return;
+        }
+        
+        if (!url.includes('/preview') && !url.includes('/view')) {
+            showNotification("Error", "URL must be a Google Drive preview link", "error");
+            return;
+        }
+        
+        const uploadData = {
+            userId: currentUser.id,
+            uploader: currentUser.name,
+            title,
+            unitCode,
+            university,
+            subject,
+            year,
+            description,
+            url,
+            status: 'pending',
+            timestamp: new Date().toISOString()
+        };
+        
+        userUploadsRef.push(uploadData)
+            .then(() => {
+                showNotification("Submitted", "Your material has been submitted for review");
+                closeUploadModal();
+                document.getElementById('uploadTitle').value = '';
+                document.getElementById('uploadUnitCode').value = '';
+                document.getElementById('uploadSubject').value = '';
+                document.getElementById('uploadDescription').value = '';
+                document.getElementById('uploadURL').value = '';
+                
+                sendBrowserNotification("New Upload", `${currentUser.name} uploaded ${title}`);
+            })
+            .catch(err => {
+                showNotification("Error", "Upload failed. Please try again.", "error");
+                console.error("Upload error:", err);
+            });
+    }
+
+    function openRequestForm() {
+        if (!currentUser) {
+            showNotification("Login Required", "Please login to request materials", "error");
+            showSignupModal();
+            return;
+        }
+        document.getElementById('requestModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRequestModal() {
+        document.getElementById('requestModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function openRequestFormForCurrent() {
+        const uni = selectedUniversityFilter !== "all" ? selectedUniversityFilter : "";
+        const code = currentSearchQuery || "";
+        
+        if (uni) document.getElementById('requestUniversity').value = uni;
+        if (code) document.getElementById('requestUnitCode').value = code;
+        
+        openRequestForm();
+    }
+
+    function submitRequest() {
+        if (!currentUser) {
+            showNotification("Login Required", "Please login to submit requests", "error");
+            return;
+        }
+        
+        const unitCode = document.getElementById('requestUnitCode').value.trim();
+        const university = document.getElementById('requestUniversity').value;
+        const subject = document.getElementById('requestSubject').value.trim();
+        const details = document.getElementById('requestDetails').value.trim();
+        
+        if (!unitCode) {
+            showNotification("Error", "Unit Code is required", "error");
+            return;
+        }
+        
+        const requestData = {
+            userId: currentUser.id,
+            requester: currentUser.name,
+            email: currentUser.email,
+            unitCode,
+            university,
+            subject,
+            details,
+            status: 'pending',
+            timestamp: new Date().toISOString()
+        };
+        
+        requestsRef.push(requestData)
+            .then(() => {
+                showNotification("Request Sent", "Your material request has been submitted");
+                closeRequestModal();
+                document.getElementById('requestUnitCode').value = '';
+                document.getElementById('requestSubject').value = '';
+                document.getElementById('requestDetails').value = '';
+            })
+            .catch(err => {
+                showNotification("Error", "Request failed. Please try again.", "error");
+                console.error("Request error:", err);
+            });
+    }
+
+    // ==================== PAYMENT VERIFICATION ====================
+    function submitTransactionCode() {
+        if (!currentUser) {
+            showNotification("Login Required", "Please create an account or login first.", "error");
+            showSignupModal();
+            return;
+        }
+        
+        const code = document.getElementById('transactionCodeInput').value.trim().toUpperCase();
+        if (!code) {
+            showNotification("Missing code", "Please enter the M‑Pesa transaction code.", "error");
+            return;
+        }
+        
+        if (code.length < 8) {
+            showNotification("Invalid code", "Please enter a valid M‑Pesa transaction code.", "error");
+            return;
+        }
+        
+        const planSelect = document.getElementById('mpesaPlanSelect').value;
+        const [planName, amountStr] = planSelect.split('|');
+        const amount = parseInt(amountStr);
+        
+        const verificationData = {
+            userId: currentUser.id,
+            userEmail: currentUser.email,
+            userName: currentUser.name,
+            userPhone: currentUser.phone,
+            transactionCode: code,
+            planName: planName,
+            amount: amount,
+            timestamp: new Date().toISOString(),
+            status: 'pending'
+        };
+        
+        paymentVerificationsRef.push(verificationData)
+            .then(() => {
+                showNotification("Code Submitted", 
+                    "Your payment is pending verification. We'll activate your account shortly.", 
+                    "success");
+                document.getElementById('transactionCodeInput').value = '';
+                loadUserVerifications();
+                
+                sendBrowserNotification("New Payment", 
+                    `${currentUser.name} submitted code ${code} for ${planName}`);
+            })
+            .catch(err => {
+                showNotification("Error", "Could not submit code. Please try again.", "error");
+                console.error("Payment submission error:", err);
+            });
+    }
+
+    function loadUserVerifications() {
+        if (!currentUser) return;
+        
+        const container = document.getElementById('userVerificationsStatus');
+        if (!container) return;
+        
+        paymentVerificationsRef.orderByChild('userId').equalTo(currentUser.id)
+            .once('value')
+            .then(snap => {
+                const verifications = snap.val();
+                if (!verifications) {
+                    container.innerHTML = '';
+                    return;
+                }
+                
+                let html = '<h4 style="margin-top:20px; color: var(--primary);">Your Submitted Codes</h4>';
+                const entries = Object.entries(verifications).sort((a, b) => 
+                    new Date(b[1].timestamp) - new Date(a[1].timestamp)
+                );
+                
+                for (let [id, v] of entries) {
+                    let statusClass = 'verification-pending';
+                    let statusIcon = '⏳';
+                    
+                    if (v.status === 'approved') {
+                        statusClass = 'verification-approved';
+                        statusIcon = '✅';
+                    } else if (v.status === 'rejected') {
+                        statusClass = 'verification-rejected';
+                        statusIcon = '❌';
+                    }
+                    
+                    html += `
+                        <div style="margin:8px 0; padding:12px; border:1px solid #e2e8f0; border-radius:8px; background: white;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong>${escapeHtml(v.transactionCode)}</strong>
+                                <span class="verification-status ${statusClass}">${statusIcon} ${v.status}</span>
+                            </div>
+                            <div style="margin-top: 5px; font-size: 13px; color: #64748b;">
+                                Plan: ${escapeHtml(v.planName)} | Ksh ${v.amount}<br>
+                                <small>${formatDate(v.timestamp)}</small>
+                            </div>
+                        </div>`;
+                }
+                
+                container.innerHTML = html;
+            });
+    }
+
+    // ==================== ADMIN FUNCTIONS ====================
+    function adminLoginFn() {
+        const pwd = document.getElementById('adminPass').value;
+        if (pwd === "walter.zauko23") {
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('adminPass').value = '';
+            
+            loadAdminMaterials();
+            loadPendingUploads();
+            loadPendingPayments();
+            showAdminSection('materials');
+            
+            showNotification("Admin Access", "Welcome to the admin panel", "success");
+        } else {
+            showNotification("Access Denied", "Incorrect admin password", "error");
+        }
+    }
+
+    function adminLogoutFn() {
+        document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('adminPass').value = '';
+        showNotification("Logged out", "Admin session ended");
+    }
+
+    function showAdminSection(section) {
+        document.querySelectorAll('.admin-section').forEach(s => {
+            s.classList.remove('active');
+        });
+        
+        const sectionMap = {
+            'materials': 'materialsSection',
+            'uploads': 'uploadsSection',
+            'jsonUpload': 'jsonUploadSection',
+            'payments': 'paymentsSection'
+        };
+        
+        const targetSection = document.getElementById(sectionMap[section]);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
+        
+        if (section === 'materials') loadAdminMaterials();
+        if (section === 'uploads') loadPendingUploads();
+        if (section === 'payments') loadPendingPayments();
+    }
+
+    function loadAdminMaterials() {
+        documentsRef.once('value').then(snap => {
+            const container = document.getElementById('adminMaterialsList');
+            if (!container) return;
+            
+            if (!snap.val()) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">No materials in database.</p>';
+                return;
+            }
+            
+            adminDocumentsCache = {};
+            const entries = Object.entries(snap.val());
+            
+            entries.forEach(([key, value]) => {
+                adminDocumentsCache[key] = value;
+            });
+            
+            document.getElementById('adminTotalDocs').innerText = entries.length;
+            
+            container.innerHTML = entries.map(([id, doc]) => `
+                <div class="admin-list-item">
+                    <div style="flex: 1; min-width: 200px;">
+                        <strong>${escapeHtml(doc.Title)}</strong><br>
+                        <small style="color: #64748b;">
+                            ${escapeHtml(doc["Unit Code"] || 'N/A')} | 
+                            ${escapeHtml(doc.University || 'N/A')} | 
+                            Year ${escapeHtml(doc.Year || 'N/A')}
+                        </small>
+                    </div>
+                    <div class="btn-group">
+                        <button class="approve-btn" onclick="viewMaterialAdmin('${id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="delete-btn" onclick="deleteMaterialAdmin('${id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+
+    function viewMaterialAdmin(docId) {
+        const doc = adminDocumentsCache[docId];
+        if (doc && doc.URL) {
+            openDocument(doc.URL, doc.Title);
+        } else {
+            showNotification("Error", "Document URL not available", "error");
+        }
+    }
+
+    function deleteMaterialAdmin(docId) {
+        if (!confirm('Are you sure you want to delete this material? This action cannot be undone.')) {
+            return;
+        }
+        
+        documentsRef.child(docId).remove()
+            .then(() => {
+                showNotification("Deleted", "Material has been deleted successfully");
+                loadDocuments();
+                loadAdminMaterials();
+                renderUniversityFilters();
+                filterAndRenderMaterials();
+            })
+            .catch(err => {
+                showNotification("Error", "Failed to delete material. Please try again.", "error");
+                console.error("Delete error:", err);
+            });
+    }
+
+    function addMaterialAdmin() {
+        const title = prompt("Enter document title:");
+        if (!title) return;
+        
+        const unitCode = prompt("Enter unit code (e.g., AGRO222):");
+        if (!unitCode) return;
+        
+        const university = prompt("Enter university:", ALL_INSTITUTIONS[0]);
+        if (!university) return;
+        
+        const subject = prompt("Enter subject:");
+        if (!subject) return;
+        
+        const year = prompt("Enter year:", "2");
+        if (!year) return;
+        
+        const description = prompt("Enter description:");
+        const url = prompt("Enter Google Drive preview URL:");
+        if (!url) return;
+        
+        if (!url.includes('/preview') && !url.includes('/view')) {
+            showNotification("Error", "URL must be a Google Drive preview link", "error");
+            return;
+        }
+        
+        const newDoc = {
+            Title: title,
+            "Unit Code": unitCode,
+            University: university,
+            Subject: subject,
+            Year: year,
+            Description: description || '',
+            URL: url
+        };
+        
+        documentsRef.push(newDoc)
+            .then(() => {
+                showNotification("Added", "Material added successfully");
+                loadDocuments();
+                loadAdminMaterials();
+                renderUniversityFilters();
+                filterAndRenderMaterials();
+            })
+            .catch(err => {
+                showNotification("Error", "Failed to add material", "error");
+                console.error("Add material error:", err);
+            });
+    }
+
+    function loadPendingUploads() {
+        userUploadsRef.once('value').then(snap => {
+            const container = document.getElementById('pendingUploadsList');
+            if (!container) return;
+            
+            if (!snap.val()) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">No pending uploads.</p>';
+                return;
+            }
+            
+            const uploads = Object.entries(snap.val()).filter(([id, up]) => up.status === 'pending');
+            
+            if (uploads.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">No pending uploads.</p>';
+                return;
+            }
+            
+            container.innerHTML = uploads.map(([id, up]) => `
+                <div class="admin-list-item">
+                    <div style="flex: 1; min-width: 200px;">
+                        <strong>${escapeHtml(up.title)}</strong><br>
+                        <small style="color: #64748b;">
+                            ${escapeHtml(up.unitCode)} | ${escapeHtml(up.university)}<br>
+                            Uploaded by: ${escapeHtml(up.uploader)}<br>
+                            ${escapeHtml(up.description || '')}
+                        </small>
+                    </div>
+                    <div class="btn-group">
+                        <button class="approve-btn" onclick="approveUpload('${id}')">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="delete-btn" onclick="rejectUpload('${id}')">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+
+    function approveUpload(uploadId) {
+        userUploadsRef.child(uploadId).once('value').then(snap => {
+            const up = snap.val();
+            if (!up) return;
+            
+            const newDoc = {
+                Title: up.title,
+                "Unit Code": up.unitCode,
+                University: up.university,
+                Subject: up.subject,
+                Year: up.year,
+                URL: up.url,
+                Description: up.description || ''
+            };
+            
+            documentsRef.push(newDoc)
+                .then(() => {
+                    userUploadsRef.child(uploadId).remove();
+                    loadDocuments();
+                    loadPendingUploads();
+                    loadAdminMaterials();
+                    showNotification("Approved", "Material added to library");
+                    
+                    if (up.userId) {
+                        usersRef.child(up.userId).once('value').then(userSnap => {
+                            const user = userSnap.val();
+                            if (user && user.email) {
+                                sendBrowserNotification("Material Approved", 
+                                    `Your upload "${up.title}" has been approved and is now live!`);
+                            }
+                        });
+                    }
+                });
+        });
+    }
+
+    function rejectUpload(uploadId) {
+        if (!confirm('Are you sure you want to reject this upload?')) return;
+        
+        userUploadsRef.child(uploadId).once('value').then(snap => {
+            const up = snap.val();
+            
+            userUploadsRef.child(uploadId).remove();
+            loadPendingUploads();
+            showNotification("Rejected", "Upload has been rejected");
+            
+            if (up && up.userId) {
+                usersRef.child(up.userId).once('value').then(userSnap => {
+                    const user = userSnap.val();
+                    if (user && user.email) {
+                        sendBrowserNotification("Material Rejected", 
+                            `Your upload "${up.title}" was not approved. Please check guidelines.`);
+                    }
+                });
+            }
+        });
+    }
+
+    function loadPendingPayments() {
+        const container = document.getElementById('pendingPaymentsList');
+        if (!container) return;
+        
+        paymentVerificationsRef.once('value').then(snap => {
+            const verifications = snap.val();
+            
+            if (!verifications) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">No payment verifications yet.</p>';
+                return;
+            }
+            
+            const entries = Object.entries(verifications)
+                .filter(([id, v]) => v.status === 'pending')
+                .sort((a, b) => new Date(b[1].timestamp) - new Date(a[1].timestamp));
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">No pending verifications.</p>';
+                return;
+            }
+            
+            container.innerHTML = entries.map(([id, v]) => `
+                <div class="admin-list-item">
+                    <div style="flex: 1; min-width: 200px;">
+                        <strong>${escapeHtml(v.transactionCode)}</strong><br>
+                        <small style="color: #64748b;">
+                            User: ${escapeHtml(v.userName)} (${escapeHtml(v.userEmail)})<br>
+                            Plan: ${escapeHtml(v.planName)} | Ksh ${v.amount}<br>
+                            Date: ${formatDate(v.timestamp)}
+                        </small>
+                    </div>
+                    <div class="btn-group">
+                        <button class="approve-btn" onclick="approvePayment('${id}')">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="delete-btn" onclick="rejectPayment('${id}')">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+
+    function approvePayment(verificationId) {
+        if (!confirm('Approve this payment and activate subscription?')) return;
+        
+        paymentVerificationsRef.child(verificationId).once('value').then(snap => {
+            const v = snap.val();
+            if (!v) return;
+            
+            const userId = v.userId;
+            const planName = v.planName;
+            const durationDays = planName.includes('2') ? 60 : 120;
+            const endDate = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+            
+            usersRef.child(userId).update({
+                'subscription/active': true,
+                'subscription/endDate': endDate,
+                'subscription/plan': planName
+            }).then(() => {
+                paymentVerificationsRef.child(verificationId).update({
+                    status: 'approved',
+                    processedDate: new Date().toISOString()
+                });
+                
+                if (currentUser && currentUser.id === userId) {
+                    currentUser.subscription.active = true;
+                    currentUser.subscription.endDate = endDate;
+                    currentUser.subscription.plan = planName;
+                    localStorage.setItem('revision_user', JSON.stringify(currentUser));
+                    updateAccountUI();
+                    filterAndRenderMaterials();
+                }
+                
+                showNotification("Approved", `Subscription activated for ${v.userName}`);
+                loadPendingPayments();
+                loadUserVerifications();
+                
+                sendBrowserNotification("Subscription Activated", 
+                    `Your ${planName} access is now active until ${formatDate(endDate)}.`);
+            }).catch(err => {
+                showNotification("Error", "Approval failed", "error");
+                console.error("Approval error:", err);
+            });
+        });
+    }
+
+    function rejectPayment(verificationId) {
+        if (!confirm('Reject this payment verification?')) return;
+        
+        paymentVerificationsRef.child(verificationId).update({
+            status: 'rejected',
+            processedDate: new Date().toISOString()
+        }).then(() => {
+            showNotification("Rejected", "Transaction code rejected");
+            loadPendingPayments();
+            loadUserVerifications();
+        });
+    }
+
+    // ==================== JSON BULK UPLOAD ====================
+    function copyJSONTemplate() {
+        const template = JSON.stringify([{
+            "Title": "Plant Breeding Notes",
+            "Unit Code": "AGRO222",
+            "University": "Egerton University",
+            "Subject": "Agronomy",
+            "Year": "2",
+            "Description": "Complete lecture notes on plant breeding",
+            "URL": "https://drive.google.com/file/d/.../preview"
+        }], null, 2);
+        
+        navigator.clipboard.writeText(template).then(() => {
+            showNotification("Copied", "JSON template copied to clipboard");
+        }).catch(() => {
+            showNotification("Error", "Failed to copy template", "error");
+        });
+    }
+
+    function handleJSONFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        if (!file.name.endsWith('.json')) {
+            showNotification("Error", "Please select a JSON file", "error");
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                if (!Array.isArray(data)) {
+                    throw new Error("JSON must be an array");
+                }
+                
+                if (data.length === 0) {
+                    throw new Error("JSON array is empty");
+                }
+                
+                data.forEach((item, index) => {
+                    if (!item.Title || !item["Unit Code"] || !item.University || !item.URL) {
+                        throw new Error(`Item ${index + 1} is missing required fields (Title, Unit Code, University, URL)`);
+                    }
+                    if (!item.URL.includes('/preview') && !item.URL.includes('/view')) {
+                        throw new Error(`Item ${index + 1} URL must be a Google Drive preview link`);
+                    }
+                });
+                
+                pendingJSON = data;
+                
+                const infoDiv = document.getElementById('jsonFileInfo');
+                infoDiv.style.display = 'block';
+                infoDiv.innerHTML = `
+                    <strong><i class="fas fa-check-circle" style="color: #10b981;"></i> File loaded successfully!</strong><br>
+                    <strong>File:</strong> ${file.name}<br>
+                    <strong>Documents:</strong> ${data.length}<br>
+                    <button class="delete-btn" style="margin-top: 8px;" onclick="clearJSONFile()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                `;
+                
+                document.getElementById('uploadJSONBtn').disabled = false;
+                showJSONPreview(data);
+                
+            } catch (err) {
+                showNotification("Error", err.message, "error");
+                clearJSONFile();
+            }
+        };
+        
+        reader.readAsText(file);
+    }
+
+    function clearJSONFile() {
+        pendingJSON = null;
+        document.getElementById('jsonFileInput').value = '';
+        document.getElementById('jsonFileInfo').style.display = 'none';
+        document.getElementById('uploadJSONBtn').disabled = true;
+        document.getElementById('jsonPreviewSection').style.display = 'none';
+    }
+
+    function showJSONPreview(data) {
+        const previewSection = document.getElementById('jsonPreviewSection');
+        const previewDiv = document.getElementById('jsonPreview');
+        const statsDiv = document.getElementById('jsonStats');
+        
+        previewSection.style.display = 'block';
+        
+        const universities = new Set(data.map(d => d.University));
+        const unitCodes = new Set(data.map(d => d["Unit Code"]));
+        
+        statsDiv.innerHTML = `
+            <div class="json-stats-grid">
+                <div class="json-stat-item">
+                    <strong>${data.length}</strong><br>
+                    <small>Documents</small>
+                </div>
+                <div class="json-stat-item">
+                    <strong>${universities.size}</strong><br>
+                    <small>Universities</small>
+                </div>
+                <div class="json-stat-item">
+                    <strong>${unitCodes.size}</strong><br>
+                    <small>Unit Codes</small>
+                </div>
+                <div class="json-stat-item">
+                    <strong>${data.filter(d => d.URL.includes('preview') || d.URL.includes('view')).length}</strong><br>
+                    <small>Valid URLs</small>
+                </div>
+            </div>
+        `;
+        
+        previewDiv.innerHTML = '<h5 style="margin-bottom: 10px;">Preview (first 3 items):</h5>' +
+            data.slice(0, 3).map((item, i) => `
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 8px;">
+                    <strong>${i + 1}. ${escapeHtml(item.Title)}</strong><br>
+                    <small>${escapeHtml(item["Unit Code"])} | ${escapeHtml(item.University)} | Year ${escapeHtml(item.Year || 'N/A')}</small>
+                </div>
+            `).join('');
+        
+        if (data.length > 3) {
+            previewDiv.innerHTML += `<p style="color: #64748b; font-size: 13px;">... and ${data.length - 3} more documents</p>`;
+        }
+    }
+
+    async function uploadJSONDocuments() {
+        if (!pendingJSON || pendingJSON.length === 0) {
+            showNotification("Error", "No JSON data to upload", "error");
+            return;
+        }
+        
+        const uploadBtn = document.getElementById('uploadJSONBtn');
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<span class="payment-loading"></span> Uploading...';
+        
+        try {
+            const promises = pendingJSON.map(doc => {
+                const formattedDoc = {
+                    Title: doc.Title,
+                    "Unit Code": doc["Unit Code"],
+                    University: doc.University,
+                    Subject: doc.Subject || '',
+                    Year: doc.Year || '',
+                    Description: doc.Description || '',
+                    URL: doc.URL
+                };
+                return documentsRef.push(formattedDoc);
+            });
+            
+            await Promise.all(promises);
+            
+            showNotification("Success", `${pendingJSON.length} documents uploaded successfully!`);
+            clearJSONFile();
+            loadDocuments();
+            loadAdminMaterials();
+            renderUniversityFilters();
+            filterAndRenderMaterials();
+            updateStats();
+            
+        } catch (err) {
+            showNotification("Error", "Upload failed: " + err.message, "error");
+            console.error("JSON upload error:", err);
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload & Process JSON';
+        }
+    }
+
+    // ==================== SETTINGS & UI ====================
+    function togglePushNotifications(enabled) {
+        if (enabled && Notification.permission !== "granted") {
+            Notification.requestPermission().then(perm => {
+                if (perm !== "granted") {
+                    document.getElementById('pushToggle').checked = false;
+                }
+            });
+        }
+        localStorage.setItem('pushEnabled', enabled);
+        showNotification("Push Notifications", enabled ? "Enabled" : "Disabled");
+    }
+
+    function clearAppCache() {
+        if (confirm('Clear all cached data? You will need to login again.')) {
+            localStorage.clear();
+            showNotification("Cache Cleared", "App data cleared. Reloading...");
+            setTimeout(() => location.reload(), 1500);
+        }
+    }
+
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+        localStorage.setItem('appTheme', theme);
+    }
+
+    function rateApp() {
+        showNotification("Rate App", "Thank you! Please rate us on Google Play Store ⭐");
+    }
+
+    function shareApp() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'RevisionVault Pro',
+                text: 'Check out RevisionVault Pro - Your complete study hub for Kenyan students!',
+                url: window.location.href
+            }).catch(() => {});
+        } else {
+            const dummy = document.createElement('textarea');
+            dummy.value = 'Check out RevisionVault Pro - Your complete study hub for Kenyan students! ' + window.location.href;
+            document.body.appendChild(dummy);
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            showNotification("Link Copied", "Share link copied to clipboard!");
+        }
+    }
+
+    function showAboutModal() {
+        document.getElementById('aboutModal').style.display = 'flex';
+    }
+
+    function showContactModal() {
+        document.getElementById('contactModal').style.display = 'flex';
+    }
+
+    function showDeleteInstructions() {
+        document.getElementById('deleteInstructionsModal').style.display = 'flex';
+    }
+
+    function showFAQModal() {
+        document.getElementById('faqModal').style.display = 'flex';
+    }
+
+    function closeModalById(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function showLoginModal() {
+        document.getElementById('loginModal').style.display = 'flex';
+        document.getElementById('signupModal').style.display = 'none';
+    }
+
+    function showSignupModal() {
+        document.getElementById('signupModal').style.display = 'flex';
+        document.getElementById('loginModal').style.display = 'none';
+    }
+
+    function closeAuthModals() {
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('signupModal').style.display = 'none';
+    }
+
+    function toggleAuthModal(type) {
+        if (type === 'login') showLoginModal();
+        else showSignupModal();
+    }
+
+    function showTermsModal() {
+        document.getElementById('termsModal').style.display = 'flex';
+    }
+
+    function closeTermsModal() {
+        document.getElementById('termsModal').style.display = 'none';
+    }
+
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        
+        const targetTab = document.getElementById(tabId);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+        
+        const tabNavMap = {
+            'home': 0,
+            'subscribe': 1,
+            'account': 2,
+            'admin': 3,
+            'settings': 4
+        };
+        
+        document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+            btn.classList.remove('active');
+            if (tabNavMap[tabId] === i) {
+                btn.classList.add('active');
+            }
+        });
+        
+        if (tabId === 'account') updateAccountUI();
+        if (tabId === 'subscribe') loadUserVerifications();
+        
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) mainContent.scrollTop = 0;
+    }
+
+    function checkExistingSession() {
+        const saved = localStorage.getItem('revision_user');
+        if (saved) {
+            try {
+                currentUser = JSON.parse(saved);
+                
+                if (currentUser.subscription && 
+                    currentUser.subscription.endDate && 
+                    new Date(currentUser.subscription.endDate) < new Date()) {
+                    currentUser.subscription.active = false;
+                }
+                
+                document.getElementById('userNameDisplay').innerText = 
+                    currentUser.name ? currentUser.name.split(' ')[0] : 'User';
+                
+                filterAndRenderMaterials();
+                updateAccountUI();
+                loadUserVerifications();
+                requestNotificationPermission();
+            } catch (e) {
+                console.error("Session restore error:", e);
+                localStorage.removeItem('revision_user');
+                showSignupModal();
+            }
+        } else {
+            showSignupModal();
+        }
+    }
+
+    // ==================== INITIALIZATION ====================
+    function init() {
+        const savedTheme = localStorage.getItem('appTheme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            const themeSelect = document.getElementById('themeSelect');
+            if (themeSelect) themeSelect.value = 'dark';
+        }
+        
+        const pushPref = localStorage.getItem('pushEnabled');
+        const pushToggle = document.getElementById('pushToggle');
+        if (pushPref === 'true' && pushToggle) {
+            pushToggle.checked = true;
+        }
+        
+        loadDocuments();
+        checkExistingSession();
+        
+        const searchInput = document.getElementById('globalSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', searchByUnitCode);
+        }
+        
+        setInterval(() => {
+            if (currentUser && 
+                currentUser.subscription && 
+                currentUser.subscription.endDate) {
+                
+                const expiryDate = new Date(currentUser.subscription.endDate);
+                const now = new Date();
+                const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+                
+                if (daysLeft <= 3 && daysLeft > 0) {
+                    const reminderKey = 'reminder_sent_' + currentUser.id;
+                    if (!localStorage.getItem(reminderKey)) {
+                        sendBrowserNotification(
+                            "Subscription Expiring Soon",
+                            `Your access expires in ${daysLeft} day(s). Renew now to continue studying!`
+                        );
+                        localStorage.setItem(reminderKey, 'true');
+                    }
+                }
+                
+                if (expiryDate < now && currentUser.subscription.active) {
+                    currentUser.subscription.active = false;
+                    localStorage.setItem('revision_user', JSON.stringify(currentUser));
+                    usersRef.child(currentUser.id).update({
+                        'subscription/active': false
+                    });
+                    filterAndRenderMaterials();
+                    updateAccountUI();
+                }
+            }
+        }, 3600000);
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeAuthModals();
+                closeTermsModal();
+                closeUploadModal();
+                closeRequestModal();
+                
+                ['aboutModal', 'contactModal', 'deleteInstructionsModal', 'faqModal'].forEach(id => {
+                    const modal = document.getElementById(id);
+                    if (modal) modal.style.display = 'none';
+                });
+            }
+        });
+        
+        document.querySelectorAll('.settings-modal-overlay, .terms-overlay, .login-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+        
+        console.log('RevisionVault Pro initialized successfully');
+    }
+
+    // ==================== EXPORT GLOBAL FUNCTIONS ====================
+    window.filterByUniversity = filterByUniversity;
+    window.filterMaterialsByUniversity = filterMaterialsByUniversity;
+    window.openDocument = openDocument;
+    window.showTab = showTab;
+    window.closeModal = closeModal;
+    window.closeUploadModal = closeUploadModal;
+    window.openUploadForm = openUploadForm;
+    window.submitUpload = submitUpload;
+    window.adminLoginFn = adminLoginFn;
+    window.adminLogoutFn = adminLogoutFn;
+    window.deleteMaterialAdmin = deleteMaterialAdmin;
+    window.addMaterialAdmin = addMaterialAdmin;
+    window.viewMaterialAdmin = viewMaterialAdmin;
+    window.openRequestForm = openRequestForm;
+    window.closeRequestModal = closeRequestModal;
+    window.submitRequest = submitRequest;
+    window.openRequestFormForCurrent = openRequestFormForCurrent;
+    window.editAccountField = editAccountField;
+    window.logoutUser = logoutUser;
+    window.rateApp = rateApp;
+    window.shareApp = shareApp;
+    window.approveUpload = approveUpload;
+    window.rejectUpload = rejectUpload;
+    window.showLoginModal = showLoginModal;
+    window.showSignupModal = showSignupModal;
+    window.closeAuthModals = closeAuthModals;
+    window.toggleAuthModal = toggleAuthModal;
+    window.showTermsModal = showTermsModal;
+    window.closeTermsModal = closeTermsModal;
+    window.loginUser = loginUser;
+    window.registerUser = registerUser;
+    window.forgotPassword = forgotPassword;
+    window.togglePushNotifications = togglePushNotifications;
+    window.clearAppCache = clearAppCache;
+    window.setTheme = setTheme;
+    window.showAboutModal = showAboutModal;
+    window.showContactModal = showContactModal;
+    window.showDeleteInstructions = showDeleteInstructions;
+    window.showFAQModal = showFAQModal;
+    window.closeModalById = closeModalById;
+    window.showAdminSection = showAdminSection;
+    window.handleJSONFileSelect = handleJSONFileSelect;
+    window.uploadJSONDocuments = uploadJSONDocuments;
+    window.copyJSONTemplate = copyJSONTemplate;
+    window.clearJSONFile = clearJSONFile;
+    window.submitTransactionCode = submitTransactionCode;
+    window.approvePayment = approvePayment;
+    window.rejectPayment = rejectPayment;
+    window.loadPendingPayments = loadPendingPayments;
+
+    document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
