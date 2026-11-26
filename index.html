@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RevisionVault Pro – Complete Study Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
-
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
         :root { --primary: #1a2980; --secondary: #26d0ce; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --light: #f8fafc; --dark: #1e293b; --radius: 16px; }
@@ -22,7 +22,7 @@
         body.dark-mode .university-chip { background: #334155; color: #e2e8f0; }
         body.dark-mode .university-chip.active { background: var(--secondary); color: #0f172a; }
         body.dark-mode .email-input, body.dark-mode .filter-select { background: #334155; color: white; border-color: #475569; }
-
+        
         .onboarding-overlay, .login-overlay, .terms-overlay, .settings-modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:3000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(8px); }
         .onboarding-card, .login-card, .terms-card, .settings-modal-card { background:white; max-width:500px; width:90%; border-radius:32px; padding:30px; text-align:center; animation:fadeInUp 0.4s ease; max-height:80vh; overflow-y:auto; }
         body.dark-mode .onboarding-card, body.dark-mode .login-card, body.dark-mode .terms-card, body.dark-mode .settings-modal-card { background: #1e293b; color: #e2e8f0; }
@@ -81,9 +81,9 @@
         .modal-header button { background: rgba(255,255,255,0.15); border: none; color: white; font-size: 20px; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: 0.2s; }
         .modal-header button:hover { background: rgba(255,255,255,0.25); }
         .filter-select { padding:10px 16px; border-radius:30px; border:2px solid #e2e8f0; background:white; cursor:pointer; font-weight:500; min-width:220px; }
-        @media (max-width:1000px) {
-            .main-layout { grid-template-columns:1fr; }
-            .sidebar-left, .sidebar-right { display:none; }
+        @media (max-width:1000px) { 
+            .main-layout { grid-template-columns:1fr; } 
+            .sidebar-left, .sidebar-right { display:none; } 
             .bottom-nav { min-width:90%; }
             .header-content { justify-content: center; }
         }
@@ -142,7 +142,7 @@
         .section-title { color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         body.dark-mode .section-title { color: #e2e8f0; }
 
-        /* Secure PDF viewer */
+        /* Secure PDF viewer – no pop-out possible */
         .pdf-viewer-wrapper { position:absolute; top:55px; left:0; right:0; bottom:0; }
         .pdf-viewer-frame { width:100%; height:100%; border:none; display:block; }
     </style>
@@ -163,7 +163,7 @@
             <input type="text" id="globalSearchInput" class="search-box" placeholder="Search by Unit Code e.g., AGRO222">
         </div>
         <div id="userInfoDiv" class="user-info" onclick="if(!currentUser) showSignupModal(); else showTab('account');">
-            <i class="fas fa-user"></i>
+            <i class="fas fa-user"></i> 
             <span id="userNameDisplay">Guest</span>
         </div>
     </div>
@@ -260,21 +260,21 @@
                 <h1 class="section-title"><i class="fas fa-user-circle"></i> My Account</h1>
                 <div id="accountDetailsContainer" class="account-card">
                     <div class="account-info-row">
-                        <strong><i class="fas fa-user"></i> Name:</strong>
-                        <span id="accName">-</span>
+                        <strong><i class="fas fa-user"></i> Name:</strong> 
+                        <span id="accName">-</span> 
                         <i class="fas fa-edit edit-icon" onclick="editAccountField('name')" title="Edit Name"></i>
                     </div>
                     <div class="account-info-row">
-                        <strong><i class="fas fa-envelope"></i> Email:</strong>
+                        <strong><i class="fas fa-envelope"></i> Email:</strong> 
                         <span id="accEmail">-</span>
                     </div>
                     <div class="account-info-row">
-                        <strong><i class="fas fa-phone"></i> Phone:</strong>
-                        <span id="accPhone">-</span>
+                        <strong><i class="fas fa-phone"></i> Phone:</strong> 
+                        <span id="accPhone">-</span> 
                         <i class="fas fa-edit edit-icon" onclick="editAccountField('phone')" title="Edit Phone"></i>
                     </div>
                     <div class="account-info-row">
-                        <strong><i class="fas fa-calendar"></i> Member since:</strong>
+                        <strong><i class="fas fa-calendar"></i> Member since:</strong> 
                         <span id="accRegDate">-</span>
                     </div>
                 </div>
@@ -315,17 +315,14 @@
                         <button class="action-btn" onclick="showAdminSection('payments')" style="background: #f59e0b;">
                             <i class="fas fa-money-bill-wave"></i> Payment Verifications
                         </button>
-                        <button class="action-btn" onclick="showAdminSection('backup')" style="background: #0f766e;">
-                            <i class="fas fa-save"></i> Save Backup
-                        </button>
                         <button class="action-btn" onclick="adminLogoutFn()" style="background:#ef4444;">
                             <i class="fas fa-sign-out-alt"></i> Logout
                         </button>
                     </div>
-
+                    
                     <div id="materialsSection" class="admin-section active">
                         <h3 style="color: var(--primary); margin-bottom: 15px;">
-                            <i class="fas fa-list"></i> Manage Study Materials
+                            <i class="fas fa-list"></i> Manage Study Materials 
                             <span style="font-size: 14px; color: #64748b;">(Total: <span id="adminTotalDocs">0</span>)</span>
                         </h3>
                         <button class="action-btn" onclick="addMaterialAdmin()" style="background:#10b981; width: auto; padding: 10px 20px; margin-bottom: 15px;">
@@ -335,7 +332,7 @@
                             <p style="text-align: center; color: #64748b;">Loading materials...</p>
                         </div>
                     </div>
-
+                    
                     <div id="uploadsSection" class="admin-section">
                         <h3 style="color: var(--primary); margin-bottom: 15px;">
                             <i class="fas fa-clock"></i> Pending User Uploads
@@ -344,7 +341,7 @@
                             <p style="text-align: center; color: #64748b;">Loading uploads...</p>
                         </div>
                     </div>
-
+                    
                     <div id="jsonUploadSection" class="admin-section">
                         <h3 style="color: var(--primary); margin-bottom: 15px;">
                             <i class="fas fa-file-code"></i> JSON Bulk Upload
@@ -375,42 +372,13 @@
                             <div id="jsonStats"></div>
                         </div>
                     </div>
-
+                    
                     <div id="paymentsSection" class="admin-section">
                         <h3 style="color: var(--primary); margin-bottom: 15px;">
                             <i class="fas fa-money-check-alt"></i> Payment Verifications
                         </h3>
                         <div id="pendingPaymentsList" class="admin-list">
                             <p style="text-align: center; color: #64748b;">Loading verifications...</p>
-                        </div>
-                    </div>
-
-                    <!-- NEW: BACKUP SECTION (ADMIN ONLY) -->
-                    <div id="backupSection" class="admin-section">
-                        <h3 style="color: var(--primary); margin-bottom: 15px;">
-                            <i class="fas fa-database"></i> Backup Documents to Device
-                        </h3>
-
-                        <div style="background:#ecfdf5; border-radius:12px; padding:18px; margin-bottom:20px; border: 2px solid #a7f3d0;">
-                            <p style="margin-bottom: 12px;">
-                                <i class="fas fa-info-circle" style="color: #059669;"></i>
-                                Export all <strong><span id="backupDocCount">0</span></strong> documents as a JSON file
-                                saved directly to this device's storage (Downloads / Files app).
-                            </p>
-                            <div class="btn-group">
-                                <button class="action-btn" style="width:auto; padding:10px 20px; background:#0f766e;" onclick="saveBackupToDevice(false)">
-                                    <i class="fas fa-download"></i> Save Backup to Phone
-                                </button>
-                                <button class="action-btn" style="width:auto; padding:10px 20px; background:#3b82f6;" onclick="saveBackupToDevice(true)">
-                                    <i class="fas fa-file-csv"></i> Save as CSV
-                                </button>
-                            </div>
-                            <div id="backupStatus" style="margin-top:12px; font-size:13px; color:#475569;"></div>
-                        </div>
-
-                        <h4 style="color: var(--primary); margin-bottom:10px;"><i class="fas fa-history"></i> Backup History (this device)</h4>
-                        <div id="backupHistoryList" class="admin-list">
-                            <p style="text-align:center; color:#64748b;">No backups yet.</p>
                         </div>
                     </div>
                 </div>
@@ -543,9 +511,9 @@
         </aside>
     </div>
     <div class="footer-credit">
-        <i class="fas fa-crown" style="color: #f59e0b;"></i>
-        RevisionVault Pro — Developed by <strong>W.Z.Aziavula</strong> |
-        📧 wzauko@gmail.com |
+        <i class="fas fa-crown" style="color: #f59e0b;"></i> 
+        RevisionVault Pro — Developed by <strong>W.Z.Aziavula</strong> | 
+        📧 wzauko@gmail.com | 
         📅 Copyright © 2026. Empowering Kenyan Students.
     </div>
 </div>
@@ -661,8 +629,8 @@
         <button onclick="closeModal()" title="Close Viewer">✖</button>
     </div>
     <div class="pdf-viewer-wrapper">
-        <iframe id="pdfFrame" class="pdf-viewer-frame"
-                sandbox="allow-scripts allow-same-origin"
+        <iframe id="pdfFrame" class="pdf-viewer-frame" 
+                sandbox="allow-scripts allow-same-origin" 
                 allow="fullscreen"
                 loading="lazy"></iframe>
     </div>
@@ -718,17 +686,17 @@
 </div>
 
 <script>
-    // ==================== FIREBASE CONFIGURATION (from New Text Document (3).txt) ====================
+    // ==================== FIREBASE CONFIGURATION ====================
     const firebaseConfig = {
-        apiKey: "AIzaSyCZEI7JrgvhhRFf7KmD7-uiFL5VqfKOeQ0",
-        authDomain: "cramio-51e4d.firebaseapp.com",
-        databaseURL: "https://cramio-51e4d-default-rtdb.firebaseio.com",
-        projectId: "cramio-51e4d",
-        storageBucket: "cramio-51e4d.firebasestorage.app",
-        messagingSenderId: "705953177891",
-        appId: "1:705953177891:android:a174369d0e68dd9bb82c96"
+        apiKey: "AIzaSyDX8T_hYJvyUq4QSAZTtCDAk_NlqZ8NVxE",
+        authDomain: "revisionvault-pro-83002.firebaseapp.com",
+        databaseURL: "https://revisionvault-pro-83002-default-rtdb.firebaseio.com",
+        projectId: "revisionvault-pro-83002",
+        storageBucket: "revisionvault-pro-83002.firebasestorage.app",
+        messagingSenderId: "669675132541",
+        appId: "1:669675132541:web:706cf06dc79eb5f36fc314"
     };
-
+    
     const fbApp = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
     const documentsRef = database.ref('documents');
@@ -785,7 +753,6 @@
     let currentSearchQuery = "";
     let pendingJSON = null;
     let adminDocumentsCache = {};
-    let isAdminSession = false;   // <-- admin gate for backups
 
     const INITIAL_DOCS = [
         {
@@ -894,24 +861,18 @@
         });
     }
 
-    function formatBytes(bytes) {
-        if (!bytes || bytes < 1024) return (bytes || 0) + ' B';
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-    }
-
     // ==================== DOCUMENT VIEWER ====================
     function openDocument(url, title) {
-        if (!currentUser ||
-            !currentUser.subscription ||
-            !currentUser.subscription.active ||
-            !currentUser.subscription.endDate ||
+        if (!currentUser || 
+            !currentUser.subscription || 
+            !currentUser.subscription.active || 
+            !currentUser.subscription.endDate || 
             new Date(currentUser.subscription.endDate) <= new Date()) {
             showNotification("Access Denied", "Please subscribe to view documents", "error");
             showTab('subscribe');
             return;
         }
-
+        
         if (!url) {
             showNotification("Error", "No document URL available", "error");
             return;
@@ -979,50 +940,50 @@
         const unisWithMaterials = new Set(allDocuments.map(d => d.University));
         const chipsDiv = document.getElementById('universityChipsList');
         const mainFilter = document.getElementById('universityFilterMain');
-
+        
         if (chipsDiv) {
-            const allChip = `<div class="university-chip ${selectedUniversityFilter === 'all' ? 'active' : ''}"
+            const allChip = `<div class="university-chip ${selectedUniversityFilter === 'all' ? 'active' : ''}" 
                                 onclick="filterByUniversity('all')">
                                 🌍 All Institutions
                             </div>`;
             const uniChips = ALL_INSTITUTIONS.map(u => {
                 const hasMaterial = unisWithMaterials.has(u);
-                return `<div class="university-chip ${selectedUniversityFilter === u ? 'active' : ''}"
+                return `<div class="university-chip ${selectedUniversityFilter === u ? 'active' : ''}" 
                             onclick="filterByUniversity('${u.replace(/'/g, "\\'")}')">
                             ${u} ${hasMaterial ? '✅' : '📌'}
                         </div>`;
             }).join('');
             chipsDiv.innerHTML = allChip + uniChips;
         }
-
+        
         if (mainFilter) {
             mainFilter.innerHTML = '<option value="all">📖 All Institutions</option>' +
                 ALL_INSTITUTIONS.map(u => `<option value="${u}" ${selectedUniversityFilter === u ? 'selected' : ''}>${u}</option>`).join('');
         }
-
+        
         const uniSelect = document.getElementById('uploadUniversity');
         if (uniSelect) {
             uniSelect.innerHTML = ALL_INSTITUTIONS.map(u => `<option value="${u}">${u}</option>`).join('');
         }
-
+        
         const reqUniSelect = document.getElementById('requestUniversity');
         if (reqUniSelect) {
             reqUniSelect.innerHTML = ALL_INSTITUTIONS.map(u => `<option value="${u}">${u}</option>`).join('');
         }
-
+        
         const searchBox = document.getElementById('uniSearchBox');
         if (searchBox) {
             searchBox.oninput = function() {
                 const q = this.value.toLowerCase();
                 const filtered = ALL_INSTITUTIONS.filter(u => u.toLowerCase().includes(q));
                 if (chipsDiv) {
-                    chipsDiv.innerHTML = `<div class="university-chip ${selectedUniversityFilter === 'all' ? 'active' : ''}"
+                    chipsDiv.innerHTML = `<div class="university-chip ${selectedUniversityFilter === 'all' ? 'active' : ''}" 
                                             onclick="filterByUniversity('all')">
                                             🌍 All Institutions
                                         </div>` +
                         filtered.map(u => {
                             const hasMaterial = unisWithMaterials.has(u);
-                            return `<div class="university-chip ${selectedUniversityFilter === u ? 'active' : ''}"
+                            return `<div class="university-chip ${selectedUniversityFilter === u ? 'active' : ''}" 
                                         onclick="filterByUniversity('${u.replace(/'/g, "\\'")}')">
                                         ${u} ${hasMaterial ? '✅' : '📌'}
                                     </div>`;
@@ -1058,34 +1019,34 @@
 
     function filterAndRenderMaterials() {
         let filtered = [...allDocuments];
-
+        
         if (selectedUniversityFilter !== "all") {
             filtered = filtered.filter(d => d.University === selectedUniversityFilter);
         }
-
+        
         if (currentSearchQuery) {
             filtered = filtered.filter(d =>
                 (d["Unit Code"] && d["Unit Code"].toUpperCase().includes(currentSearchQuery)) ||
                 (d.Title && d.Title.toUpperCase().includes(currentSearchQuery))
             );
         }
-
-        const hasActiveSub = currentUser &&
-                            currentUser.subscription &&
-                            currentUser.subscription.active &&
-                            currentUser.subscription.endDate &&
+        
+        const hasActiveSub = currentUser && 
+                            currentUser.subscription && 
+                            currentUser.subscription.active && 
+                            currentUser.subscription.endDate && 
                             new Date(currentUser.subscription.endDate) > new Date();
-
+        
         const grid = document.getElementById('materialsGrid');
         const searchInfo = document.getElementById('searchResultsInfo');
-
+        
         if (currentSearchQuery) {
             searchInfo.style.display = 'block';
             searchInfo.innerHTML = `<i class="fas fa-search"></i> Results for "<strong>${escapeHtml(currentSearchQuery)}</strong>": <strong>${filtered.length}</strong> material(s) found.`;
         } else {
             searchInfo.style.display = 'none';
         }
-
+        
         if (filtered.length === 0) {
             grid.innerHTML = `
                 <div class="empty-state">
@@ -1097,7 +1058,7 @@
                 </div>`;
             return;
         }
-
+        
         grid.innerHTML = filtered.map(doc => `
             <div class="material-card">
                 <div class="material-image">
@@ -1111,21 +1072,21 @@
                         <span>🏛️ ${escapeHtml(doc.University || 'N/A')}</span>
                     </div>
                     <p style="font-size:13px; color:#475569; margin-bottom:12px;">${escapeHtml(doc.Description || 'No description available')}</p>
-                    <button class="action-btn ${!hasActiveSub ? 'locked' : ''}"
+                    <button class="action-btn ${!hasActiveSub ? 'locked' : ''}" 
                             onclick="${hasActiveSub ? `openDocument('${escapeHtml(doc.URL)}','${escapeHtml(doc.Title)}')` : 'showTab(\'subscribe\')'}">
                         ${hasActiveSub ? '<i class="fas fa-eye"></i> View Document' : '<i class="fas fa-lock"></i> Subscribe to Unlock'}
                     </button>
                 </div>
             </div>
         `).join('');
-
+        
         const bannerDiv = document.getElementById('accessBanner');
         if (hasActiveSub && currentUser.subscription.endDate) {
             const expiry = formatDate(currentUser.subscription.endDate);
             const daysLeft = Math.ceil((new Date(currentUser.subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24));
             bannerDiv.innerHTML = `
                 <div>
-                    <i class="fas fa-unlock-alt"></i>
+                    <i class="fas fa-unlock-alt"></i> 
                     <strong>Access Active</strong><br>
                     Expires: ${expiry} (${daysLeft} days left)
                 </div>
@@ -1136,7 +1097,7 @@
         } else {
             bannerDiv.innerHTML = `
                 <div>
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-lock"></i> 
                     <strong>Access Locked</strong><br>
                     Subscribe to open documents
                 </div>
@@ -1153,30 +1114,30 @@
         const email = document.getElementById('signupEmail').value.trim();
         const phoneRaw = document.getElementById('signupPhone').value.trim();
         const password = document.getElementById('signupPassword').value;
-
+        
         if (!name || !email || !phoneRaw || !password) {
             showNotification("Error", "All fields are required", "error");
             return;
         }
-
+        
         if (password.length < 6) {
             showNotification("Error", "Password must be at least 6 characters", "error");
             return;
         }
-
+        
         let phone = phoneRaw.replace(/^0+/, '').replace(/^\+/, '');
         if (!phone.startsWith('254')) {
             phone = '254' + phone.replace(/^07/, '7');
         }
-
+        
         if (phone.length !== 12 || !phone.startsWith('254')) {
             showNotification("Error", "Please enter a valid Kenyan phone number (07XXXXXXXX)", "error");
             return;
         }
-
+        
         const hashedPw = sha256(password);
         const userId = Date.now().toString();
-
+        
         const newUser = {
             id: userId,
             name,
@@ -1191,16 +1152,16 @@
                 plan: null
             }
         };
-
+        
         try {
             await usersRef.child(userId).set(newUser);
             currentUser = { ...newUser };
             delete currentUser.password;
-
+            
             localStorage.setItem('revision_user', JSON.stringify(currentUser));
             closeAuthModals();
             document.getElementById('userNameDisplay').innerText = name.split(' ')[0];
-
+            
             showNotification("Welcome!", `Account created successfully, ${name}!`, "success");
             filterAndRenderMaterials();
             updateAccountUI();
@@ -1216,21 +1177,21 @@
     async function loginUser() {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
-
+        
         if (!email || !password) {
             showNotification("Error", "Email and password are required", "error");
             return;
         }
-
+        
         const hashed = sha256(password);
-
+        
         try {
             const snapshot = await usersRef.once('value');
             if (!snapshot.val()) {
                 showNotification("Error", "No users found. Please sign up first.", "error");
                 return;
             }
-
+            
             let found = null;
             for (let key in snapshot.val()) {
                 const u = snapshot.val()[key];
@@ -1239,21 +1200,21 @@
                     break;
                 }
             }
-
+            
             if (found) {
                 currentUser = found;
                 delete currentUser.password;
-
-                if (currentUser.subscription &&
-                    currentUser.subscription.endDate &&
+                
+                if (currentUser.subscription && 
+                    currentUser.subscription.endDate && 
                     new Date(currentUser.subscription.endDate) < new Date()) {
                     currentUser.subscription.active = false;
                 }
-
+                
                 localStorage.setItem('revision_user', JSON.stringify(currentUser));
                 closeAuthModals();
                 document.getElementById('userNameDisplay').innerText = currentUser.name.split(' ')[0];
-
+                
                 showNotification("Logged in", `Welcome back, ${currentUser.name}!`, "success");
                 filterAndRenderMaterials();
                 updateAccountUI();
@@ -1281,8 +1242,8 @@
     }
 
     function requestNotificationPermission() {
-        if ("Notification" in window &&
-            Notification.permission !== "granted" &&
+        if ("Notification" in window && 
+            Notification.permission !== "granted" && 
             Notification.permission !== "denied") {
             Notification.requestPermission();
         }
@@ -1299,23 +1260,23 @@
             document.getElementById('subPlan').innerText = '-';
             return;
         }
-
+        
         document.getElementById('accName').innerText = currentUser.name || '-';
         document.getElementById('accEmail').innerText = currentUser.email || '-';
         document.getElementById('accPhone').innerText = currentUser.phone || '-';
-        document.getElementById('accRegDate').innerText = currentUser.registrationDate ?
+        document.getElementById('accRegDate').innerText = currentUser.registrationDate ? 
             formatDate(currentUser.registrationDate) : '-';
-
+        
         const sub = currentUser.subscription;
         const active = sub && sub.active && sub.endDate && new Date(sub.endDate) > new Date();
-
-        document.getElementById('subStatus').innerHTML = active ?
-            '<span style="color:#10b981;">Active ✅</span>' :
+        
+        document.getElementById('subStatus').innerHTML = active ? 
+            '<span style="color:#10b981;">Active ✅</span>' : 
             '<span style="color:#ef4444;">Inactive ❌</span>';
-
-        document.getElementById('subExpiry').innerText = (sub && sub.endDate && active) ?
+        
+        document.getElementById('subExpiry').innerText = (sub && sub.endDate && active) ? 
             formatDate(sub.endDate) : '-';
-
+        
         document.getElementById('subPlan').innerText = (sub && sub.plan) ? sub.plan : '-';
     }
 
@@ -1324,11 +1285,11 @@
             showNotification("Error", "Please login first", "error");
             return;
         }
-
+        
         const newVal = prompt(`Enter new ${field}:`, currentUser[field] || '');
         if (newVal && newVal.trim() !== "" && newVal.trim() !== currentUser[field]) {
             let finalVal = newVal.trim();
-
+            
             if (field === 'phone') {
                 let phone = finalVal.replace(/^0+/, '').replace(/^\+/, '');
                 if (!phone.startsWith('254')) {
@@ -1340,9 +1301,9 @@
                 }
                 finalVal = phone;
             }
-
+            
             currentUser[field] = finalVal;
-
+            
             usersRef.child(currentUser.id).update({ [field]: finalVal })
                 .then(() => {
                     localStorage.setItem('revision_user', JSON.stringify(currentUser));
@@ -1384,7 +1345,7 @@
             showNotification("Login Required", "Please login to upload", "error");
             return;
         }
-
+        
         const title = document.getElementById('uploadTitle').value.trim();
         const unitCode = document.getElementById('uploadUnitCode').value.trim();
         const university = document.getElementById('uploadUniversity').value;
@@ -1392,17 +1353,17 @@
         const year = document.getElementById('uploadYear').value;
         const description = document.getElementById('uploadDescription').value.trim();
         const url = document.getElementById('uploadURL').value.trim();
-
+        
         if (!title || !unitCode || !url) {
             showNotification("Error", "Title, Unit Code, and URL are required", "error");
             return;
         }
-
+        
         if (!url.includes('/preview') && !url.includes('/view')) {
             showNotification("Error", "URL must be a Google Drive preview link", "error");
             return;
         }
-
+        
         const uploadData = {
             userId: currentUser.id,
             uploader: currentUser.name,
@@ -1416,7 +1377,7 @@
             status: 'pending',
             timestamp: new Date().toISOString()
         };
-
+        
         userUploadsRef.push(uploadData)
             .then(() => {
                 showNotification("Submitted", "Your material has been submitted for review");
@@ -1426,7 +1387,7 @@
                 document.getElementById('uploadSubject').value = '';
                 document.getElementById('uploadDescription').value = '';
                 document.getElementById('uploadURL').value = '';
-
+                
                 sendBrowserNotification("New Upload", `${currentUser.name} uploaded ${title}`);
             })
             .catch(err => {
@@ -1453,10 +1414,10 @@
     function openRequestFormForCurrent() {
         const uni = selectedUniversityFilter !== "all" ? selectedUniversityFilter : "";
         const code = currentSearchQuery || "";
-
+        
         if (uni) document.getElementById('requestUniversity').value = uni;
         if (code) document.getElementById('requestUnitCode').value = code;
-
+        
         openRequestForm();
     }
 
@@ -1465,17 +1426,17 @@
             showNotification("Login Required", "Please login to submit requests", "error");
             return;
         }
-
+        
         const unitCode = document.getElementById('requestUnitCode').value.trim();
         const university = document.getElementById('requestUniversity').value;
         const subject = document.getElementById('requestSubject').value.trim();
         const details = document.getElementById('requestDetails').value.trim();
-
+        
         if (!unitCode) {
             showNotification("Error", "Unit Code is required", "error");
             return;
         }
-
+        
         const requestData = {
             userId: currentUser.id,
             requester: currentUser.name,
@@ -1487,7 +1448,7 @@
             status: 'pending',
             timestamp: new Date().toISOString()
         };
-
+        
         requestsRef.push(requestData)
             .then(() => {
                 showNotification("Request Sent", "Your material request has been submitted");
@@ -1502,29 +1463,29 @@
             });
     }
 
-    // ==================== PAYMENT VERIFICATION ====================
+    // ==================== PAYMENT VERIFICATION (WITH WHATSAPP) ====================
     function submitTransactionCode() {
         if (!currentUser) {
             showNotification("Login Required", "Please create an account or login first.", "error");
             showSignupModal();
             return;
         }
-
+        
         const code = document.getElementById('transactionCodeInput').value.trim().toUpperCase();
         if (!code) {
             showNotification("Missing code", "Please enter the M‑Pesa transaction code.", "error");
             return;
         }
-
+        
         if (code.length < 8) {
             showNotification("Invalid code", "Please enter a valid M‑Pesa transaction code.", "error");
             return;
         }
-
+        
         const planSelect = document.getElementById('mpesaPlanSelect').value;
         const [planName, amountStr] = planSelect.split('|');
         const amount = parseInt(amountStr);
-
+        
         const verificationData = {
             userId: currentUser.id,
             userEmail: currentUser.email,
@@ -1537,21 +1498,23 @@
             status: 'pending'
         };
 
+        // 🔔 Send WhatsApp notification FIRST (popup-safe, user-initiated)
         try {
             sendWhatsAppNotification(buildPaymentMessage(verificationData));
         } catch (e) {
             console.warn("WhatsApp popup blocked:", e);
         }
-
+        
+        // Then save to Firebase
         paymentVerificationsRef.push(verificationData)
             .then(() => {
-                showNotification("Code Submitted",
-                    "Your payment is pending verification. We'll activate your account shortly.",
+                showNotification("Code Submitted", 
+                    "Your payment is pending verification. We'll activate your account shortly.", 
                     "success");
                 document.getElementById('transactionCodeInput').value = '';
                 loadUserVerifications();
-
-                sendBrowserNotification("New Payment",
+                
+                sendBrowserNotification("New Payment", 
                     `${currentUser.name} submitted code ${code} for ${planName}`);
             })
             .catch(err => {
@@ -1562,10 +1525,10 @@
 
     function loadUserVerifications() {
         if (!currentUser) return;
-
+        
         const container = document.getElementById('userVerificationsStatus');
         if (!container) return;
-
+        
         paymentVerificationsRef.orderByChild('userId').equalTo(currentUser.id)
             .once('value')
             .then(snap => {
@@ -1574,16 +1537,16 @@
                     container.innerHTML = '';
                     return;
                 }
-
+                
                 let html = '<h4 style="margin-top:20px; color: var(--primary);">Your Submitted Codes</h4>';
-                const entries = Object.entries(verifications).sort((a, b) =>
+                const entries = Object.entries(verifications).sort((a, b) => 
                     new Date(b[1].timestamp) - new Date(a[1].timestamp)
                 );
-
+                
                 for (let [id, v] of entries) {
                     let statusClass = 'verification-pending';
                     let statusIcon = '⏳';
-
+                    
                     if (v.status === 'approved') {
                         statusClass = 'verification-approved';
                         statusIcon = '✅';
@@ -1591,7 +1554,7 @@
                         statusClass = 'verification-rejected';
                         statusIcon = '❌';
                     }
-
+                    
                     html += `
                         <div style="margin:8px 0; padding:12px; border:1px solid #e2e8f0; border-radius:8px; background: white;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1604,7 +1567,7 @@
                             </div>
                         </div>`;
                 }
-
+                
                 container.innerHTML = html;
             });
     }
@@ -1613,15 +1576,14 @@
     function adminLoginFn() {
         const pwd = document.getElementById('adminPass').value;
         if (pwd === "walter.zauko23") {
-            isAdminSession = true;
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('adminPass').value = '';
-
+            
             loadAdminMaterials();
             loadPendingUploads();
             loadPendingPayments();
             showAdminSection('materials');
-
+            
             showNotification("Admin Access", "Welcome to the admin panel", "success");
         } else {
             showNotification("Access Denied", "Incorrect admin password", "error");
@@ -1629,63 +1591,59 @@
     }
 
     function adminLogoutFn() {
-        isAdminSession = false;
         document.getElementById('adminPanel').style.display = 'none';
         document.getElementById('adminPass').value = '';
-        const bs = document.getElementById('backupStatus');
-        if (bs) bs.innerHTML = '';
         showNotification("Logged out", "Admin session ended");
     }
 
     function showAdminSection(section) {
-        document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.admin-section').forEach(s => {
+            s.classList.remove('active');
+        });
+        
         const sectionMap = {
             'materials': 'materialsSection',
             'uploads': 'uploadsSection',
             'jsonUpload': 'jsonUploadSection',
-            'payments': 'paymentsSection',
-            'backup': 'backupSection'
+            'payments': 'paymentsSection'
         };
-        const target = document.getElementById(sectionMap[section]);
-        if (target) target.classList.add('active');
+        
+        const targetSection = document.getElementById(sectionMap[section]);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
+        
         if (section === 'materials') loadAdminMaterials();
         if (section === 'uploads') loadPendingUploads();
         if (section === 'payments') loadPendingPayments();
-        if (section === 'backup') {
-            documentsRef.once('value').then(snap => {
-                const el = document.getElementById('backupDocCount');
-                if (el) el.innerText = snap.val() ? Object.keys(snap.val()).length : 0;
-            });
-            renderBackupHistory();
-        }
     }
 
     function loadAdminMaterials() {
         documentsRef.once('value').then(snap => {
             const container = document.getElementById('adminMaterialsList');
             if (!container) return;
-
+            
             if (!snap.val()) {
                 container.innerHTML = '<p style="text-align: center; color: #64748b;">No materials in database.</p>';
                 return;
             }
-
+            
             adminDocumentsCache = {};
             const entries = Object.entries(snap.val());
-
+            
             entries.forEach(([key, value]) => {
                 adminDocumentsCache[key] = value;
             });
-
+            
             document.getElementById('adminTotalDocs').innerText = entries.length;
-
+            
             container.innerHTML = entries.map(([id, doc]) => `
                 <div class="admin-list-item">
                     <div style="flex: 1; min-width: 200px;">
                         <strong>${escapeHtml(doc.Title)}</strong><br>
                         <small style="color: #64748b;">
-                            ${escapeHtml(doc["Unit Code"] || 'N/A')} |
-                            ${escapeHtml(doc.University || 'N/A')} |
+                            ${escapeHtml(doc["Unit Code"] || 'N/A')} | 
+                            ${escapeHtml(doc.University || 'N/A')} | 
                             Year ${escapeHtml(doc.Year || 'N/A')}
                         </small>
                     </div>
@@ -1715,7 +1673,7 @@
         if (!confirm('Are you sure you want to delete this material? This action cannot be undone.')) {
             return;
         }
-
+        
         documentsRef.child(docId).remove()
             .then(() => {
                 showNotification("Deleted", "Material has been deleted successfully");
@@ -1733,28 +1691,28 @@
     function addMaterialAdmin() {
         const title = prompt("Enter document title:");
         if (!title) return;
-
+        
         const unitCode = prompt("Enter unit code (e.g., AGRO222):");
         if (!unitCode) return;
-
+        
         const university = prompt("Enter university:", ALL_INSTITUTIONS[0]);
         if (!university) return;
-
+        
         const subject = prompt("Enter subject:");
         if (!subject) return;
-
+        
         const year = prompt("Enter year:", "2");
         if (!year) return;
-
+        
         const description = prompt("Enter description:");
         const url = prompt("Enter Google Drive preview URL:");
         if (!url) return;
-
+        
         if (!url.includes('/preview') && !url.includes('/view')) {
             showNotification("Error", "URL must be a Google Drive preview link", "error");
             return;
         }
-
+        
         const newDoc = {
             Title: title,
             "Unit Code": unitCode,
@@ -1764,7 +1722,7 @@
             Description: description || '',
             URL: url
         };
-
+        
         documentsRef.push(newDoc)
             .then(() => {
                 showNotification("Added", "Material added successfully");
@@ -1783,19 +1741,19 @@
         userUploadsRef.once('value').then(snap => {
             const container = document.getElementById('pendingUploadsList');
             if (!container) return;
-
+            
             if (!snap.val()) {
                 container.innerHTML = '<p style="text-align: center; color: #64748b;">No pending uploads.</p>';
                 return;
             }
-
+            
             const uploads = Object.entries(snap.val()).filter(([id, up]) => up.status === 'pending');
-
+            
             if (uploads.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #64748b;">No pending uploads.</p>';
                 return;
             }
-
+            
             container.innerHTML = uploads.map(([id, up]) => `
                 <div class="admin-list-item">
                     <div style="flex: 1; min-width: 200px;">
@@ -1823,7 +1781,7 @@
         userUploadsRef.child(uploadId).once('value').then(snap => {
             const up = snap.val();
             if (!up) return;
-
+            
             const newDoc = {
                 Title: up.title,
                 "Unit Code": up.unitCode,
@@ -1833,7 +1791,7 @@
                 URL: up.url,
                 Description: up.description || ''
             };
-
+            
             documentsRef.push(newDoc)
                 .then(() => {
                     userUploadsRef.child(uploadId).remove();
@@ -1841,12 +1799,12 @@
                     loadPendingUploads();
                     loadAdminMaterials();
                     showNotification("Approved", "Material added to library");
-
+                    
                     if (up.userId) {
                         usersRef.child(up.userId).once('value').then(userSnap => {
                             const user = userSnap.val();
                             if (user && user.email) {
-                                sendBrowserNotification("Material Approved",
+                                sendBrowserNotification("Material Approved", 
                                     `Your upload "${up.title}" has been approved and is now live!`);
                             }
                         });
@@ -1857,19 +1815,19 @@
 
     function rejectUpload(uploadId) {
         if (!confirm('Are you sure you want to reject this upload?')) return;
-
+        
         userUploadsRef.child(uploadId).once('value').then(snap => {
             const up = snap.val();
-
+            
             userUploadsRef.child(uploadId).remove();
             loadPendingUploads();
             showNotification("Rejected", "Upload has been rejected");
-
+            
             if (up && up.userId) {
                 usersRef.child(up.userId).once('value').then(userSnap => {
                     const user = userSnap.val();
                     if (user && user.email) {
-                        sendBrowserNotification("Material Rejected",
+                        sendBrowserNotification("Material Rejected", 
                             `Your upload "${up.title}" was not approved. Please check guidelines.`);
                     }
                 });
@@ -1880,24 +1838,24 @@
     function loadPendingPayments() {
         const container = document.getElementById('pendingPaymentsList');
         if (!container) return;
-
+        
         paymentVerificationsRef.once('value').then(snap => {
             const verifications = snap.val();
-
+            
             if (!verifications) {
                 container.innerHTML = '<p style="text-align: center; color: #64748b;">No payment verifications yet.</p>';
                 return;
             }
-
+            
             const entries = Object.entries(verifications)
                 .filter(([id, v]) => v.status === 'pending')
                 .sort((a, b) => new Date(b[1].timestamp) - new Date(a[1].timestamp));
-
+            
             if (entries.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #64748b;">No pending verifications.</p>';
                 return;
             }
-
+            
             container.innerHTML = entries.map(([id, v]) => `
                 <div class="admin-list-item">
                     <div style="flex: 1; min-width: 200px;">
@@ -1923,16 +1881,16 @@
 
     function approvePayment(verificationId) {
         if (!confirm('Approve this payment and activate subscription?')) return;
-
+        
         paymentVerificationsRef.child(verificationId).once('value').then(snap => {
             const v = snap.val();
             if (!v) return;
-
+            
             const userId = v.userId;
             const planName = v.planName;
             const durationDays = planName.includes('2') ? 60 : 120;
             const endDate = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
-
+            
             usersRef.child(userId).update({
                 'subscription/active': true,
                 'subscription/endDate': endDate,
@@ -1942,7 +1900,7 @@
                     status: 'approved',
                     processedDate: new Date().toISOString()
                 });
-
+                
                 if (currentUser && currentUser.id === userId) {
                     currentUser.subscription.active = true;
                     currentUser.subscription.endDate = endDate;
@@ -1951,12 +1909,12 @@
                     updateAccountUI();
                     filterAndRenderMaterials();
                 }
-
+                
                 showNotification("Approved", `Subscription activated for ${v.userName}`);
                 loadPendingPayments();
                 loadUserVerifications();
-
-                sendBrowserNotification("Subscription Activated",
+                
+                sendBrowserNotification("Subscription Activated", 
                     `Your ${planName} access is now active until ${formatDate(endDate)}.`);
             }).catch(err => {
                 showNotification("Error", "Approval failed", "error");
@@ -1967,7 +1925,7 @@
 
     function rejectPayment(verificationId) {
         if (!confirm('Reject this payment verification?')) return;
-
+        
         paymentVerificationsRef.child(verificationId).update({
             status: 'rejected',
             processedDate: new Date().toISOString()
@@ -1989,7 +1947,7 @@
             "Description": "Complete lecture notes on plant breeding",
             "URL": "https://drive.google.com/file/d/.../preview"
         }], null, 2);
-
+        
         navigator.clipboard.writeText(template).then(() => {
             showNotification("Copied", "JSON template copied to clipboard");
         }).catch(() => {
@@ -2000,25 +1958,25 @@
     function handleJSONFileSelect(event) {
         const file = event.target.files[0];
         if (!file) return;
-
+        
         if (!file.name.endsWith('.json')) {
             showNotification("Error", "Please select a JSON file", "error");
             return;
         }
-
+        
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-
+                
                 if (!Array.isArray(data)) {
                     throw new Error("JSON must be an array");
                 }
-
+                
                 if (data.length === 0) {
                     throw new Error("JSON array is empty");
                 }
-
+                
                 data.forEach((item, index) => {
                     if (!item.Title || !item["Unit Code"] || !item.University || !item.URL) {
                         throw new Error(`Item ${index + 1} is missing required fields (Title, Unit Code, University, URL)`);
@@ -2027,9 +1985,9 @@
                         throw new Error(`Item ${index + 1} URL must be a Google Drive preview link`);
                     }
                 });
-
+                
                 pendingJSON = data;
-
+                
                 const infoDiv = document.getElementById('jsonFileInfo');
                 infoDiv.style.display = 'block';
                 infoDiv.innerHTML = `
@@ -2040,16 +1998,16 @@
                         <i class="fas fa-times"></i> Clear
                     </button>
                 `;
-
+                
                 document.getElementById('uploadJSONBtn').disabled = false;
                 showJSONPreview(data);
-
+                
             } catch (err) {
                 showNotification("Error", err.message, "error");
                 clearJSONFile();
             }
         };
-
+        
         reader.readAsText(file);
     }
 
@@ -2065,12 +2023,12 @@
         const previewSection = document.getElementById('jsonPreviewSection');
         const previewDiv = document.getElementById('jsonPreview');
         const statsDiv = document.getElementById('jsonStats');
-
+        
         previewSection.style.display = 'block';
-
+        
         const universities = new Set(data.map(d => d.University));
         const unitCodes = new Set(data.map(d => d["Unit Code"]));
-
+        
         statsDiv.innerHTML = `
             <div class="json-stats-grid">
                 <div class="json-stat-item">
@@ -2091,7 +2049,7 @@
                 </div>
             </div>
         `;
-
+        
         previewDiv.innerHTML = '<h5 style="margin-bottom: 10px;">Preview (first 3 items):</h5>' +
             data.slice(0, 3).map((item, i) => `
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 8px;">
@@ -2099,7 +2057,7 @@
                     <small>${escapeHtml(item["Unit Code"])} | ${escapeHtml(item.University)} | Year ${escapeHtml(item.Year || 'N/A')}</small>
                 </div>
             `).join('');
-
+        
         if (data.length > 3) {
             previewDiv.innerHTML += `<p style="color: #64748b; font-size: 13px;">... and ${data.length - 3} more documents</p>`;
         }
@@ -2110,11 +2068,11 @@
             showNotification("Error", "No JSON data to upload", "error");
             return;
         }
-
+        
         const uploadBtn = document.getElementById('uploadJSONBtn');
         uploadBtn.disabled = true;
         uploadBtn.innerHTML = '<span class="payment-loading"></span> Uploading...';
-
+        
         try {
             const promises = pendingJSON.map(doc => {
                 const formattedDoc = {
@@ -2128,9 +2086,9 @@
                 };
                 return documentsRef.push(formattedDoc);
             });
-
+            
             await Promise.all(promises);
-
+            
             showNotification("Success", `${pendingJSON.length} documents uploaded successfully!`);
             clearJSONFile();
             loadDocuments();
@@ -2138,7 +2096,7 @@
             renderUniversityFilters();
             filterAndRenderMaterials();
             updateStats();
-
+            
         } catch (err) {
             showNotification("Error", "Upload failed: " + err.message, "error");
             console.error("JSON upload error:", err);
@@ -2146,112 +2104,6 @@
             uploadBtn.disabled = false;
             uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload & Process JSON';
         }
-    }
-
-    // ==================== DEVICE BACKUP (ADMIN ONLY) ====================
-    async function saveBackupToDevice(asCSV = false) {
-        // ADMIN GUARD
-        if (!isAdminSession) {
-            showNotification("Access Denied", "Admin login required for backups", "error");
-            return;
-        }
-
-        const status = document.getElementById('backupStatus');
-        try {
-            status.innerHTML = '<span class="payment-loading"></span> Fetching documents...';
-
-            const snap = await documentsRef.once('value');
-            const data = snap.val() || {};
-            const entries = Object.entries(data);
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-
-            let blob, filename;
-
-            if (asCSV) {
-                const headers = ['Title', 'Unit Code', 'University', 'Subject', 'Year', 'Description', 'URL'];
-                const escapeCSV = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-                const rows = entries.map(([id, doc]) =>
-                    headers.map(h => escapeCSV(doc[h] || '')).join(',')
-                );
-                const csv = headers.join(',') + '\n' + rows.join(',');
-                blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                filename = `revisionvault_docs_${timestamp}.csv`;
-            } else {
-                const payload = {
-                    exportedAt: new Date().toISOString(),
-                    project: "cramio-51e4d",
-                    exportedBy: "admin",
-                    totalDocuments: entries.length,
-                    documents: entries.map(([id, doc]) => ({ id, ...doc }))
-                };
-                blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-                filename = `revisionvault_docs_${timestamp}.json`;
-            }
-
-            triggerDeviceDownload(blob, filename);
-
-            const history = JSON.parse(localStorage.getItem('backupHistory') || '[]');
-            history.unshift({
-                filename,
-                totalDocuments: entries.length,
-                sizeBytes: blob.size,
-                type: asCSV ? 'CSV' : 'JSON',
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem('backupHistory', JSON.stringify(history.slice(0, 20)));
-
-            status.innerHTML = `<span style="color:#059669;">
-                <i class="fas fa-check-circle"></i> Saved <strong>${filename}</strong> (${entries.length} docs, ${formatBytes(blob.size)}).
-                <br><small>Check your Downloads / Files app.</small></span>`;
-            showNotification("Backup Saved", `${entries.length} documents saved to device`);
-            renderBackupHistory();
-
-        } catch (err) {
-            console.error("Backup error:", err);
-            status.innerHTML = `<span style="color:#ef4444;"><i class="fas fa-exclamation-circle"></i> Backup failed: ${err.message}</span>`;
-            showNotification("Backup Failed", err.message, "error");
-        }
-    }
-
-    function triggerDeviceDownload(blob, filename) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.rel = 'noopener';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-
-        setTimeout(() => {
-            if (blob.size > 0 && /wv|FBAN|FBAV|Instagram|Line/i.test(navigator.userAgent)) {
-                window.open(url, '_blank');
-            }
-        }, 500);
-    }
-
-    function renderBackupHistory() {
-        if (!isAdminSession) return;
-        const container = document.getElementById('backupHistoryList');
-        if (!container) return;
-        const history = JSON.parse(localStorage.getItem('backupHistory') || '[]');
-        if (history.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#64748b;">No backups yet.</p>';
-            return;
-        }
-        container.innerHTML = history.map(b => `
-            <div class="admin-list-item">
-                <div style="flex:1; min-width:200px;">
-                    <strong>${escapeHtml(b.filename)}</strong><br>
-                    <small style="color:#64748b;">
-                        ${b.type || 'JSON'} · ${b.totalDocuments} docs · ${formatBytes(b.sizeBytes || 0)}<br>
-                        ${formatDate(b.timestamp)}
-                    </small>
-                </div>
-                <span class="verification-approved" style="padding:4px 10px;">Saved</span>
-            </div>`).join('');
     }
 
     // ==================== SETTINGS & UI ====================
@@ -2356,12 +2208,12 @@
 
     function showTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-
+        
         const targetTab = document.getElementById(tabId);
         if (targetTab) {
             targetTab.classList.add('active');
         }
-
+        
         const tabNavMap = {
             'home': 0,
             'subscribe': 1,
@@ -2369,17 +2221,17 @@
             'admin': 3,
             'settings': 4
         };
-
+        
         document.querySelectorAll('.nav-btn').forEach((btn, i) => {
             btn.classList.remove('active');
             if (tabNavMap[tabId] === i) {
                 btn.classList.add('active');
             }
         });
-
+        
         if (tabId === 'account') updateAccountUI();
         if (tabId === 'subscribe') loadUserVerifications();
-
+        
         const mainContent = document.querySelector('.main-content');
         if (mainContent) mainContent.scrollTop = 0;
     }
@@ -2389,16 +2241,16 @@
         if (saved) {
             try {
                 currentUser = JSON.parse(saved);
-
-                if (currentUser.subscription &&
-                    currentUser.subscription.endDate &&
+                
+                if (currentUser.subscription && 
+                    currentUser.subscription.endDate && 
                     new Date(currentUser.subscription.endDate) < new Date()) {
                     currentUser.subscription.active = false;
                 }
-
-                document.getElementById('userNameDisplay').innerText =
+                
+                document.getElementById('userNameDisplay').innerText = 
                     currentUser.name ? currentUser.name.split(' ')[0] : 'User';
-
+                
                 filterAndRenderMaterials();
                 updateAccountUI();
                 loadUserVerifications();
@@ -2421,30 +2273,30 @@
             const themeSelect = document.getElementById('themeSelect');
             if (themeSelect) themeSelect.value = 'dark';
         }
-
+        
         const pushPref = localStorage.getItem('pushEnabled');
         const pushToggle = document.getElementById('pushToggle');
         if (pushPref === 'true' && pushToggle) {
             pushToggle.checked = true;
         }
-
+        
         loadDocuments();
         checkExistingSession();
-
+        
         const searchInput = document.getElementById('globalSearchInput');
         if (searchInput) {
             searchInput.addEventListener('input', searchByUnitCode);
         }
-
+        
         setInterval(() => {
-            if (currentUser &&
-                currentUser.subscription &&
+            if (currentUser && 
+                currentUser.subscription && 
                 currentUser.subscription.endDate) {
-
+                
                 const expiryDate = new Date(currentUser.subscription.endDate);
                 const now = new Date();
                 const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-
+                
                 if (daysLeft <= 3 && daysLeft > 0) {
                     const reminderKey = 'reminder_sent_' + currentUser.id;
                     if (!localStorage.getItem(reminderKey)) {
@@ -2455,7 +2307,7 @@
                         localStorage.setItem(reminderKey, 'true');
                     }
                 }
-
+                
                 if (expiryDate < now && currentUser.subscription.active) {
                     currentUser.subscription.active = false;
                     localStorage.setItem('revision_user', JSON.stringify(currentUser));
@@ -2467,7 +2319,7 @@
                 }
             }
         }, 3600000);
-
+        
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeModal();
@@ -2475,14 +2327,14 @@
                 closeTermsModal();
                 closeUploadModal();
                 closeRequestModal();
-
+                
                 ['aboutModal', 'contactModal', 'deleteInstructionsModal', 'faqModal'].forEach(id => {
                     const modal = document.getElementById(id);
                     if (modal) modal.style.display = 'none';
                 });
             }
         });
-
+        
         document.querySelectorAll('.settings-modal-overlay, .terms-overlay, .login-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -2490,7 +2342,7 @@
                 }
             });
         });
-
+        
         console.log('RevisionVault Pro initialized successfully');
     }
 
@@ -2546,9 +2398,6 @@
     window.loadPendingPayments = loadPendingPayments;
     window.sendWhatsAppNotification = sendWhatsAppNotification;
     window.buildPaymentMessage = buildPaymentMessage;
-    window.saveBackupToDevice = saveBackupToDevice;
-    window.triggerDeviceDownload = triggerDeviceDownload;
-    window.renderBackupHistory = renderBackupHistory;
 
     document.addEventListener("DOMContentLoaded", init);
 </script>
